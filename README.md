@@ -9,6 +9,10 @@
 | 215983 | **Adrián Rivas Escárcega** |
 | 222835 | **Anna Lizbeth Barajas Sandoval** |
 
+## Arquitectura de Software
+<img width="1412" height="1412" alt="image" src="https://github.com/user-attachments/assets/a46375c6-9552-440d-bc4e-317a409dbf4a" />
+
+
 ## ⚙️ Tecnologías Utilizadas
 
 <p align="center">
