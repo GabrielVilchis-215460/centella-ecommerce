@@ -1,0 +1,79 @@
+# bilchis
+import json
+from typing import List
+#from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    # Datos de la app
+    APP_NAME: str = "Centella E-Commerce API"
+    APP_VERSION: str = "1.0.0"
+    DEBUG: bool = False
+
+    # BD
+    DATABASE_URL: str
+
+    # API de envios
+    SKYDROPX_API: str
+    SKYDROPX_SECRET_API: str
+
+    # Stripe
+    STRIPE_API: str
+    STRIPE_SECRET_API: str
+
+    # CloudFlare bucket
+    BUCKET_NAME: str
+    BUCKET_API: str
+
+    # Paypal
+    PAYPAL_SECRET_API: str
+    PAYPAL_CLIENT_ID: str
+    PAYPAL_API_BASE_URL: str
+
+    # Conekta
+    CONEKTA_API: str
+
+    # CORS
+    BACKEND_CORS_ORIGINS: List[str] = [] # localhost y los urls de app del backend y front desplegados
+    #APP_URL: str # url del front desplegado
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore"
+    )
+    """
+    Funcion para verificar el estado de las variables de entorno, solo se ejecuta si DEBUG esta en true
+    """
+    def print_debug_info(self):
+        print("\n" + "="*50)
+        # Estado del debug
+        print(f"DEBUG INFO - {self.APP_NAME} v{self.APP_VERSION}")
+        print("="*50)
+        # Info de la app
+        #print(f"App URL: {self.APP_URL}")
+        # Info de los origines del CORS
+        print(f"CORS: {self.BACKEND_CORS_ORIGINS}")
+        # Api de envio    
+        print("\n Api de Skydropx:")
+        print(f"   API Key: {'✓' if self.SKYDROPX_API else '✗'}")
+        print(f"   Secret:  {'✓' if self.SKYDROPX_SECRET_API else '✗'}")
+        # Apis de pagos    
+        print("\n Apis de pagos (Stripe, PayPal, Conekta):")
+        print(f"   Stripe API:    {'✓' if self.STRIPE_API else '✗'}")
+        print(f"   PayPal Client: {'✓' if self.PAYPAL_CLIENT_ID else '✗'}")
+        print(f"   Conekta API:   {'✓' if self.CONEKTA_API else '✗'}")
+        # Bucket de cloudflare 
+        print("\nCloudFlare bucket:")
+        print(f"   Bucket: {self.BUCKET_NAME}")
+        print(f"   API:    {'✓' if self.BUCKET_API else '✗'}")
+        # Base de datos
+        print("\n Base de datos:")
+        db_preview = self.DATABASE_URL[:25] + "..." if self.DATABASE_URL else "✗ NO DEFINIDA"
+        print(f"   URL: {db_preview}")
+        print("="*50 + "\n")
+
+
+# Instancia global de configuracion
+settings = Settings()
