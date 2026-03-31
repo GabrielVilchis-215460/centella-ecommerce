@@ -40,7 +40,6 @@ class MetodoPagoEnum(str, Enum):
     stripe = "stripe"
     paypal = "paypal"
     conekta_spei = "conekta_spei"
-    conekta_oxxo = "conekta_oxxo"
  
 class TipoContenidoReporteEnum(str, Enum):
     producto = "producto"
