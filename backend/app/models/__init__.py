@@ -1,6 +1,6 @@
 from . enum import *
 from .usuario import Usuario
-from .emprendedora import Vendedora
+from .emprendedora import Emprendedora
 from .pagina_emprendimiento import PaginaEmprendimiento
 from .direccion import Direccion
 from .categoria import Categoria
@@ -18,7 +18,7 @@ from .reporte import Reporte
 __all__ = [
     # Modelos
     "Usuario",
-    "Vendedora",
+    "Emprendedora",
     "PaginaEmprendimiento",
     "Direccion",
     "Categoria",

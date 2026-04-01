@@ -11,7 +11,7 @@ class Pedido(Base):
 
     id_pedido: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_cliente: Mapped[int] = mapped_column(ForeignKey("usuario.id_usuario"), nullable=False)
-    id_emprendedora: Mapped[int] = mapped_column(ForeignKey("vendedora.id_vendedora"), nullable=False)
+    id_emprendedora: Mapped[int] = mapped_column(ForeignKey("emprendedora.id_emprendedora"), nullable=False)
     fecha_pedido: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     estado: Mapped[EstadoPedidoEnum] = mapped_column(Enum(EstadoPedidoEnum), nullable=False)
     subtotal: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
@@ -24,6 +24,6 @@ class Pedido(Base):
 
     # Relationships
     cliente: Mapped["Usuario"] = relationship(back_populates="pedidos", foreign_keys=[id_cliente])
-    emprendedora: Mapped["Emprendedora"] = relationship(back_populates="pedidos", foreign_keys=[id_vendedora])
+    emprendedora: Mapped["Emprendedora"] = relationship(back_populates="pedidos", foreign_keys=[id_emprendedora])
     direccion_envio: Mapped[Optional["Direccion"]] = relationship(back_populates="pedidos")
     items: Mapped[list["ItemPedido"]] = relationship(back_populates="pedido")
