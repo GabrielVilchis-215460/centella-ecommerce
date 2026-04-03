@@ -22,5 +22,5 @@ class Emprendedora(Base):
     pagina: Mapped[Optional["PaginaEmprendimiento"]] = relationship(back_populates="emprendedora", uselist=False)
     productos: Mapped[list["Producto"]] = relationship(back_populates="emprendedora")
     servicios: Mapped[list["Servicio"]] = relationship(back_populates="emprendedora")
-    pedidos: Mapped[list["Pedido"]] = relationship(back_populates="emprendedora", foreign_keys="Pedido.id_vendedora")
-    resenas: Mapped[list["Resena"]] = relationship(back_populates="emprendedora", foreign_keys="Resena.id_vendedora")
+    pedidos: Mapped[list["Pedido"]] = relationship(back_populates="emprendedora", foreign_keys="Pedido.id_emprendedora")
+    resenas: Mapped[list["Resena"]] = relationship(back_populates="emprendedora", foreign_keys="Resena.id_emprendedora")
