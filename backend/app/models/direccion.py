@@ -14,6 +14,7 @@ class Direccion(Base):
     colonia: Mapped[str] = mapped_column(String(100), nullable=False)
     ciudad: Mapped[str] = mapped_column(String(100), nullable=False)
     estado: Mapped[str] = mapped_column(String(100), nullable=False)
+    numero_telefonico: Mapped[str] = mapped_column(String(20), nullable=False)
     codigo_postal: Mapped[str] = mapped_column(String(10), nullable=False)
     es_principal:  Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
