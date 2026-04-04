@@ -5,11 +5,13 @@ from app.api.v1.Envios.schemas import (
 from app.models.pedido import Pedido
 from app.models.enum import EstadoPedidoEnum
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, session
+#from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
+from app.core.database import get_db
+from fastapi import Depends
 
-async def cotizar(body: CotizarRequest):
+async def servicio_cotizar(body: CotizarRequest):
     """
     Funcion para obtener las tarifas disponibles para la ruta del cliente.
     """
@@ -47,12 +49,12 @@ async def cotizar_mas_barato(destino: dict, paquete: dict, carrier: str):
     )
     return min(tarifas, key=lambda t: float(t["totalPrice"]))
 
-async def service_asignar_envio(pedido_id: int, carrier: str, service: str, db: AsyncSession):
+async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
     """
     Funcion que genera la etiqueta a partir de un pedido existente en la BD y guarda el numero de rastreo y costo de envio
     """
     # busca pedido por su direccion y cliente
-    result = await db.execute(
+    query = (
         select(Pedido)
         .options(
             selectinload(Pedido.direccion_envio),
@@ -60,7 +62,8 @@ async def service_asignar_envio(pedido_id: int, carrier: str, service: str, db: 
         )
         .where(Pedido.id_pedido == pedido_id)
     )
-    pedido = result.scalar_one_or_none()
+    result = db.execute(query)
+    pedido = result.scalars().first()
 
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado.")
@@ -108,21 +111,13 @@ async def service_asignar_envio(pedido_id: int, carrier: str, service: str, db: 
         service=mejor_tarifa["service"],
     )
 
-    # Llamar a Envia
-    resultado = await envia_service.generar_etiqueta(
-        destino=destino,
-        paquete=paquete,
-        carrier=carrier,
-        service=service,
-    )
-
     # Guardar solo numero_rastreo y costo_envio en BD
     pedido.numero_rastreo = resultado["tracking_number"]
     pedido.costo_envio = resultado["total_price"]
     pedido.estado = EstadoPedidoEnum.enviado # se cambia el estado para que la emprendedora interactue con el estado del pedido
 
-    await db.commit()
-    await db.refresh(pedido)
+    db.commit()
+    db.refresh(pedido)
 
     return {
         "pedido_id": pedido.id_pedido,

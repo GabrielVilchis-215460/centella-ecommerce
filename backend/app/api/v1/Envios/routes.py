@@ -6,9 +6,9 @@ from app.api.v1.Envios.schemas import (
     TrackingResponse
 )
 from app.api.v1.Envios.service import (
-    service_cotizar,
-    service_generar_etiqueta,
-    service_rastrear,
+    servicio_cotizar,
+    servicio_generar_etiqueta,
+    rastrear_pedido,
     service_asignar_envio
 )
 
@@ -22,7 +22,7 @@ async def cotizar(body: CotizarRequest):
     """
     Retorna tarifas de envío disponibles para la dirección del cliente.
     """
-    tarifas = await service_cotizar(body)
+    tarifas = await servicio_cotizar(body)
     return {"tarifas": tarifas}
 
 
@@ -31,7 +31,7 @@ async def generar_etiqueta(body: GenerarEtiquetaRequest):
     """
     Genera la etiqueta de envío y retorna el tracking number.
     """
-    return await service_generar_etiqueta(body)
+    return await servicio_generar_etiqueta(body)
 
 
 @router.get("/rastrear/{tracking_number}", response_model=TrackingResponse)
@@ -39,7 +39,7 @@ async def rastrear(tracking_number: str):
     """
     Retorna el estado y eventos del envío.
     """
-    return await service_rastrear(tracking_number)
+    return await rastrear_pedido(tracking_number)
 
 @router.post("/asignar-envio")
 async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db)):
