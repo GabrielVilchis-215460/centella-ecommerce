@@ -14,8 +14,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # API de envios
-    SKYDROPX_API: str
-    SKYDROPX_SECRET_API: str
+    ENVIA_BASE_URL: str
+    ENVIA_API_KEY: str
+    STORE_NAME: str
+    STORE_PHONE: str
+    STORE_STREET: str
+    STORE_CITY: str
+    STORE_STATE: str
+    STORE_COUNTRY: str
+    STORE_POSTAL_CODE: str
+    STORE_NUMBER: str
 
     # Stripe
     STRIPE_API: str
@@ -56,9 +64,8 @@ class Settings(BaseSettings):
         # Info de los origines del CORS
         print(f"CORS: {self.BACKEND_CORS_ORIGINS}")
         # Api de envio    
-        print("\n Api de Skydropx:")
-        print(f"   API Key: {'✓' if self.SKYDROPX_API else '✗'}")
-        print(f"   Secret:  {'✓' if self.SKYDROPX_SECRET_API else '✗'}")
+        print("\n Api de Envia.com:")
+        print(f"   API Key: {'✓' if self.ENVIA_API_KEY else '✗'}")
         # Apis de pagos    
         print("\n Apis de pagos (Stripe, PayPal, Conekta):")
         print(f"   Stripe API:    {'✓' if self.STRIPE_API else '✗'}")
