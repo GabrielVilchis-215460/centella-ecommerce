@@ -5,6 +5,7 @@ class DireccionSchema(BaseModel):
     name: str = Field(..., example="Juan Pérez")
     phone: str = Field(..., example="6561111111")
     street: str = Field(..., example="Av. Tecnológico")
+    number: str = Field(..., example="314")
     city: str = Field(..., example="Ciudad Juárez")
     state: str = Field(..., example="CHH")
     country: str = Field(default="MX", example="MX")
