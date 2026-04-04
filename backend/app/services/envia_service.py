@@ -49,13 +49,13 @@ class EnviaService:
 
     async def cotizar_envio(self, destino: dict, paquete: dict, carrier: str):
         payload = {
-            "origin": self.origen,
+            "origin": self.origin,
             "destination": destino,
-            "packages": [self._build_package_payload(paquete)],
+            "packages": [self.build_payload(paquete)],
             "shipment": {"type": 1, "carrier": carrier},
         }
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.post(f"{self.BASE_URL}/ship/rate/", json=payload, headers=self.headers)
+            response = await client.post(f"{self.base_url}/ship/rate/", json=payload, headers=self.headers)
 
         data = self.handle_response(response, "cotizar envío")
         tarifas = data.get("data", [])
@@ -81,12 +81,12 @@ class EnviaService:
             },
         }
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.post(f"{self.BASE_URL}/ship/generate/", json=payload, headers=self.headers)
+            response = await client.post(f"{self.base_url}/ship/generate/", json=payload, headers=self.headers)
         
         print("STATUS:", response.status_code)
         print("RESPONSE RAW:", response.text)
 
-        data = self._handle_response(response, "generar etiqueta")
+        data = self.handle_response(response, "generar etiqueta")
         result = data.get("data", [{}])[0]
 
         return {
@@ -102,12 +102,12 @@ class EnviaService:
     async def rastrear_envio(self, tracking_number: str) -> dict:
         async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(
-                f"{self.BASE_URL}/ship/generaltrack/",
+                f"{self.base_url}/ship/generaltrack/",
                 json={"trackingNumbers": [tracking_number]},
                 headers=self.headers,
             )
 
-        data = self._handle_response(response, "rastrear envío")
+        data = self.handle_response(response, "rastrear envío")
         resultados = data.get("data", [])
 
         if not resultados:
