@@ -4,6 +4,7 @@ from app.core.database import get_db
 from . import service, schemas
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
+# falta endpoint para vaciar el carrito manualmente
 
 @router.get("/", response_model=schemas.Carrito)
 def leer_carrito(id_usuario: int, db: Session = Depends(get_db)):
@@ -27,3 +28,73 @@ def quitar_producto(id_item: int, db: Session = Depends(get_db)):
     if not item_eliminado:
         raise HTTPException(status_code=404, detail="Item no encontrado")
     return {"message": "Producto eliminado del carrito"}
+
+@router.patch("/items/{id_item}", response_model=schemas.ItemCarrito)
+def actualizar_item(
+    id_item: int,
+    datos: schemas.ItemCarritoUpdate,
+    db: Session = Depends(get_db),
+):
+    """Actualiza la cantidad de un item existente."""
+    from app.models import ItemCarrito as ItemCarritoModel
+    db_item = db.query(ItemCarritoModel).filter(
+        ItemCarritoModel.id_item == id_item
+    ).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Item no encontrado.")
+
+    update_data = datos.model_dump(exclude_unset=True)
+    for campo, valor in update_data.items():
+        setattr(db_item, campo, valor)
+
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+@router.get("/totales", response_model=schemas.TotalesCarrito)
+def obtener_totales(id_usuario: int, db: Session = Depends(get_db)):
+    """Calcula subtotales por item y el total general del carrito."""
+    carrito = service.get_carrito_by_usuario(db, id_usuario)
+    return service.calcular_totales(db, carrito.id_carrito)
+
+
+@router.post("/checkout", response_model=schemas.CheckoutResponse, status_code=201)
+def finalizar_compra(
+    id_usuario: int,
+    checkout: schemas.CheckoutRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Valida stock y tipo de entrega, descuenta inventario, genera un pedido
+    por emprendedora y vacía el carrito.
+
+    El request debe incluir el método de pago, la dirección de envío
+    (si algún item requiere envío) y la selección de tipo de entrega
+    por cada item del carrito.
+    """
+    pedidos = service.convertir_a_pedido(db, id_usuario, checkout)
+
+    resumenes = [
+        schemas.PedidoResumen(
+            id_pedido=p.id_pedido,
+            id_emprendedora=p.id_emprendedora,
+            subtotal=float(p.subtotal),
+            costo_envio=float(p.costo_envio),
+            total=float(p.total),
+            requiere_envio=any(
+                i.tipo_entrega.value == "envio" for i in p.items
+            ),
+            requiere_qr=any(
+                i.tipo_entrega.value == "fisica" for i in p.items
+            ),
+        )
+        for p in pedidos
+    ]
+
+    return schemas.CheckoutResponse(
+        status="success",
+        metodo_pago=checkout.metodo_pago,
+        pedidos=resumenes,
+        total_general=sum(r.total for r in resumenes),
+    )
+
