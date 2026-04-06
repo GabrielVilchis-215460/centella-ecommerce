@@ -50,6 +50,7 @@ def listar_emprendedoras(
     skip: int = 0,
     limit: int = 20,
     nombre: Optional[str] = Query(None),
+    ordenar_por: Optional[str] = Query(None, enum=["calificacion", "nombre_negocio", "recientes"]),
     db: Session = Depends(get_db),
 ):
-    return service.get_emprendedoras(db, skip, limit, nombre)
+    return service.get_emprendedoras(db, skip, limit, nombre, ordenar_por)

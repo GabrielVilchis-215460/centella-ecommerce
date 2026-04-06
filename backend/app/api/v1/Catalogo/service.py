@@ -150,6 +150,7 @@ def get_emprendedoras(
     skip: int = 0,
     limit: int = 20,
     nombre: Optional[str] = None,
+    ordenar_por: Optional[str] = None,
 ) -> list[EmprendedoraCatalogoRead]:
 
     calificacion_sq = (
@@ -168,6 +169,7 @@ def get_emprendedoras(
             Emprendedora.logo_url,
             Usuario.nombre,
             Usuario.apellido,
+            Usuario.fecha_registro,
             calificacion_sq.c.calificacion_promedio,
         )
         .join(Usuario, Usuario.id_usuario == Emprendedora.id_usuario)
@@ -180,6 +182,13 @@ def get_emprendedoras(
             Usuario.apellido.ilike(f"%{nombre}%") |
             Emprendedora.nombre_negocio.ilike(f"%{nombre}%")
         )
+
+    if ordenar_por == "calificacion":
+        query = query.order_by(calificacion_sq.c.calificacion_promedio.desc().nulls_last())
+    elif ordenar_por == "nombre_negocio":
+        query = query.order_by(Emprendedora.nombre_negocio.asc())
+    elif ordenar_por == "recientes":
+        query = query.order_by(Usuario.fecha_registro.desc())
 
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
     return [EmprendedoraCatalogoRead(**row) for row in rows]

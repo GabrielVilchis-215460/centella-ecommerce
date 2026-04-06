@@ -44,4 +44,4 @@ class EmprendedoraCatalogoRead(BaseModel):
     apellido: str
     calificacion_promedio: Optional[float]
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "extra": "ignore"}
