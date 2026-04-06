@@ -6,7 +6,7 @@ from app.models.emprendedora import Emprendedora
 from app.models.usuario import Usuario
 from app.models.resena import Resena
 from app.models.categoria import Categoria
-from app.models.enum import TipoResenaEnum
+from app.models.enum import TipoResenaEnum, TipoEntregaEnum
 from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead
 from typing import Optional
 
@@ -17,6 +17,11 @@ def get_productos(
     limit: int = 20,
     id_categoria: Optional[int] = None,
     nombre: Optional[str] = None,
+    precio_min: Optional[float] = None,
+    precio_max: Optional[float] = None,
+    hecho_juarez: Optional[bool] = None,
+    tipo_entrega: Optional[TipoEntregaEnum] = None,
+    ordenar_por: Optional[str] = None,
 ) -> list[ProductoCatalogoRead]:
 
     calificacion_sq = (
@@ -44,6 +49,7 @@ def get_productos(
             calificacion_sq.c.calificacion_promedio,
         )
         .join(Categoria, Categoria.id_categoria == Producto.id_categoria)
+        .join(Emprendedora, Emprendedora.id_emprendedora == Producto.id_emprendedora)
         .outerjoin(calificacion_sq, calificacion_sq.c.id_referencia == Producto.id_producto)
         .where(Producto.activo == True)
     )
@@ -52,6 +58,25 @@ def get_productos(
         query = query.where(Producto.id_categoria == id_categoria)
     if nombre:
         query = query.where(Producto.nombre.ilike(f"%{nombre}%"))
+    if precio_min is not None:
+        query = query.where(Producto.precio >= precio_min)
+    if precio_max is not None:
+        query = query.where(Producto.precio <= precio_max)
+    if hecho_juarez is not None:
+        query = query.where(Emprendedora.insignia_hecho_juarez == hecho_juarez)
+    if tipo_entrega:
+        query = query.where(Producto.tipo_entrega == tipo_entrega)
+
+    if ordenar_por == "precio_asc":
+        query = query.order_by(Producto.precio.asc())
+    elif ordenar_por == "precio_desc":
+        query = query.order_by(Producto.precio.desc())
+    elif ordenar_por == "calificacion":
+        query = query.order_by(calificacion_sq.c.calificacion_promedio.desc().nulls_last())
+    elif ordenar_por == "recientes":
+        query = query.order_by(Producto.fecha_creacion.desc())
+    elif ordenar_por == "nombre":
+        query = query.order_by(Producto.nombre.asc())
 
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
     return [ProductoCatalogoRead(**row) for row in rows]
@@ -63,6 +88,9 @@ def get_servicios(
     limit: int = 20,
     id_categoria: Optional[int] = None,
     nombre: Optional[str] = None,
+    precio_min: Optional[float] = None,
+    precio_max: Optional[float] = None,
+    ordenar_por: Optional[str] = None,
 ) -> list[ServicioCatalogoRead]:
 
     calificacion_sq = (
@@ -97,6 +125,21 @@ def get_servicios(
         query = query.where(Servicio.id_categoria == id_categoria)
     if nombre:
         query = query.where(Servicio.nombre.ilike(f"%{nombre}%"))
+    if precio_min is not None:
+        query = query.where(Servicio.precio >= precio_min)
+    if precio_max is not None:
+        query = query.where(Servicio.precio <= precio_max)
+
+    if ordenar_por == "precio_asc":
+        query = query.order_by(Servicio.precio.asc())
+    elif ordenar_por == "precio_desc":
+        query = query.order_by(Servicio.precio.desc())
+    elif ordenar_por == "calificacion":
+        query = query.order_by(calificacion_sq.c.calificacion_promedio.desc().nulls_last())
+    elif ordenar_por == "recientes":
+        query = query.order_by(Servicio.fecha_creacion.desc())
+    elif ordenar_por == "nombre":
+        query = query.order_by(Servicio.nombre.asc())
 
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
     return [ServicioCatalogoRead(**row) for row in rows]
