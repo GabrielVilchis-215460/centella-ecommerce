@@ -56,3 +56,44 @@ def obtener_totales(id_usuario: int, db: Session = Depends(get_db)):
     """Calcula subtotales por item y el total general del carrito."""
     carrito = service.get_carrito_by_usuario(db, id_usuario)
     return service.calcular_totales(db, carrito.id_carrito)
+
+
+@router.post("/checkout", response_model=schemas.CheckoutResponse, status_code=201)
+def finalizar_compra(
+    id_usuario: int,
+    checkout: schemas.CheckoutRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Valida stock y tipo de entrega, descuenta inventario, genera un pedido
+    por emprendedora y vacía el carrito.
+
+    El request debe incluir el método de pago, la dirección de envío
+    (si algún item requiere envío) y la selección de tipo de entrega
+    por cada item del carrito.
+    """
+    pedidos = service.convertir_a_pedido(db, id_usuario, checkout)
+
+    resumenes = [
+        schemas.PedidoResumen(
+            id_pedido=p.id_pedido,
+            id_emprendedora=p.id_emprendedora,
+            subtotal=float(p.subtotal),
+            costo_envio=float(p.costo_envio),
+            total=float(p.total),
+            requiere_envio=any(
+                i.tipo_entrega.value == "envio" for i in p.items
+            ),
+            requiere_qr=any(
+                i.tipo_entrega.value == "fisica" for i in p.items
+            ),
+        )
+        for p in pedidos
+    ]
+
+    return schemas.CheckoutResponse(
+        status="success",
+        metodo_pago=checkout.metodo_pago,
+        pedidos=resumenes,
+        total_general=sum(r.total for r in resumenes),
+    )

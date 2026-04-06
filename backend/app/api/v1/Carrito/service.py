@@ -150,3 +150,112 @@ def calcular_totales(db: Session, carrito_id: int):
         )
 
     return schemas.TotalesCarrito(items=detalles, total_pagar=total_general)
+
+# ---------------------------------------------------------------------------
+# Checkout
+# ---------------------------------------------------------------------------
+
+def convertir_a_pedido(
+    db: Session,
+    id_usuario: int,
+    checkout: schemas.CheckoutRequest,
+) -> list[Pedido]:
+    """
+    Valida stock y tipo de entrega, luego genera un Pedido por cada
+    emprendedora involucrada en el carrito. Vacía el carrito al final.
+
+    Retorna la lista de pedidos creados.
+    """
+    carrito = get_carrito_by_usuario(db, id_usuario)
+
+    if not carrito.items:
+        raise HTTPException(status_code=400, detail="El carrito está vacío.")
+
+    # Mapear las selecciones del request por id_item para acceso rápido
+    selecciones: dict[int, schemas.ItemCheckout] = {
+        s.id_item: s for s in checkout.items
+    }
+
+    # Verificar que el request cubre todos los items del carrito
+    ids_carrito = {item.id_item for item in carrito.items}
+    ids_checkout = set(selecciones.keys())
+    faltantes = ids_carrito - ids_checkout
+    if faltantes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Faltan selecciones de entrega para los items: {faltantes}",
+        )
+
+    # --- Validaciones previas (sin modificar nada aún) ---
+    productos: dict[int, Producto] = {}
+    for item in carrito.items:
+        producto = get_producto(db, item.id_producto)
+        tipo_seleccionado = selecciones[item.id_item].tipo_entrega_seleccionado
+        validar_tipo_entrega_compatible(producto, tipo_seleccionado)
+        validar_stock(producto, item.cantidad)
+        productos[item.id_producto] = producto
+
+    # --- Agrupar items por emprendedora ---
+    grupos: dict[int, list[ItemCarrito]] = defaultdict(list)
+    for item in carrito.items:
+        id_emprendedora = productos[item.id_producto].id_emprendedora
+        grupos[id_emprendedora].append(item)
+
+    # --- Crear un Pedido por emprendedora ---
+    pedidos_creados: list[Pedido] = []
+    ahora = datetime.utcnow()
+
+    for id_emprendedora, items_grupo in grupos.items():
+        subtotal = sum(
+            float(productos[item.id_producto].precio) * item.cantidad
+            for item in items_grupo
+        )
+
+        # costo_envio lo puede calcular el módulo de envíos posteriormente;
+        # por ahora se deja en 0 y se actualiza cuando se procese el envío.
+        costo_envio = 0.0
+        total = subtotal + costo_envio
+
+        nuevo_pedido = Pedido(
+            id_cliente=id_usuario,
+            id_emprendedora=id_emprendedora,
+            fecha_pedido=ahora,
+            estado="pendiente",
+            subtotal=subtotal,
+            costo_envio=costo_envio,
+            total=total,
+            metodo_pago=checkout.metodo_pago,
+            id_direccion_envio=checkout.id_direccion_envio,
+            # codigo_qr_url lo genera el módulo de QR después
+            codigo_qr_url=None,
+        )
+        db.add(nuevo_pedido)
+        db.flush()  # Necesario para obtener id_pedido antes de crear los ItemPedido
+
+        # Crear ItemPedido (snapshot del producto al momento de compra)
+        for item in items_grupo:
+            producto = productos[item.id_producto]
+            tipo_entrega = selecciones[item.id_item].tipo_entrega_seleccionado
+
+            db.add(ItemPedido(
+                id_pedido=nuevo_pedido.id_pedido,
+                id_producto=item.id_producto,
+                nombre_producto=producto.nombre,       # snapshot: no cambia si el producto cambia
+                precio_unitario=producto.precio,        # snapshot: precio al momento de compra
+                cantidad=item.cantidad,
+                tipo_entrega=tipo_entrega,
+            ))
+
+            # Descontar stock
+            producto.cantidad_stock -= item.cantidad
+
+        pedidos_creados.append(nuevo_pedido)
+
+    # --- Vaciar carrito y confirmar toda la transacción ---
+    vaciar_carrito(db, carrito.id_carrito)
+    db.commit()
+
+    for pedido in pedidos_creados:
+        db.refresh(pedido)
+
+    return pedidos_creados
