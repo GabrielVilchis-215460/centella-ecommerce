@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     MERCADO_PAGO_API: str
     MERCADO_PAGO_ACCESS_TOKEN: str
     MERCADO_PAGO_WEBHOOK: str
-
+    MERCADO_PAGO_BASE_URL: str
     # Fastapi mail config
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
