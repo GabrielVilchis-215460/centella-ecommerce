@@ -38,9 +38,18 @@ class Settings(BaseSettings):
     PAYPAL_CLIENT_ID: str
     PAYPAL_API_BASE_URL: str
 
-    # Conekta
-    CONEKTA_API: str
-
+    # Mercado Pago
+    MERCADO_PAGO_API: str
+    MERCADO_PAGO_ACCESS_TOKEN: str
+    MERCADO_PAGO_WEBHOOK: str
+    MERCADO_PAGO_BASE_URL: str
+    # Fastapi mail config
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int
+    MAIL_SERVER: str
+    MAIL_FROM_NAME: str
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [] # localhost y los urls de app del backend y front desplegados
     #APP_URL: str # url del front desplegado
@@ -67,10 +76,10 @@ class Settings(BaseSettings):
         print("\n Api de Envia.com:")
         print(f"   API Key: {'✓' if self.ENVIA_API_KEY else '✗'}")
         # Apis de pagos    
-        print("\n Apis de pagos (Stripe, PayPal, Conekta):")
+        print("\n Apis de pagos (Stripe, PayPal, MercadoPago):")
         print(f"   Stripe API:    {'✓' if self.STRIPE_API else '✗'}")
         print(f"   PayPal Client: {'✓' if self.PAYPAL_CLIENT_ID else '✗'}")
-        print(f"   Conekta API:   {'✓' if self.CONEKTA_API else '✗'}")
+        print(f"   Conekta API:   {'✓' if self.MERCADO_PAGO_API else '✗'}")
         # Bucket de cloudflare 
         print("\nCloudFlare bucket:")
         print(f"   Bucket: {self.BUCKET_NAME}")
