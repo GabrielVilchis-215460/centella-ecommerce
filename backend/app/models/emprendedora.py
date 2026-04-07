@@ -16,6 +16,8 @@ class Emprendedora(Base):
     insignia_hecho_juarez: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     solicitud_insignia_activa: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     enlace_redes_sociales: Mapped[dict] = mapped_column(JSON, nullable=False)
+    # guardar el color hexadecimal que saldra en el catalogo
+    color_emprendedora_hex: Mapped[str] = mapped_column(String(10), nullable=False)
 
     # Relationships
     usuario: Mapped["Usuario"] = relationship(back_populates="emprendedora")
