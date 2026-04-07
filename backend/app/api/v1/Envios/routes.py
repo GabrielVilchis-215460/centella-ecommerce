@@ -14,7 +14,10 @@ from app.api.v1.Envios.service import (
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from fastapi import Depends
+from fastapi import Depends, Response
+from app.api.v1.Envios.service import _generar_qr_base64
+import base64
+from app.services.email_service import enviar_correo_pedido
 
 router = APIRouter(prefix="/shipping", tags=["Shipping"])
 @router.post("/cotizar")
@@ -44,3 +47,48 @@ async def rastrear(tracking_number: str):
 @router.post("/asignar-envio")
 async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db)):
     return await service_asignar_envio(pedido_id, db)
+
+@router.post("/test-envio")
+async def test_email(email: str, pedido: int):
+    """
+    Ruta rápida para probar el envío sin crear un pedido real.
+    Uso: /shipping/test-envio?email=tu_correo@gmail.com&pedido=1
+    """
+    qr_base64 = _generar_qr_base64(pedido)
+
+    await enviar_correo_pedido(
+        email_destino=email,
+        nombre_cliente="Steven",
+        pedido_id=pedido,
+        tiene_envio=True,
+        tiene_fisica=True,
+        tracking_number="794797531854",
+        label_url="https://s3.us-east-2.amazonaws.com/envia-staging/uploads/fedex/794797531854481369d32aaf8f8bc.pdf",
+        track_url="https://tracking.envia.com/794797531854",
+        qr_base64=qr_base64,
+    )
+    return {"message": "Correo enviado, revisa tu bandeja de entrada"}
+
+@router.get("/qr/test/{pedido_id}")
+async def test_qr(pedido_id: int):
+    qr_base64 = _generar_qr_base64(pedido_id)
+    img_bytes = base64.b64decode(qr_base64)
+
+    from PIL import Image, ImageDraw, ImageFont
+    from io import BytesIO
+
+    qr_img = Image.open(BytesIO(img_bytes)).convert("RGB")
+
+    ancho, alto = qr_img.size
+    espacio_texto = 40
+    nueva_img = Image.new("RGB", (ancho, alto + espacio_texto), "white")
+    nueva_img.paste(qr_img, (0, 0))
+
+    draw = ImageDraw.Draw(nueva_img)
+    texto = f"Número de pedido: #{pedido_id}"
+    draw.text((ancho // 2, alto + 10), texto, fill="black", anchor="mt")
+
+    buf = BytesIO()
+    nueva_img.save(buf, format="PNG")
+
+    return Response(content=buf.getvalue(), media_type="image/png")

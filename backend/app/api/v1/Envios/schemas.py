@@ -59,3 +59,7 @@ class TrackingResponse(BaseModel):
     status: str | None = None
     carrier: str | None = None
     events: list[TrackingEventSchema] = []
+
+class QRSimpleResponse(BaseModel):
+    """Schema de respuesta para documentación (el endpoint retorna imagen PNG)"""
+    pass
