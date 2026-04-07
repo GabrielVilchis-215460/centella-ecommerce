@@ -1,8 +1,8 @@
-"""Migracion inicial
+"""Cuarta migracion de la BD
 
-Revision ID: 9570d4505159
+Revision ID: 5413b34c6f54
 Revises: 
-Create Date: 2026-03-31 23:10:20.255070
+Create Date: 2026-04-06 23:33:40.860746
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9570d4505159'
+revision: str = '5413b34c6f54'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,6 +25,8 @@ def upgrade() -> None:
     sa.Column('id_categoria', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.Column('descripcion', sa.String(length=300), nullable=True),
+    sa.Column('color_preferencia_hex', sa.String(length=10), nullable=False),
+    sa.Column('tipo_categoria', sa.Enum('producto', 'servicio', name='tipocategoriaenum'), nullable=False),
     sa.PrimaryKeyConstraint('id_categoria'),
     sa.UniqueConstraint('nombre')
     )
@@ -57,6 +59,7 @@ def upgrade() -> None:
     sa.Column('colonia', sa.String(length=100), nullable=False),
     sa.Column('ciudad', sa.String(length=100), nullable=False),
     sa.Column('estado', sa.String(length=100), nullable=False),
+    sa.Column('numero_telefonico', sa.String(length=20), nullable=False),
     sa.Column('codigo_postal', sa.String(length=10), nullable=False),
     sa.Column('es_principal', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['id_usuario'], ['usuario.id_usuario'], ),
@@ -72,6 +75,7 @@ def upgrade() -> None:
     sa.Column('insignia_hecho_juarez', sa.Boolean(), nullable=False),
     sa.Column('solicitud_insignia_activa', sa.Boolean(), nullable=False),
     sa.Column('enlace_redes_sociales', sa.JSON(), nullable=False),
+    sa.Column('color_emprendedora_hex', sa.String(length=10), nullable=False),
     sa.ForeignKeyConstraint(['id_usuario'], ['usuario.id_usuario'], ),
     sa.PrimaryKeyConstraint('id_emprendedora'),
     sa.UniqueConstraint('id_usuario')
@@ -105,10 +109,11 @@ def upgrade() -> None:
     sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('costo_envio', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('total', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('metodo_pago', sa.Enum('stripe', 'paypal', 'conekta_spei', name='metodopagoenum'), nullable=False),
+    sa.Column('metodo_pago', sa.Enum('stripe', 'paypal', 'mercadopago_spei', name='metodopagoenum'), nullable=False),
     sa.Column('id_direccion_envio', sa.Integer(), nullable=True),
     sa.Column('numero_rastreo', sa.String(length=200), nullable=True),
     sa.Column('codigo_qr_url', sa.String(length=500), nullable=True),
+    sa.Column('proveedor_payment_id', sa.String(length=200), nullable=True),
     sa.ForeignKeyConstraint(['id_cliente'], ['usuario.id_usuario'], ),
     sa.ForeignKeyConstraint(['id_direccion_envio'], ['direccion.id_direccion'], ),
     sa.ForeignKeyConstraint(['id_emprendedora'], ['emprendedora.id_emprendedora'], ),
@@ -162,6 +167,7 @@ def upgrade() -> None:
     sa.Column('id_producto', sa.Integer(), nullable=False),
     sa.Column('tipo', sa.Enum('talla', 'color', 'tamanio', 'material', name='tipoatributoenum'), nullable=False),
     sa.Column('valor', sa.String(length=100), nullable=False),
+    sa.Column('atributo_activo', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['id_producto'], ['producto.id_producto'], ),
     sa.PrimaryKeyConstraint('id_atributo')
     )

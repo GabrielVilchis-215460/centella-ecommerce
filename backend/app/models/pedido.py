@@ -21,6 +21,8 @@ class Pedido(Base):
     id_direccion_envio: Mapped[Optional[int]] = mapped_column(ForeignKey("direccion.id_direccion"), nullable=True)
     numero_rastreo: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     codigo_qr_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    # Para guardar el ID del pago segun sea el metodo preferido
+    proveedor_payment_id: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
     # Relationships
     cliente: Mapped["Usuario"] = relationship(back_populates="pedidos", foreign_keys=[id_cliente])

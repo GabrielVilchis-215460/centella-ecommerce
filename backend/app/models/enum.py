@@ -21,6 +21,10 @@ class TipoAtributoEnum(str, Enum):
     tamanio = "tamaño"
     material = "material"
  
+class TipoCategoriaEnum(str, Enum):
+    producto = "producto"
+    servicio = "servicio"
+
 class TipoResenaEnum(str, Enum):
     producto = "producto"
     servicio = "servicio"
@@ -39,7 +43,7 @@ class EstadoPedidoEnum(str, Enum):
 class MetodoPagoEnum(str, Enum):
     stripe = "stripe"
     paypal = "paypal"
-    conekta_spei = "conekta_spei"
+    mercadopago_spei = "mercadopago_spei"
  
 class TipoContenidoReporteEnum(str, Enum):
     producto = "producto"
