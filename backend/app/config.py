@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     MAIL_FROM_NAME: str
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [] # localhost y los urls de app del backend y front desplegados
-    #APP_URL: str # url del front desplegado
+    APP_URL: str # url del back desplegado
 
     model_config = SettingsConfigDict(
         env_file=".env",
