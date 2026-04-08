@@ -9,7 +9,7 @@ class PayPalService:
         self.client_id = settings.PAYPAL_CLIENT_ID
         self.client_secret = settings.PAYPAL_SECRET_API
         self.base_url = settings.PAYPAL_API_BASE_URL # Entorno Sandbox
-        self.client = httpx.AsyncClient()
+        self.client = httpx.AsyncClient(follow_redirects=True)
         self.access_token = None
 
     def get_auth_header(self):

@@ -67,3 +67,16 @@ async def webhook_mercadopago_test(
     db: Session = Depends(get_db)
 ):
     return await payment_service.manejar_webhook_mercadopago(db, evento.dict())
+
+@router.get("/success")
+async def payment_success(id_pedido: int | None = None):
+    return {
+        "mensaje": "Pago exitoso",
+        "id_pedido": id_pedido
+    }
+
+@router.get("/cancel")
+async def payment_cancel():
+    return {
+        "mensaje": "Pago cancelado"
+    }
