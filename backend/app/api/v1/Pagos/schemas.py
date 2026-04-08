@@ -11,8 +11,8 @@ class PaymentResponse(BaseModel):
     metodo_pago: MetodoPagoEnum
     estado: EstadoPedidoEnum
     total: Decimal
-    # redirect_url: str | None = None
-    # checkout_id: str | None = None
+    redirect_url: str | None = None
+    checkout_id: str | None = None
     ticket_url: str | None = None     
 
 class PayResponseList(BaseModel):
