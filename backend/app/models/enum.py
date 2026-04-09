@@ -43,7 +43,7 @@ class EstadoPedidoEnum(str, Enum):
 class MetodoPagoEnum(str, Enum):
     stripe = "stripe"
     paypal = "paypal"
-    mercadopago_spei = "mercadopago_spei"
+    #mercadopago_spei = "mercadopago_spei"
  
 class TipoContenidoReporteEnum(str, Enum):
     producto = "producto"
