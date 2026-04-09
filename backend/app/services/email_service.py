@@ -2,6 +2,11 @@ from app.config import settings
 import base64, tempfile, os
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 
+# Estilos de la identidad corporativa
+FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'
+BASE_STYLE = "font-family: 'Poppins', Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px; color: #333;"
+TITLE_STYLE = "font-family: 'Libre Baskerville', serif; color: #872B3D; margin-top: 0;"
+
 conf = ConnectionConfig(
     MAIL_USERNAME = settings.MAIL_USERNAME,
     MAIL_PASSWORD = settings.MAIL_PASSWORD,
@@ -20,27 +25,32 @@ async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_n
     Función para enviar el link del PDF y el rastreo al cliente.
     """
     html = f"""
-    <div style="font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px;">
-        <h2 style="color: #2c3e50;">¡Tu pedido de Centella ha sido enviado!</h2>
-        <p>Hola <strong>{nombre_cliente}</strong>,</p>
-        <p>Tu paquete ya está en manos de la paquetería.</p>
-        <p><strong>Número de rastreo:</strong> <span style="color: #e67e22; font-weight: bold;">{tracking_number}</span></p>
-        <br>
-        <div style="margin-bottom: 25px;">
-            <a href="{label_url}" 
-               style="background-color: #27ae60; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-               Descargar Etiqueta de Envío (PDF)
+    <html>
+    <head>{FONT_IMPORT}</head>
+    <body>
+        <div style="{BASE_STYLE}">
+            <h2 style="{TITLE_STYLE}">¡Tu pedido de Centella ha sido enviado!</h2>
+            <p>Hola <strong>{nombre_cliente}</strong>,</p>
+            <p>Tu paquete ya está en manos de la paquetería.</p>
+            <p><strong>Número de rastreo:</strong> <span style="color: #8D75BD; font-weight: bold;">{tracking_number}</span></p>
+            <br>
+            <div style="margin-bottom: 25px;">
+                <a href="{label_url}" 
+                   style="background-color: #872B3D; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: 600;">
+                   Descargar Etiqueta de Envío (PDF)
+                </a>
+            </div>
+            <p>Para rastrear tu pedido en tiempo real, haz clic abajo:</p>
+            <a href="https://dev.envia.com/es-MX/tracking" 
+               style="background-color: #9F4658; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: 600;">
+               Rastrear mi pedido
             </a>
+            <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px;">
+                Este es un correo automático de prueba generado por el sistema Centella.
+            </p>
         </div>
-        <p>Para rastrear tu pedido en tiempo real, haz clic abajo:</p>
-        <a href="https://dev.envia.com/es-MX/tracking" 
-           style="background-color: #2980b9; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-           Rastrear mi pedido
-        </a>
-        <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; pt: 10px;">
-            Este es un correo automático de prueba generado por el sistema Centella.
-        </p>
-    </div>
+    </body>
+    </html>
     """
 
     message = MessageSchema(
@@ -60,18 +70,23 @@ async def enviar_correo_qr(
     qr_base64: str,
 ):
     html = f"""
-    <div style="font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px;">
-        <h2 style="color: #2c3e50;">¡Tu pedido está listo para recoger!</h2>
-        <p>Hola <strong>{nombre_cliente}</strong>,</p>
-        <p>Tu pedido <strong>#{pedido_id}</strong> está listo para ser recogido en el punto de entrega.</p>
-        <p>Presenta el siguiente código QR al momento de recoger tu pedido:</p>
-        <div style="text-align: center; margin: 20px 0;">
-            <img src="cid:qr_pedido" alt="QR Pedido #{pedido_id}" style="width: 200px; height: 200px;" />
+    <html>
+    <head>{FONT_IMPORT}</head>
+    <body>
+        <div style="{BASE_STYLE}">
+            <h2 style="{TITLE_STYLE}">¡Tu pedido está listo para recoger!</h2>
+            <p>Hola <strong>{nombre_cliente}</strong>,</p>
+            <p>Tu pedido <strong style="color: #8D75BD;">#{pedido_id}</strong> está listo para ser recogido en el punto de entrega.</p>
+            <p>Presenta el siguiente código QR al momento de recoger tu pedido:</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <img src="cid:qr_pedido" alt="QR Pedido #{pedido_id}" style="width: 200px; height: 200px; border: 1px solid #eee;" />
+            </div>
+            <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px;">
+                Este es un correo automático generado por el sistema.
+            </p>
         </div>
-        <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee;">
-            Este es un correo automático generado por el sistema.
-        </p>
-    </div>
+    </body>
+    </html>
     """
 
     # Guardar QR como archivo temporal
