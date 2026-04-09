@@ -28,8 +28,6 @@ class PaymentService:
                     resultado = await self._procesar_stripe(db, pedido)
                 case MetodoPagoEnum.paypal:
                     resultado = await self._procesar_paypal(db, pedido)
-                case MetodoPagoEnum.mercadopago_spei:
-                    resultado = await self._procesar_mercadopago(db, pedido)
                 case _:
                     raise HTTPException(status_code=400, detail="Metodo de pago no soportado.")
 
