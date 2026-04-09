@@ -1,12 +1,14 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import select
 from fastapi import HTTPException
 from app.models.pedido import Pedido
-from app.models.enum import MetodoPagoEnum, EstadoPedidoEnum
+from app.models.enum import MetodoPagoEnum, EstadoPedidoEnum, TipoEntregaItemEnum
 from .schemas import PaymentResponse, PayResponseList
 from app.services.stripe_service import stripe_service
 from app.services.paypal_service import paypal_service
-import httpx
 from app.config import settings
+from app.api.v1.Envios.service import service_asignar_envio, _generar_qr_base64
+from app.services.email_service import enviar_correo_pedido
 
 class PaymentService:
 
@@ -46,7 +48,7 @@ class PaymentService:
             metadata={"id_pedido": str(pedido.id_pedido)}
         )
         if not session:
-            raise HTTPException(status_code=502, detail="Error al crear sesión de Stripe.")
+            raise HTTPException(status_code=502, detail="Error al crear sesión de Stripe")
 
         pedido.proveedor_payment_id = session["id"]
         db.commit()
@@ -85,7 +87,7 @@ class PaymentService:
             redirect_url=approval_url
         )
     
-    # --- Confirmación PayPal (tras redirect) ---
+    # --- Confirmación PayPal (tras redirect de la pasarela de pago) ---
     async def confirmar_paypal(self, db: Session, id_pedido: int, token: str):
         """PayPal regresa con ?token=ORDER_ID en la URL"""
         capture = await paypal_service.capture_order(token)
@@ -95,6 +97,7 @@ class PaymentService:
             pedido.estado = EstadoPedidoEnum.confirmado
             db.commit()
             db.refresh(pedido)
+            await self.post_pago(db, pedido)
             return PaymentResponse(
                 id_pedido=pedido.id_pedido,
                 metodo_pago=pedido.metodo_pago,
@@ -104,12 +107,13 @@ class PaymentService:
 
         raise HTTPException(status_code=400, detail="El pago de PayPal no fue completado.")
 
-    # --- Confirmación Stripe (tras redirect) ---
+    # --- Confirmación Stripe (tras redirect de la pasarela de pago) ---
     async def confirmar_stripe(self, db: Session, id_pedido: int):
         pedido = self.get_pedido(db, id_pedido)
         pedido.estado = EstadoPedidoEnum.confirmado
         db.commit()
         db.refresh(pedido)
+        await self.post_pago(db, pedido)
         return PaymentResponse(
             id_pedido=pedido.id_pedido,
             metodo_pago=pedido.metodo_pago,
@@ -117,7 +121,6 @@ class PaymentService:
             total=pedido.total,
         )
 
-    
     # Funciones auxiliares
     def get_pedidos(self, db: Session, ids: list[int]):
         pedidos = db.query(Pedido).filter(Pedido.id_pedido.in_(ids)).all()
@@ -126,10 +129,54 @@ class PaymentService:
         return pedidos
 
     def get_pedido(self, db: Session, id_pedido: int):
-        pedido = db.query(Pedido).filter(Pedido.id_pedido == id_pedido).first()
+        # pedido = db.query(Pedido).filter(Pedido.id_pedido == id_pedido).first()
+        # nueva query
+        pedido = db.execute(
+            select(Pedido)
+            .options(selectinload(Pedido.items))
+            .where(Pedido.id_pedido == id_pedido)
+        ).scalar_one_or_none()
+         
         if not pedido:
             raise HTTPException(status_code=404, detail="Pedido no encontrado.")
         return pedido
+    
+    async def post_pago(self, db: Session, pedido: Pedido):
+        # en caso de que los productos sean por shipping
+        tiene_envio = any(
+            item.tipo_entrega == TipoEntregaItemEnum.envio
+            for item in pedido.items
+        )
+
+        # caso de que los productos sean por entrega fisica
+        tiene_fisica = any(
+            item.tipo_entrega == TipoEntregaItemEnum.fisica
+            for item in pedido.items
+        ) 
+
+        if tiene_envio:
+            try:
+                await service_asignar_envio(pedido.id_pedido, db)
+            except Exception as e:
+                print(f"Error al asignar envío para pedido {pedido.id_pedido}: {e}")
+
+        if tiene_fisica:
+            try:
+                qr_base64 = _generar_qr_base64(pedido.id_pedido)
+                pedido.codigo_qr_url = qr_base64
+                db.commit()
+
+                await enviar_correo_pedido(
+                    email_destino=pedido.cliente.email,
+                    nombre_cliente=f"{pedido.cliente.nombre} {pedido.cliente.apellido}",
+                    pedido_id=pedido.id_pedido,
+                    tiene_envio=False,
+                    tiene_fisica=True,
+                    qr_base64=qr_base64,
+                )
+            except Exception as e:
+                print(f"Error al generar QR o mandar correo: {e}")
+
 
 # Instancia global para usar
 payment_service = PaymentService()
