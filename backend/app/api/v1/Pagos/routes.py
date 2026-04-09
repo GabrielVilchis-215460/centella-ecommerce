@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from .schemas import PayRequest, PayResponseList, PaymentResponse, WebhookMPEvent
+from .schemas import PayRequest, PayResponseList, PaymentResponse
 from .service import payment_service
-# from app.services.mercadopago_service import mercadopago_service
 from app.models import Pedido
 from app.models.enum import EstadoPedidoEnum
 
@@ -24,19 +23,6 @@ async def confirmar_paypal(
 @router.get("/confirm/stripe/{id_pedido}", response_model=PaymentResponse)
 async def confirmar_stripe(id_pedido: int, db: Session = Depends(get_db)):
     return await payment_service.confirmar_stripe(db, id_pedido)
-
-@router.post("/webhook/mercadopago")
-async def webhook_mercadopago(
-    request: Request,
-    db: Session = Depends(get_db)
-):
-    try:
-        evento = await request.json()
-        print("Webhook MercadoPago:", evento)
-    except Exception:
-        return {"status": "ignored"}
-
-    return await payment_service.manejar_webhook_mercadopago(db, evento)
 
 # Solo para pruebas de pagos
 @router.patch("/test/pedido/{id_pedido}/estado")
@@ -59,14 +45,6 @@ async def cambiar_estado_pedido(
         "estado": pedido.estado,
         "proveedor_payment_id": pedido.proveedor_payment_id
     }
-
-# endpoint para probar webhook
-@router.post("/webhook/mercadopago/test")
-async def webhook_mercadopago_test(
-    evento: WebhookMPEvent,
-    db: Session = Depends(get_db)
-):
-    return await payment_service.manejar_webhook_mercadopago(db, evento.dict())
 
 @router.get("/success")
 async def payment_success(id_pedido: int | None = None):

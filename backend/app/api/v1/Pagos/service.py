@@ -5,7 +5,6 @@ from app.models.enum import MetodoPagoEnum, EstadoPedidoEnum
 from .schemas import PaymentResponse, PayResponseList
 from app.services.stripe_service import stripe_service
 from app.services.paypal_service import paypal_service
-from app.services.mercadopago_service import mercadopago_service
 import httpx
 from app.config import settings
 
@@ -87,30 +86,7 @@ class PaymentService:
             total=pedido.total,
             redirect_url=approval_url
         )
-
-    #case MetodoPagoEnum.mercadopago_spei:
-       # resultado = await self._procesar_mercadopago(db, pedido)
-
-    # --- Mercado Pago ---
-    async def _procesar_mercadopago(self, db: Session, pedido: Pedido):
-        cliente = pedido.cliente
-
-        resultado = mercadopago_service.crear_preferencia_checkout(
-            pedido=pedido,
-            cliente_email=cliente.email
-        )
-
-        pedido.proveedor_payment_id = resultado["preference_id"]
-        db.commit()
-
-        return PaymentResponse(
-            id_pedido=pedido.id_pedido,
-            metodo_pago=pedido.metodo_pago,
-            estado=pedido.estado,
-            total=pedido.total,
-            ticket_url=resultado["init_point"]
-            #ticket_url=resultado["ticket_url"]  # frontend redirige aquí
-        )
+    
     # --- Confirmación PayPal (tras redirect) ---
     async def confirmar_paypal(self, db: Session, id_pedido: int, token: str):
         """PayPal regresa con ?token=ORDER_ID en la URL"""
@@ -143,40 +119,7 @@ class PaymentService:
             total=pedido.total,
         )
 
-    async def manejar_webhook_mercadopago(self, db: Session, evento: dict):
-        # MercadoPago manda type y data.id
-        tipo = evento.get("type")
-        
-        if tipo != "payment":
-            return {"status": "ignored"}
-
-        payment_id = str(evento.get("data", {}).get("id", ""))
-
-        pedido = db.query(Pedido).filter(
-            Pedido.proveedor_payment_id == payment_id
-        ).first()
-
-        if not pedido:
-            return {"status": "ignored", "reason": "pedido no encontrado"}
-
-        # Verificar estado real del pago en MercadoPago
-        accion = evento.get("action", "")
-        if accion == "payment.updated":
-            # Consultar el estado actual del pago
-            with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"https://api.mercadopago.com/v1/payments/{payment_id}",
-                    headers={"Authorization": f"Bearer {settings.MERCADOPAGO_ACCESS_TOKEN}"}
-                )
-            pago = response.json()
-            if pago.get("status") == "approved":
-                pedido.estado = EstadoPedidoEnum.confirmado
-            elif pago.get("status") in ("cancelled", "rejected"):
-                pedido.estado = EstadoPedidoEnum.cancelado
-
-        db.commit()
-        return {"status": "ok"}
-
+    
     # Funciones auxiliares
     def get_pedidos(self, db: Session, ids: list[int]):
         pedidos = db.query(Pedido).filter(Pedido.id_pedido.in_(ids)).all()
@@ -184,7 +127,7 @@ class PaymentService:
             raise HTTPException(status_code=404, detail="Uno o mas pedidos no encontrados")
         return pedidos
 
-    def _get_pedido(self, db: Session, id_pedido: int):
+    def get_pedido(self, db: Session, id_pedido: int):
         pedido = db.query(Pedido).filter(Pedido.id_pedido == id_pedido).first()
         if not pedido:
             raise HTTPException(status_code=404, detail="Pedido no encontrado.")

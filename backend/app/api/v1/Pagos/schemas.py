@@ -17,9 +17,3 @@ class PaymentResponse(BaseModel):
 
 class PayResponseList(BaseModel):
     pagos: list[PaymentResponse]
-
-# Para probar el webhook de mercado pago
-class WebhookMPEvent(BaseModel):
-    type: str
-    action: str | None = None
-    data: dict
