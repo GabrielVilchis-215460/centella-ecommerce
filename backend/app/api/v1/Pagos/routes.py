@@ -45,16 +45,3 @@ async def cambiar_estado_pedido(
         "estado": pedido.estado,
         "proveedor_payment_id": pedido.proveedor_payment_id
     }
-
-@router.get("/success")
-async def payment_success(id_pedido: int | None = None):
-    return {
-        "mensaje": "Pago exitoso",
-        "id_pedido": id_pedido
-    }
-
-@router.get("/cancel")
-async def payment_cancel():
-    return {
-        "mensaje": "Pago cancelado"
-    }
