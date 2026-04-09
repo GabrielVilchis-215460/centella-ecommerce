@@ -30,6 +30,7 @@ class Carrito(BaseModel):
 
 class ItemCarritoDetallado(ItemCarrito):
     nombre_producto: str
+    imagen_url: Optional[str] = None
     precio_unitario: float
     subtotal: float
 

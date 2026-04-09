@@ -38,7 +38,6 @@ def validar_stock(producto: Producto, cantidad_solicitada: int):
             ),
         )
 
-
 def validar_tipo_entrega_compatible(
     producto: Producto,
     tipo_seleccionado: TipoEntregaItemEnum,
@@ -134,6 +133,17 @@ def calcular_totales(db: Session, carrito_id: int):
 
     for item in items:
         producto = get_producto(db, item.id_producto)
+        # para jalar las imagenes de los productos
+        url_principal = None
+        if producto.imagenes:
+            img_principal = next(
+                (img.url for img in producto.imagenes if img.orden == 0),
+                producto.imagenes[0].url
+            )
+            url_principal = img_principal
+
+        subtotal = float(item.cantidad * producto.precio)
+        total_general += subtotal
         subtotal = float(item.cantidad * producto.precio)
         total_general += subtotal
         detalles.append(
@@ -144,6 +154,7 @@ def calcular_totales(db: Session, carrito_id: int):
                 cantidad=item.cantidad,
                 tipo_entrega_seleccionado=item.tipo_entrega_seleccionado,
                 nombre_producto=producto.nombre,
+                imagen_url=url_principal,
                 precio_unitario=float(producto.precio),
                 subtotal=subtotal,
             )
@@ -151,10 +162,7 @@ def calcular_totales(db: Session, carrito_id: int):
 
     return schemas.TotalesCarrito(items=detalles, total_pagar=total_general)
 
-# ---------------------------------------------------------------------------
 # Checkout
-# ---------------------------------------------------------------------------
-
 def convertir_a_pedido(
     db: Session,
     id_usuario: int,

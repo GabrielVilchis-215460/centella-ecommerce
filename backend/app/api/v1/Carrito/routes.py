@@ -57,7 +57,7 @@ def obtener_totales(id_usuario: int, db: Session = Depends(get_db)):
     carrito = service.get_carrito_by_usuario(db, id_usuario)
     return service.calcular_totales(db, carrito.id_carrito)
 
-
+# resumen de pedido
 @router.post("/checkout", response_model=schemas.CheckoutResponse, status_code=201)
 def finalizar_compra(
     id_usuario: int,
