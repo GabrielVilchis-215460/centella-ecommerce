@@ -1,6 +1,7 @@
 from app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from decimal import Decimal
+from typing import Optional
 from sqlalchemy import Enum, ForeignKey, Integer, Numeric, String
 from .enum import TipoEntregaItemEnum
 
@@ -14,6 +15,7 @@ class ItemPedido(Base):
     precio_unitario: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     cantidad: Mapped[int] = mapped_column(Integer, nullable=False)
     tipo_entrega: Mapped[TipoEntregaItemEnum] = mapped_column(Enum(TipoEntregaItemEnum), nullable=False)
+    imagen_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Relationships
     pedido: Mapped["Pedido"] = relationship(back_populates="items")
