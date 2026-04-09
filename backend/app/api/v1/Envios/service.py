@@ -6,11 +6,11 @@ from app.models.pedido import Pedido
 from app.models.item_pedido import ItemPedido
 from app.models.enum import EstadoPedidoEnum, TipoEntregaItemEnum
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, session
+from sqlalchemy.orm import selectinload, Session
 #from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from app.core.database import get_db
-from fastapi import Depends
+#from app.core.database import get_db
+#from fastapi import Depends
 import qrcode, base64, os
 from qrcode.constants import ERROR_CORRECT_H
 from io import BytesIO
@@ -60,7 +60,7 @@ async def cotizar_mas_barato(destino: dict, paquete: dict, carrier: str):
     )
     return min(tarifas, key=lambda t: float(t["totalPrice"]))
 
-async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
+async def service_asignar_envio(pedido_id: int, db: Session):
     """
     Funcion que genera la etiqueta a partir de un pedido existente en la BD y guarda el numero de rastreo y costo de envio
     """
@@ -74,7 +74,8 @@ async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
         .where(Pedido.id_pedido == pedido_id)
     )
     result = db.execute(query)
-    pedido = result.scalars().first()
+    #pedido = result.scalars().first()
+    pedido = result.scalar_one_or_none()
 
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado.")
@@ -86,7 +87,7 @@ async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
     direccion = pedido.direccion_envio
     cliente = pedido.cliente
 
-    # Construir destino desde los modelos
+    # Construir destino
     destino = {
         "name": f"{cliente.nombre} {cliente.apellido}",
         "phone": direccion.numero_telefonico, 
@@ -127,19 +128,19 @@ async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
     pedido.costo_envio = resultado["total_price"]
     pedido.estado = EstadoPedidoEnum.enviado # se cambia el estado para que la emprendedora interactue con el estado del pedido
     # Determinar tipos de entrega del pedido
-    tiene_fisica = await _tiene_entrega_fisica(db, pedido.id_pedido)
+    tiene_fisica = _tiene_entrega_fisica(pedido.id_pedido, db)
     tiene_envio = not tiene_fisica or any(
         item.tipo_entrega == TipoEntregaItemEnum.envio
         for item in pedido.items
     )
 
     qr_base64 = None
-    if await _tiene_entrega_fisica(db, pedido.id_pedido):
+    if tiene_fisica:
         qr_base64 = _generar_qr_base64(pedido.id_pedido)
 
     db.commit()
     db.refresh(pedido)
-# Enviar correo según tipo de entrega
+    # Enviar correo según tipo de entrega
     await enviar_correo_pedido(
         email_destino=cliente.email,
         nombre_cliente=f"{cliente.nombre} {cliente.apellido}",
@@ -162,10 +163,10 @@ async def service_asignar_envio(pedido_id: int, db: session = Depends(get_db)):
         "qr_base64": qr_base64,   # None si no hay entrega física
     }
 
-def _generar_qr_base64(pedido_id: int) -> str:
+def _generar_qr_base64(pedido_id: int):
     qr = qrcode.QRCode(
         version=None,
-        error_correction=ERROR_CORRECT_H,  # H en lugar de M para soportar el logo encima
+        error_correction=ERROR_CORRECT_H,  
         box_size=QR_BOX_SIZE,
         border=QR_BORDER,
     )
@@ -194,11 +195,11 @@ def _generar_qr_base64(pedido_id: int) -> str:
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 
-async def _tiene_entrega_fisica(pedido_id: int, db: session = Depends(get_db)) -> bool:
+def _tiene_entrega_fisica(pedido_id: int, db: Session):
     """
     Retorna True si al menos un item del pedido tiene tipo_entrega = fisica.
     """
-    result = await db.execute(
+    result = db.execute(
         select(ItemPedido).where(
             ItemPedido.id_pedido == pedido_id,
             ItemPedido.tipo_entrega == TipoEntregaItemEnum.fisica,
