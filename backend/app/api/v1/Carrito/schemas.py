@@ -66,12 +66,18 @@ class CheckoutRequest(BaseModel):
         tipos = {i.tipo_entrega_seleccionado for i in self.items}
         requiere_envio = (
             TipoEntregaItemEnum.envio in tipos
-            or TipoEntregaItemEnum.ambas in tipos
+            # or TipoEntregaItemEnum.ambas in tipos
         )
         if requiere_envio and not self.id_direccion_envio:
             raise ValueError(
                 "id_direccion_envio es requerido cuando algún item seleccionó envío."
             )
+        if TipoEntregaItemEnum.envio in tipos:
+            if not self.id_direccion_envio:
+                raise ValueError(
+                    "Se seleccionó envío para uno o más productos, "
+                    "por lo que se requiere una id_direccion_envio."
+                )
         return self
 
 # Checkout — response

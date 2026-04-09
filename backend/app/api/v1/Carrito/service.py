@@ -6,8 +6,9 @@ from collections import defaultdict
 from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-
-# Faltaria agregar cosas del login
+from app.api.v1.Envios.service import cotizar_mas_barato
+from app.models.direccion import Direccion
+from app.models.usuario import Usuario
 
 # Funciones auxiliares
 def get_producto(db: Session, id_producto: int):
@@ -163,7 +164,7 @@ def calcular_totales(db: Session, carrito_id: int):
     return schemas.TotalesCarrito(items=detalles, total_pagar=total_general)
 
 # Checkout
-def convertir_a_pedido(
+async def convertir_a_pedido(
     db: Session,
     id_usuario: int,
     checkout: schemas.CheckoutRequest,
@@ -177,7 +178,11 @@ def convertir_a_pedido(
     carrito = get_carrito_by_usuario(db, id_usuario)
 
     if not carrito.items:
-        raise HTTPException(status_code=400, detail="El carrito está vacío.")
+        raise HTTPException(status_code=400, detail="El carrito está vacío")
+    
+    cliente = db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first() 
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     # Mapear las selecciones del request por id_item para acceso rápido
     selecciones: dict[int, schemas.ItemCheckout] = {
@@ -194,7 +199,7 @@ def convertir_a_pedido(
             detail=f"Faltan selecciones de entrega para los items: {faltantes}",
         )
 
-    # --- Validaciones previas (sin modificar nada aún) ---
+    # Validaciones previas
     productos: dict[int, Producto] = {}
     for item in carrito.items:
         producto = get_producto(db, item.id_producto)
@@ -203,25 +208,54 @@ def convertir_a_pedido(
         validar_stock(producto, item.cantidad)
         productos[item.id_producto] = producto
 
-    # --- Agrupar items por emprendedora ---
+    # Agrupar items por emprendedora 
     grupos: dict[int, list[ItemCarrito]] = defaultdict(list)
     for item in carrito.items:
         id_emprendedora = productos[item.id_producto].id_emprendedora
         grupos[id_emprendedora].append(item)
 
-    # --- Crear un Pedido por emprendedora ---
+    # Crear un Pedido por emprendedora 
     pedidos_creados: list[Pedido] = []
     ahora = datetime.utcnow()
+
+    direccion = None
+    if checkout.id_direccion_envio:
+        direccion = db.query(Direccion).filter(Direccion.id_direccion == checkout.id_direccion_envio).first()
 
     for id_emprendedora, items_grupo in grupos.items():
         subtotal = sum(
             float(productos[item.id_producto].precio) * item.cantidad
             for item in items_grupo
         )
-
-        # costo_envio lo puede calcular el módulo de envíos posteriormente;
-        # por ahora se deja en 0 y se actualiza cuando se procese el envío.
         costo_envio = 0.0
+        # verificar modalidad de envios por shipping
+        tiene_envio = any(selecciones[it.id_item].tipo_entrega_seleccionado == "envio" for it in items_grupo)
+        
+        if tiene_envio and direccion:
+            try:
+                destino = {
+                    "name": f"{cliente.nombre} {cliente.apellido}",
+                    "phone": direccion.numero_telefonico, 
+                    "street": direccion.calle,
+                    "number": direccion.numero_ext or "S/N",
+                    "city": direccion.ciudad,
+                    "state": direccion.estado,
+                    "country": "MX",
+                    "postalCode": direccion.codigo_postal,
+                }
+                
+                paquete = {
+                    "content": "Productos Varios",
+                    "weight": 1.0, 
+                    "length": 30.0, "width": 20.0, "height": 10.0,
+                    "declared_value": float(subtotal)
+                }
+
+                tarifa = await cotizar_mas_barato(destino, paquete, carrier="fedex")
+                costo_envio = float(tarifa["totalPrice"])
+            except Exception:
+                costo_envio = 150.0
+
         total = subtotal + costo_envio
 
         nuevo_pedido = Pedido(
@@ -234,22 +268,26 @@ def convertir_a_pedido(
             total=total,
             metodo_pago=checkout.metodo_pago,
             id_direccion_envio=checkout.id_direccion_envio,
-            # codigo_qr_url lo genera el módulo de QR después
             codigo_qr_url=None,
         )
         db.add(nuevo_pedido)
         db.flush()  # Necesario para obtener id_pedido antes de crear los ItemPedido
 
-        # Crear ItemPedido (snapshot del producto al momento de compra)
+        # Crear ItemPedido 
         for item in items_grupo:
             producto = productos[item.id_producto]
             tipo_entrega = selecciones[item.id_item].tipo_entrega_seleccionado
 
+            url_img = None
+            if producto.imagenes:
+                url_img = next((img.url for img in producto.imagenes if img.orden == 0), producto.imagenes[0].url)
+
             db.add(ItemPedido(
                 id_pedido=nuevo_pedido.id_pedido,
                 id_producto=item.id_producto,
-                nombre_producto=producto.nombre,       # snapshot: no cambia si el producto cambia
-                precio_unitario=producto.precio,        # snapshot: precio al momento de compra
+                nombre_producto=producto.nombre, 
+                imagen_url=url_img,      
+                precio_unitario=producto.precio,        
                 cantidad=item.cantidad,
                 tipo_entrega=tipo_entrega,
             ))
