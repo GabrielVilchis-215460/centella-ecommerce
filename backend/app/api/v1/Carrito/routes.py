@@ -3,11 +3,13 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db 
 from app.api.v1.Carrito.service import convertir_a_pedido, get_carrito_by_usuario, agregar_item_al_carrito, eliminar_item, calcular_totales
 from app.api.v1.Carrito.schemas import Carrito, ItemCarrito, ItemCarritoCreate, ItemCarritoUpdate, TotalesCarrito, CheckoutRequest, CheckoutResponse, PedidoResumen
+from app.core.deps import get_current_user, require_cliente
+from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
 @router.get("/", response_model=Carrito)
-def leer_carrito(id_usuario: int, db: Session = Depends(get_db)):
+def leer_carrito(id_usuario: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Obtiene el carrito del usuario actual."""
     return get_carrito_by_usuario(db, id_usuario=id_usuario)
 
@@ -15,14 +17,15 @@ def leer_carrito(id_usuario: int, db: Session = Depends(get_db)):
 def agregar_producto(
     id_usuario: int, 
     item: ItemCarritoCreate, 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_cliente)
 ):
     """Agrega un producto al carrito del usuario."""
     carrito = get_carrito_by_usuario(db, id_usuario=id_usuario)
     return agregar_item_al_carrito(db, id_carrito=carrito.id_carrito, item=item)
 
 @router.delete("/items/{id_item}")
-def quitar_producto(id_item: int, db: Session = Depends(get_db)):
+def quitar_producto(id_item: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Elimina un item específico del carrito."""
     item_eliminado = eliminar_item(db, id_item=id_item)
     if not item_eliminado:
@@ -34,6 +37,7 @@ def actualizar_item(
     id_item: int,
     datos:ItemCarritoUpdate,
     db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_cliente),
 ):
     """Actualiza la cantidad de un item existente."""
     from app.models import ItemCarrito as ItemCarritoModel
@@ -52,7 +56,7 @@ def actualizar_item(
     return db_item
 
 @router.get("/totales", response_model=TotalesCarrito)
-def obtener_totales(id_usuario: int, db: Session = Depends(get_db)):
+def obtener_totales(id_usuario: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Calcula subtotales por item y el total general del carrito."""
     carrito = get_carrito_by_usuario(db, id_usuario)
     return calcular_totales(db, carrito.id_carrito)
@@ -63,6 +67,7 @@ async def finalizar_compra(
     id_usuario: int,
     checkout: CheckoutRequest,
     db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_cliente),
 ):
     """
     Valida stock y tipo de entrega, descuenta inventario, genera un pedido
