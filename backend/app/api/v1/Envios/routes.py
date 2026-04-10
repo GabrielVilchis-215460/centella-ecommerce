@@ -18,10 +18,12 @@ from fastapi import Depends, Response
 from app.api.v1.Envios.service import _generar_qr_base64
 import base64
 from app.services.email_service import enviar_correo_pedido
+from app.core.deps import get_current_user, require_admin
+from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/shipping", tags=["Shipping"])
 @router.post("/cotizar")
-async def cotizar(body: CotizarRequest):
+async def cotizar(body: CotizarRequest, current_user: Usuario = Depends(get_current_user)):
     """
     Retorna tarifas de envío disponibles para la dirección del cliente.
     """
@@ -30,26 +32,27 @@ async def cotizar(body: CotizarRequest):
 
 
 @router.post("/generar-etiqueta", response_model=EtiquetaResponse)
-async def generar_etiqueta(body: GenerarEtiquetaRequest):
+async def generar_etiqueta(body: GenerarEtiquetaRequest, current_user: Usuario = Depends(get_current_user)):
     """
     Genera la etiqueta de envío y retorna el tracking number.
     """
     return await servicio_generar_etiqueta(body)
 
-
+# Este endpoint es solo para probar el rastreo
 @router.get("/rastrear/{tracking_number}", response_model=TrackingResponse)
-async def rastrear(tracking_number: str):
+async def rastrear(tracking_number: str, current_user: Usuario = Depends(get_current_user)):
     """
     Retorna el estado y eventos del envío.
     """
     return await rastrear_pedido(tracking_number)
 
 @router.post("/asignar-envio")
-async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db)):
+async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     return await service_asignar_envio(pedido_id, db)
 
+# Para probar el envio de pedidos
 @router.post("/test-envio")
-async def test_email(email: str, pedido: int):
+async def test_email(email: str, pedido: int, current_user: Usuario = Depends(require_admin)):
     """
     Ruta rápida para probar el envío sin crear un pedido real.
     Uso: /shipping/test-envio?email=tu_correo@gmail.com&pedido=1
