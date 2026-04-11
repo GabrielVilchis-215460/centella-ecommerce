@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from app.api.v1 import api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,10 +25,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(api_router)            
+
 @app.get("/")
 def root():
     return {
         "message": "API corriendo exitosamente!",
         "docs": "/docs",
-        "api_v1":"/api/v1"
-        }
+        "api_v1": "/api/v1"
+    }
