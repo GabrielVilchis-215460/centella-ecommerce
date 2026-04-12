@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func
+from sqlalchemy import select, func, union_all, literal
 from app.models.producto import Producto
 from app.models.servicio import Servicio
 from app.models.emprendedora import Emprendedora
@@ -166,7 +166,10 @@ def get_emprendedoras(
         select(
             Emprendedora.id_emprendedora,
             Emprendedora.nombre_negocio,
+            Emprendedora.descripcion_negocio, 
             Emprendedora.logo_url,
+            Usuario.foto_perfil_url,
+            Emprendedora.insignia_hecho_juarez, 
             Usuario.nombre,
             Usuario.apellido,
             Usuario.fecha_registro,
@@ -191,4 +194,48 @@ def get_emprendedoras(
         query = query.order_by(Usuario.fecha_registro.desc())
 
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
-    return [EmprendedoraCatalogoRead(**row) for row in rows]
+
+    result = []
+    for row in rows:
+        etiquetas = _get_etiquetas(db, row["id_emprendedora"])
+        result.append(EmprendedoraCatalogoRead(
+            **{**dict(row), "etiquetas": etiquetas}
+        ))
+    return result
+    #return [EmprendedoraCatalogoRead(**row) for row in rows]
+
+def _get_etiquetas(db: Session, id_emprendedora: int) -> list[str]:
+    """Calcula las etiquetas de tipo_negocio + categorías top para una emprendedora."""
+    from app.models.producto import Producto
+    from app.models.servicio import Servicio
+
+    p_cats = select(
+        Producto.id_categoria,
+        literal("Productos").label("origen")
+    ).where(Producto.id_emprendedora == id_emprendedora, Producto.activo == True)
+
+    s_cats = select(
+        Servicio.id_categoria,
+        literal("Servicios").label("origen")
+    ).where(Servicio.id_emprendedora == id_emprendedora, Servicio.activo == True)
+
+    union_query = union_all(p_cats, s_cats).subquery()
+
+    stats = db.execute(
+        select(Categoria.nombre, union_query.c.origen)
+        .join(Categoria, Categoria.id_categoria == union_query.c.id_categoria)
+        .group_by(Categoria.id_categoria, Categoria.nombre, union_query.c.origen)
+        .limit(3)
+    ).all()
+
+    tipos_encontrados = {row.origen for row in stats}
+    nombres_categorias = list(dict.fromkeys([row.nombre for row in stats]))
+
+    etiquetas = list(tipos_encontrados)
+    if len(tipos_encontrados) > 1:
+        if nombres_categorias:
+            etiquetas.append(nombres_categorias[0])
+    else:
+        etiquetas.extend(nombres_categorias)
+
+    return etiquetas

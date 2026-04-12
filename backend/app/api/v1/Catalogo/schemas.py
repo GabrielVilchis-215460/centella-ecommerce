@@ -39,9 +39,13 @@ class ServicioCatalogoRead(BaseModel):
 class EmprendedoraCatalogoRead(BaseModel):
     id_emprendedora: int
     nombre_negocio: str
+    descripcion_negocio: Optional[str]
     logo_url: Optional[str]
+    foto_perfil_url: Optional[str]
     nombre: str
     apellido: str
+    insignia_hecho_juarez: bool
     calificacion_promedio: Optional[float]
+    etiquetas: list[str]
 
     model_config = {"from_attributes": True, "extra": "ignore"}
