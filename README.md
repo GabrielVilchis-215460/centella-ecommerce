@@ -1,4 +1,5 @@
-# _Nota:_ Si quieren agregar algo o quitar algo, o inclusive, organizar, sientanse libres de hacerlo🤠.
+# _☪️ Centella E-commerce_
+> _"Ilumminando tu camino al éxito."_
 
 ## Integrantes del Equipo
 
@@ -10,7 +11,7 @@
 | 215983    | **Adrián Rivas Escárcega**        |
 | 222835    | **Anna Lizbeth Barajas Sandoval** |
 
-## Arquitectura de Software
+## 🏛️ Arquitectura de Software
 
 <img width="1412" height="1412" alt="image" src="https://github.com/user-attachments/assets/a46375c6-9552-440d-bc4e-317a409dbf4a" />
 
@@ -22,13 +23,14 @@
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
   <img src="https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61DAFB"/>
   <img src="https://img.shields.io/badge/TailwindCSS-0EA5E9?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
-  <img src="https://img.shields.io/badge/postgresql-4169e1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
 </p>
-En caso de requerir un deploy, agregar la badge correspondiente🗣️
 
 ## Ramas Clave
 
-## Instrucciones de uso - Backend
+## 🛠️ Instrucciones de Uso
+### 🔧 Backend (FastAPI)
 
 Para instalar las dependencias requeridas ubicadas en "requirements.txt", es necesario realizar los siguientes pasos:
 
@@ -66,7 +68,7 @@ uvicorn app.main:app --reload
 # Para cerrar el server una vez que se este ejecutando: ctrl + c
 ```
 
-## Instrucciones de uso - Frontend
+### 🔧 Frontend (React)
 
 Verificar si Node.js y npm están instalados correctamente:
 
@@ -94,7 +96,7 @@ npm run dev
 
 ---
 
-## Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
 ```
 backend/
@@ -115,4 +117,20 @@ backend/
 Frontend/
 ├── README.md             # Documentación del proyecto
 └── requirements.txt      # Dependencias del proyecto
+frontend/
+├── public/              # Archivos estáticos 
+├── src/
+│   ├── assets/          # Imágenes, fuentes y estilos globales
+│   ├── components/      # Componentes UI reutilizables
+│   │   ├── common/      # Botones, Inputs, etc.
+│   │   └── layout/      # Header, Footer, Sidebar
+│   ├── features/        # Módulos por funcionalidad (Auth, Cart, Dashboard)
+│   ├── hooks/           # Custom hooks globales
+│   ├── services/        # Lógica de comunicación con la API mediante Axios
+│   ├── utils/           # Funciones de ayuda y constantes
+│   ├── App.jsx          # Componente raíz y rutas principales
+│   └── main.jsx         # Punto de entrada del cliente
+├── .env                 # Variables de entorno (VITE_API_URL)
+├── tailwind.config.js   # Configuración de estilos
+└── package.json         # Dependencias del ecosistema Node
 ```
