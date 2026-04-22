@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     # CloudFlare bucket
     BUCKET_NAME: str
     BUCKET_API: str
+    BUCKET_API_TOKEN: str
+    BUCKET_ACCESS_KEY: str
+    BUCKET_ACCESS_KEY_SECRET: str
+    BUCKET_ACCOUNT_ID: str
 
     # Paypal
     PAYPAL_SECRET_API: str
