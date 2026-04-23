@@ -14,7 +14,7 @@ from .schemas import ImageResponse, ImagesListResponse
 router = APIRouter(prefix="/imagenes", tags=["Imagenes"])
 
 #AWS ONLY ALLOWS 1 week of duration for presigned urls
-ONE_YEAR = 7 * 24 * 60 * 60
+ONE_WEEK = 7 * 24 * 60 * 60
  
  
 def get_service(db: Session = Depends(get_db)) -> ImageUploadService:
@@ -36,7 +36,7 @@ async def upload_image(
 @router.get("/presigned-download/{id_imagen}")
 async def get_presigned_download_url(
     id_imagen: int,
-    expires_in: int = Query(ONE_YEAR, description="URL expiration in seconds (default: 1 year)"),
+    expires_in: int = Query(ONE_WEEK, description="URL expiration in seconds (default: 1 year)"),
     service: ImageUploadService = Depends(get_service)
 ):
     """Get temporary presigned URL for downloading an image"""
