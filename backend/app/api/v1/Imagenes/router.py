@@ -12,7 +12,8 @@ from .schemas import ImageResponse, ImagesListResponse
 
 
 router = APIRouter(prefix="/imagenes", tags=["Imagenes"])
- 
+
+#AWS ONLY ALLOWS 1 week of duration for presigned urls
 ONE_YEAR = 7 * 24 * 60 * 60
  
  
