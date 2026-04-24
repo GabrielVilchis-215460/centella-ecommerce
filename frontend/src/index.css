@@ -1,6 +1,39 @@
 @import "tailwindcss";
 @import "./assets/styles.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-primary:      var(--color-primary);
+  --color-aux:          var(--color-aux);
+  --color-secondary:    var(--color-secondary);
+
+  --color-bg:           var(--color-bg);
+  --color-bg-dark:      var(--color-bg-dark);
+  --color-bg-light:     var(--color-bg-light);
+
+  --color-text-dark:    var(--color-text-dark);
+  --color-text-regular: var(--color-text-regular);
+  --color-text-light:   var(--color-text-light);
+
+  --color-success:      var(--color-success);
+  --color-error:        var(--color-error);
+  --color-warning:      var(--color-warning);
+
+  --color-states-red:   var(--color-states-red);
+  --color-states-green: var(--color-states-green);
+  --color-states-blue:  var(--color-states-blue);
+  --color-states-orange:var(--color-states-orange);
+  --color-states-gray:  var(--color-states-grays);
+
+  --font-heading: var(--font-heading);
+  --font-body:    var(--font-body);
+
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-xxl:  var(--radius-xxl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
