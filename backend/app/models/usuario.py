@@ -19,6 +19,8 @@ class Usuario(Base):
     fecha_registro: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     email_verificado: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     token_verificacion: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    codigo_reset: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
+    codigo_reset_expira: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # Relationships
     emprendedora: Mapped[Optional["Emprendedora"]] = relationship(back_populates="usuario", uselist=False)

@@ -174,3 +174,38 @@ async def enviar_correo_verificacion(email_destino: str, nombre: str, token: str
     )
     fm = FastMail(conf)
     await fm.send_message(message)
+    
+async def enviar_correo_reset(email_destino: str, nombre: str, codigo: str):
+    html = f"""
+    <html>
+    <head>{FONT_IMPORT}</head>
+    <body>
+        <div style="{BASE_STYLE}">
+            <h2 style="{TITLE_STYLE}">Recupera tu contraseña - Centella</h2>
+            <p>Hola <strong>{nombre}</strong>,</p>
+            <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+            <p>Tu código de verificación es:</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <span style="font-size: 36px; font-weight: bold; color: #872B3D; letter-spacing: 8px;">
+                    {codigo}
+                </span>
+            </div>
+            <p>Este código expira en <strong>15 minutos</strong>.</p>
+            <p style="font-size: 12px; color: #7f8c8d;">
+                Si no solicitaste restablecer tu contraseña, ignora este correo.
+            </p>
+            <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px;">
+                Este es un correo automático generado por el sistema Centella.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    message = MessageSchema(
+        subject="Código de recuperación - Centella",
+        recipients=[email_destino],
+        body=html,
+        subtype=MessageType.html
+    )
+    fm = FastMail(conf)
+    await fm.send_message(message)
