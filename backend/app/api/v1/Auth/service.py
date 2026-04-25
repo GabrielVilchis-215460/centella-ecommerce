@@ -1,14 +1,13 @@
-import uuid
+import random
+from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
 from app.models.enum import TipoUsuarioEnum
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token
 from app.services.email_service import enviar_correo_verificacion, enviar_correo_reset
-from app.api.v1.Auth.schemas import RegistroRequest, LoginRequest, ResetPasswordRequest
-import random
-from datetime import datetime, timedelta
-from app.api.v1.Auth.schemas import ForgotPasswordRequest, ConfirmResetRequest
+from app.api.v1.Auth.schemas import RegistroRequest, LoginRequest, ResetPasswordRequest, ForgotPasswordRequest, ConfirmResetRequest, NewPasswordRequest
+
 
 async def register_user(data: RegistroRequest, db: Session):
     if db.query(Usuario).filter(Usuario.email == data.email).first():
@@ -16,7 +15,7 @@ async def register_user(data: RegistroRequest, db: Session):
     if data.tipo_usuario == TipoUsuarioEnum.administrador:
         raise HTTPException(status_code=403, detail="No se puede registrar un administrador")
 
-    token = str(uuid.uuid4())
+    codigo = str(random.randint(100000, 999999))
 
     nuevo_usuario = Usuario(
         email=data.email,
@@ -26,7 +25,8 @@ async def register_user(data: RegistroRequest, db: Session):
         tipo_usuario=data.tipo_usuario,
         fecha_registro=datetime.utcnow(),
         email_verificado=False,
-        token_verificacion=token
+        codigo_verificacion=codigo,
+        codigo_verificacion_expira=datetime.utcnow() + timedelta(minutes=15)
     )
     db.add(nuevo_usuario)
     db.commit()
@@ -35,18 +35,23 @@ async def register_user(data: RegistroRequest, db: Session):
     await enviar_correo_verificacion(
         email_destino=nuevo_usuario.email,
         nombre=nuevo_usuario.nombre,
-        token=token
+        codigo=codigo
     )
 
     return {"message": "Usuario creado. Revisa tu correo para verificar tu cuenta."}
 
 
-def verify_email(token: str, db: Session):
-    user = db.query(Usuario).filter(Usuario.token_verificacion == token).first()
+def verify_email(email: str, codigo: str, db: Session):
+    user = db.query(Usuario).filter(Usuario.email == email).first()
     if not user:
-        raise HTTPException(status_code=400, detail="Token inválido o ya usado")
+        raise HTTPException(status_code=400, detail="Código inválido o expirado")
+    if not user.codigo_verificacion or user.codigo_verificacion != codigo:
+        raise HTTPException(status_code=400, detail="Código inválido o expirado")
+    if datetime.utcnow() > user.codigo_verificacion_expira:
+        raise HTTPException(status_code=400, detail="El código ha expirado")
     user.email_verificado = True
-    user.token_verificacion = None
+    user.codigo_verificacion = None
+    user.codigo_verificacion_expira = None
     db.commit()
     return {"message": "Correo verificado exitosamente"}
 
@@ -86,11 +91,9 @@ def reset_password(data: ResetPasswordRequest, current_user: Usuario, db: Sessio
 
 async def forgot_password(data: ForgotPasswordRequest, db: Session):
     user = db.query(Usuario).filter(Usuario.email == data.email).first()
-    # Por seguridad, siempre devolvemos el mismo mensaje aunque el email no exista
     if not user:
         return {"message": "Si el correo existe, recibirás un código de verificación"}
-    
-    # Generar código de 6 dígitos
+
     codigo = str(random.randint(100000, 999999))
     user.codigo_reset = codigo
     user.codigo_reset_expira = datetime.utcnow() + timedelta(minutes=15)
@@ -113,9 +116,17 @@ def confirm_reset(data: ConfirmResetRequest, db: Session):
         raise HTTPException(status_code=400, detail="Código inválido o expirado")
     if datetime.utcnow() > user.codigo_reset_expira:
         raise HTTPException(status_code=400, detail="El código ha expirado")
-    
-    user.contrasena = hash_password(data.contrasena_nueva)
     user.codigo_reset = None
     user.codigo_reset_expira = None
+    db.commit()
+    return {"message": "Código verificado. Ahora puedes cambiar tu contraseña."}
+
+def new_password(data: NewPasswordRequest, db: Session):
+    user = db.query(Usuario).filter(Usuario.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Usuario no encontrado")
+    if user.codigo_reset is not None:
+        raise HTTPException(status_code=400, detail="Debes verificar el código primero")
+    user.contrasena = hash_password(data.contrasena_nueva)
     db.commit()
     return {"message": "Contraseña actualizada exitosamente"}
