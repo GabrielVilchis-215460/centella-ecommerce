@@ -5,7 +5,7 @@ from .pagina_emprendimiento import PaginaEmprendimiento
 from .direccion import Direccion
 from .categoria import Categoria
 from .producto import Producto
-from .imagen_producto import ImagenProducto
+from .imagen import Imagen
 from .atributo_producto import AtributoProducto
 from .servicio import Servicio
 from .resena import Resena
@@ -23,7 +23,7 @@ __all__ = [
     "Direccion",
     "Categoria",
     "Producto",
-    "ImagenProducto",
+    "Imagen",
     "AtributoProducto",
     "Servicio",
     "Resena",
