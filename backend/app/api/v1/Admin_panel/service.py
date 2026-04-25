@@ -200,7 +200,7 @@ def get_reportes_service(
         {
             "id_reporte": row.id_reporte,
             "producto_id": row.id_producto,
-            "producto": row.producto,
+            "producto": row.producto_nombre,
             "propietario": row.propietario,
             "reportado_por": row.reportado_por,
             "estado": row.estado,

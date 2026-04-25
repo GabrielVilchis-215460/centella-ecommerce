@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-
+from typing import Optional
 
 class EmprendedoraOut(BaseModel):
     id_emprendedora: int
@@ -21,8 +21,11 @@ class InsigniaOut(BaseModel):
 
 class ReporteOut(BaseModel):
     id_reporte: int
-    producto_id: int
-    producto: str
-    propietario: str
+    producto_id: Optional[int] = None
+    producto: Optional[str] = None
+    propietario: Optional[str] = None
     reportado_por: str
     estado: str
+
+    class Config:
+        from_attributes = True
