@@ -3,7 +3,8 @@ from app.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.api.v1 import api_router
-
+import logging
+logging.basicConfig(level=logging.DEBUG)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Variables de entorno cargadas con exito!")
