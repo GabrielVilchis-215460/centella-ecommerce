@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from app.core.database import get_db
-from app.api.v1.Pedidos.router import get_current_user
+from app.core.deps import require_cliente, require_emprendedora, get_current_user
 from app.models.usuario import Usuario
 
 from .schemas import (
@@ -18,6 +18,8 @@ from .service import (
     update_pagina,
     get_pagina_publica,
 )
+from fastapi import UploadFile, File
+from app.api.v1.Imagenes.service import ImageUploadService
 
 router = APIRouter(prefix="/paginas", tags=["Paginas"])
 
@@ -44,31 +46,62 @@ def get_public_page(
 def create(
     data: PaginaCreate,
     db: Session = Depends(get_db),
-    current_user: Usuario = Depends(get_current_user),
+    current_user: Usuario = Depends(require_emprendedora),
 ):
     try:
         return create_pagina(
             db,
             current_user,
             data.contenido or {},
+            data.emprendedora.model_dump() if data.emprendedora else None,
         )
     except Exception as e:
         raise HTTPException(403, str(e))
-    
+
 
 @router.patch("/", response_model=PaginaRead)
 def update(
     data: PaginaUpdate,
     db: Session = Depends(get_db),
-    current_user: Usuario = Depends(get_current_user),
+    current_user: Usuario = Depends(require_emprendedora),
 ):
     pagina = update_pagina(
         db,
         current_user,
         data.contenido,
+        data.emprendedora.model_dump() if data.emprendedora else None,
     )
 
     if not pagina:
         raise HTTPException(404, "Página no encontrada")
 
     return pagina
+
+def get_image_service(db: Session = Depends(get_db)) -> ImageUploadService:
+    return ImageUploadService(db)
+
+@router.post("/logo", response_model=dict)
+async def upload_logo(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_emprendedora),
+    image_service: ImageUploadService = Depends(get_image_service),
+):
+    emprendedora = current_user.emprendedora
+    if not emprendedora:
+        raise HTTPException(404, "Emprendedora no encontrada")
+
+    result = image_service.upload_image(
+        file,
+        entity_id=emprendedora.id_emprendedora,
+        entity_type="emprendedora"
+    )
+
+    if not result.get("success"):
+        raise HTTPException(400, result.get("error"))
+
+    # Guarda la URL en emprendedora.logo_url
+    emprendedora.logo_url = result["url"]
+    db.commit()
+
+    return result

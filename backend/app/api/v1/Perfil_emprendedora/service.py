@@ -15,8 +15,8 @@ from app.models.enum import (
     TipoResenaEnum,
 )
 
-
-def create_pagina(db: Session, user: Usuario, contenido: dict):
+# cambio aqui en el def
+def create_pagina(db: Session, user: Usuario, contenido: dict, emprendedora_data: Optional[dict] = None):
     if user.tipo_usuario != TipoUsuarioEnum.emprendedora or not user.emprendedora:
         raise Exception("No autorizado")
 
@@ -26,6 +26,12 @@ def create_pagina(db: Session, user: Usuario, contenido: dict):
 
     if existing:
         raise Exception("La página ya existe")
+    
+    # Actualiza campos de emprendedora si vienen
+    if emprendedora_data:
+        for key, value in emprendedora_data.items():
+            if value is not None:
+                setattr(user.emprendedora, key, value)
 
     pagina = PaginaEmprendimiento(
         id_emprendedora=user.emprendedora.id_emprendedora,
@@ -39,8 +45,8 @@ def create_pagina(db: Session, user: Usuario, contenido: dict):
     db.refresh(pagina)
     return pagina
 
-
-def update_pagina(db: Session, user: Usuario, contenido: Optional[dict]):
+# cambio tmb en el def
+def update_pagina(db: Session, user: Usuario, contenido: Optional[dict], emprendedora_data: Optional[dict] = None):
     if user.tipo_usuario != TipoUsuarioEnum.emprendedora or not user.emprendedora:
         raise Exception("No autorizado")
 
@@ -53,6 +59,13 @@ def update_pagina(db: Session, user: Usuario, contenido: Optional[dict]):
 
     if contenido is not None:
         pagina.contenido = contenido
+
+    # Actualiza campos de emprendedora si vienen
+    if emprendedora_data:
+        for key, value in emprendedora_data.items():
+            if value is not None:
+                setattr(user.emprendedora, key, value)
+
 
     pagina.ultima_actualizacion = datetime.utcnow()
 
