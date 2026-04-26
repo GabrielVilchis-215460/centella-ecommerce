@@ -11,6 +11,7 @@ import {
 } from "@tabler/icons-react"
 import { useAuth } from "../../context/AuthContext"
 import logo from "../../assets/Logo_sm_white.png"
+import { CartDropdown } from "../common/CartDropdown"
 
 // Nav 
 const NAV_EMPRENDEDORA = [
@@ -108,6 +109,23 @@ function HeaderCliente() {
   const [busqueda, setBusqueda] = useState("")
   const navigate = useNavigate()
   const dropdownRef = useRef(null)
+  const [carritoAbierto, setCarritoAbierto] = useState(false)
+  const [itemsCarrito, setItemsCarrito] = useState([])
+
+  const handleEliminar = (id) => setItemsCarrito((prev) => prev.filter((i) => i.id !== id))
+  const handleCantidad = (id, val) => setItemsCarrito((prev) => prev.map((i) => i.id === id ? { ...i, cantidad: val } : i))
+
+  const carritoRef = useRef(null)
+  
+    useEffect(() => {
+      const handler = (e) => {
+        if (carritoRef.current && !carritoRef.current.contains(e.target)) {
+          setCarritoAbierto(false)
+        }
+      }
+      document.addEventListener("mousedown", handler)
+      return () => document.removeEventListener("mousedown", handler)
+    }, [])
 
   useEffect(() => {
     const handler = (e) => {
@@ -149,9 +167,19 @@ function HeaderCliente() {
       <div className="flex items-center gap-8">
 
         {/* Carrito */}
-        <Link to="/carrito">
-          <IconShoppingCart size={32} stroke={2} color="white" />
-        </Link>
+        <div className="relative" ref={carritoRef}>
+          <button onClick={() => setCarritoAbierto(!carritoAbierto)}>
+            <IconShoppingCart size={26} stroke={1.5} color="white" />
+          </button>
+          {carritoAbierto && (
+            <CartDropdown
+              items={itemsCarrito}
+              onEliminar={handleEliminar}
+              onCantidadChange={handleCantidad}
+              onClose={() => setCarritoAbierto(false)}
+            />
+          )}
+        </div>
 
         {/* perfil */}
         <div className="relative" ref={dropdownRef}>

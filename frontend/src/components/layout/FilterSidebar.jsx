@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Switch } from "../common/Switch"
 import { Button } from "../common/Button"
+import { NumberInput } from "../common/NumberInput"
 
 // bloque
 function SeccionFiltro({ titulo, children }) {
@@ -91,28 +92,10 @@ export function FilterSidebar({
           {/* Precio */}
           {mostrarPrecio && (
             <div className="flex flex-col gap-2">
-              <span className="font-body text-md text-text-dark font-regular">Precio</span>
-              <div className="flex gap-2">
-                <div className="flex flex-col gap-1 flex-1">
-                  <label className="font-body text-sm text-text-light">Mínimo</label>
-                  <input
-                    type="number"
-                    value={precioMin}
-                    onChange={(e) => setPrecioMin(e.target.value)}
-                    placeholder="$0"
-                    className="w-full px-3 py-2 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular"
-                  />
-                </div>
-                <div className="flex flex-col gap-1 flex-1">
-                  <label className="font-body text-sm text-text-light">Máximo</label>
-                  <input
-                    type="number"
-                    value={precioMax}
-                    onChange={(e) => setPrecioMax(e.target.value)}
-                    placeholder="$0"
-                    className="w-full px-3 py-2 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular"
-                  />
-                </div>
+              <span className="font-body text-base text-text-dark font-medium">Precio</span>
+              <div className="flex gap-3">
+                <NumberInput label="Mínimo" value={precioMin} onChange={setPrecioMin} prefix="$" min={0} className="w-30" />
+                <NumberInput label="Máximo" value={precioMax} onChange={setPrecioMax} prefix="$" min={0} className="w-30"/>
               </div>
               <div className="flex justify-end">
                 <Button size="sm" className="w-auto! px-6">Buscar</Button>
