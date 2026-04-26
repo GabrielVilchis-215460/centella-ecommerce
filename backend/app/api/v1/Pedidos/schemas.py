@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from decimal import Decimal
 from app.models.enum import EstadoPedidoEnum, MetodoPagoEnum, TipoEntregaItemEnum
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
 
 class ItemPedidoConfirmacion(BaseModel):
     nombre_producto: str
@@ -44,3 +47,30 @@ class ConfirmacionPedidoResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PedidoCreate(BaseModel):
+    id_emprendedora: int
+    subtotal: Decimal
+    costo_envio: Decimal = 0
+    metodo_pago: MetodoPagoEnum
+    id_direccion_envio: Optional[int] = None
+
+
+class PedidoUpdate(BaseModel):
+    estado: Optional[EstadoPedidoEnum] = None
+    #numero_rastreo: Optional[str] = None
+    #codigo_qr_url: Optional[str] = None
+    #proveedor_payment_id: Optional[str] = None
+
+
+class PedidoRead(BaseModel):
+    id_pedido: int
+    numero_rastreo: Optional[str] = None
+    #tipo_entrega: Optional[TipoEntregaItemEnum] = None
+    tipo_entrega: Optional[str] = None  # "envio", "fisica" o "mixto"
+    estado: EstadoPedidoEnum
+    fecha_pedido: datetime
+
+    class Config:
+        from_attributes = True
+
