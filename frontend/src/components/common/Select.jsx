@@ -9,12 +9,13 @@ export function Select({
   disabled = false,
   error,
   className = "",
+  labelClassName = "",
 }) {
   return (
     <div className="flex flex-col gap-1 w-full">
 
       {label && (
-        <label className="font-body text-base text-text-regular">
+        <label className={`font-body text-base text-text-regular ${labelClassName}`}>
           {label}
         </label>
       )}

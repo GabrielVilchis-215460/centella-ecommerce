@@ -21,7 +21,7 @@ export function NumberInput({ label, value = 0, onChange, min = 0, max, prefix =
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
       {label && (
-        <span className="font-body text-sm text-text-light">{label}</span>
+        <span className="font-body text-sm text-text-regular">{label}</span>
       )}
       <div className="flex items-center border border-text-light rounded-md overflow-hidden">
         <span className="font-body text-sm text-text-light pl-3">{prefix}</span>
@@ -37,7 +37,7 @@ export function NumberInput({ label, value = 0, onChange, min = 0, max, prefix =
           className="flex-1 font-body text-sm text-text-regular bg-transparent py-2 px-1 outline-none min-w-0
             [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
-        <div className="flex flex-col border-l border-text-light shrink-0">
+        <div className="flex flex-col border-l border-text-light shrink-0 py-1.5">
           <button
             onClick={incrementar}
             className="px-1 pt-0.75 pb-px hover:bg-bg-dark transition-colors"
