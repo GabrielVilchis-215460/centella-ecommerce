@@ -214,7 +214,7 @@ def verificar_emprendedora_service(db: Session, id: int):
     if not emp:
         return None
 
-    emp.estado_verificacion = EstadoVerificacionEnum.verificado
+    emp.estado_verificacion = EstadoVerificacionEnum.verificada
     db.commit()
     return True
 
@@ -224,7 +224,7 @@ def suspender_emprendedora_service(db: Session, id: int):
     if not emp:
         return None
 
-    emp.estado_verificacion = EstadoVerificacionEnum.rechazado
+    emp.estado_verificacion = EstadoVerificacionEnum.suspendida
     db.commit()
     return True
 
