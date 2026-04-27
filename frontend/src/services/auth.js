@@ -1,7 +1,6 @@
 import axios from "axios"
 
-//const API_URL = import.meta.env.VITE_API_URL // nohayenv como nohayfron ＞﹏＜
-const API_URL = "http://localhost:8000" //TODO: remove hardcoded ref and add .env
+const API_URL = import.meta.env.VITE_API_URL
 
 export const authService = {
 
