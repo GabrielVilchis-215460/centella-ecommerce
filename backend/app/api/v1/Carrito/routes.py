@@ -6,7 +6,7 @@ from app.api.v1.Carrito.schemas import Carrito, ItemCarrito, ItemCarritoCreate, 
 from app.core.deps import get_current_user, require_cliente
 from app.models.usuario import Usuario
 
-router = APIRouter(prefix="/cart", tags=["Cart"])
+router = APIRouter(prefix="/carrito", tags=["Carrito"])
 
 @router.get("/", response_model=Carrito)
 def leer_carrito(id_usuario: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
