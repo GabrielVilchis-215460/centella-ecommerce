@@ -21,7 +21,7 @@ from app.services.email_service import enviar_correo_pedido
 from app.core.deps import require_cliente, require_emprendedora_or_admin, require_admin
 from app.models.usuario import Usuario
 
-router = APIRouter(prefix="/shipping", tags=["Shipping"])
+router = APIRouter(prefix="/envios", tags=["Envios"])
 @router.post("/cotizar")
 async def cotizar(body: CotizarRequest, current_user: Usuario = Depends(require_cliente)):
     """
@@ -32,14 +32,14 @@ async def cotizar(body: CotizarRequest, current_user: Usuario = Depends(require_
 
 
 @router.post("/generar-etiqueta", response_model=EtiquetaResponse)
-async def generar_etiqueta(body: GenerarEtiquetaRequest, current_user: Usuario = Depends(require_emprendedora_or_admin)):
+async def generar_etiqueta(body: GenerarEtiquetaRequest, current_user: Usuario = Depends(require_cliente)):
     """
     Genera la etiqueta de envío y retorna el tracking number.
     """
     return await servicio_generar_etiqueta(body)
 
 @router.post("/asignar-envio")
-async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db), current_user: Usuario = Depends(require_emprendedora_or_admin)):
+async def asignar_envio(pedido_id: int, db: AsyncSession = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     return await service_asignar_envio(pedido_id, db)
 
 # Endpoints para probar ciertas features
