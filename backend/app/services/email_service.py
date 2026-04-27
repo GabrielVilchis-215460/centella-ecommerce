@@ -1,11 +1,8 @@
 from app.config import settings
-import base64, tempfile, os
+import base64
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
-
-# Estilos de la identidad corporativa
-FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'
-BASE_STYLE = "font-family: 'Poppins', Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px; color: #333;"
-TITLE_STYLE = "font-family: 'Libre Baskerville', serif; color: #872B3D; margin-top: 0;"
+import tempfile
+import os
 
 conf = ConnectionConfig(
     MAIL_USERNAME = settings.MAIL_USERNAME,
@@ -20,9 +17,14 @@ conf = ConnectionConfig(
     VALIDATE_CERTS = True
 )
 
+# Estilos comunes para reutilizar
+FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'
+BASE_STYLE = "font-family: 'Poppins', Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px; color: #333;"
+TITLE_STYLE = "font-family: 'Libre Baskerville', serif; color: #872B3D; margin-top: 0;"
+
 async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_number: str, label_url: str):
     """
-    Función para enviar el link del PDF y el rastreo al cliente.
+    Función para enviar el link del PDF y el rastreo al cliente con la nueva identidad visual.
     """
     html = f"""
     <html>
@@ -89,7 +91,6 @@ async def enviar_correo_qr(
     </html>
     """
 
-    # Guardar QR como archivo temporal
     img_bytes = base64.b64decode(qr_base64)
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
     tmp.write(img_bytes)
@@ -101,12 +102,12 @@ async def enviar_correo_qr(
             recipients=[email_destino],
             body=html,
             subtype=MessageType.html,
-            attachments=[tmp.name],  # fastapi_mail acepta la ruta del archivo
+            attachments=[tmp.name],
         )
         fm = FastMail(conf)
         await fm.send_message(message)
     finally:
-        os.unlink(tmp.name)  # elimina el archivo temporal al terminar
+        os.unlink(tmp.name)
 
 async def enviar_correo_pedido(
     email_destino: str,
@@ -121,9 +122,6 @@ async def enviar_correo_pedido(
 ):
     """
     Decide qué correo(s) mandar según el tipo de entrega del pedido.
-    - Solo envío     → correo con tracking y etiqueta
-    - Solo física    → correo con QR
-    - Ambas          → ambos correos
     """
     if tiene_envio and tracking_number:
         await enviar_correo_guia(
@@ -140,3 +138,72 @@ async def enviar_correo_pedido(
             pedido_id=pedido_id,
             qr_base64=qr_base64,
         )
+        
+async def enviar_correo_verificacion(email_destino: str, nombre: str, codigo: str):
+    html = f"""
+    <html>
+    <head>{FONT_IMPORT}</head>
+    <body>
+        <div style="{BASE_STYLE}">
+            <h2 style="{TITLE_STYLE}">Verifica tu cuenta en Centella</h2>
+            <p>Hola <strong>{nombre}</strong>,</p>
+            <p>Gracias por registrarte. Tu código de verificación es:</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <span style="font-size: 36px; font-weight: bold; color: #872B3D; letter-spacing: 8px;">
+                    {codigo}
+                </span>
+            </div>
+            <p>Este código expira en <strong>15 minutos</strong>.</p>
+            <p style="font-size: 12px; color: #7f8c8d;">
+                Si no creaste una cuenta, ignora este correo.
+            </p>
+            <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px;">
+                Este es un correo automático generado por el sistema Centella.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    message = MessageSchema(
+        subject="Verifica tu cuenta - Centella",
+        recipients=[email_destino],
+        body=html,
+        subtype=MessageType.html
+    )
+    fm = FastMail(conf)
+    await fm.send_message(message)
+    
+async def enviar_correo_reset(email_destino: str, nombre: str, codigo: str):
+    html = f"""
+    <html>
+    <head>{FONT_IMPORT}</head>
+    <body>
+        <div style="{BASE_STYLE}">
+            <h2 style="{TITLE_STYLE}">Recupera tu contraseña - Centella</h2>
+            <p>Hola <strong>{nombre}</strong>,</p>
+            <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+            <p>Tu código de verificación es:</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <span style="font-size: 36px; font-weight: bold; color: #872B3D; letter-spacing: 8px;">
+                    {codigo}
+                </span>
+            </div>
+            <p>Este código expira en <strong>15 minutos</strong>.</p>
+            <p style="font-size: 12px; color: #7f8c8d;">
+                Si no solicitaste restablecer tu contraseña, ignora este correo.
+            </p>
+            <p style="margin-top: 30px; font-size: 11px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px;">
+                Este es un correo automático generado por el sistema Centella.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    message = MessageSchema(
+        subject="Código de recuperación - Centella",
+        recipients=[email_destino],
+        body=html,
+        subtype=MessageType.html
+    )
+    fm = FastMail(conf)
+    await fm.send_message(message)
