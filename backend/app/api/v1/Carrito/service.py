@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from app.api.v1.Envios.service import cotizar_mas_barato
 from app.models.direccion import Direccion
 from app.models.usuario import Usuario
+from app.models.imagen import Imagen
 
 # Funciones auxiliares
 def get_producto(db: Session, id_producto: int):
@@ -135,8 +136,14 @@ def calcular_totales(db: Session, carrito_id: int):
     for item in items:
         producto = get_producto(db, item.id_producto)
         # para jalar las imagenes de los productos
+        imagenes = db.query(Imagen).filter(
+            Imagen.entity_id == item.id_producto,
+            Imagen.entity_type == "producto"
+        ).order_by(Imagen.orden).all()
+
         url_principal = None
-        if producto.imagenes:
+
+        if imagenes:
             img_principal = next(
                 (img.url for img in producto.imagenes if img.orden == 0),
                 producto.imagenes[0].url
@@ -278,9 +285,18 @@ async def convertir_a_pedido(
             producto = productos[item.id_producto]
             tipo_entrega = selecciones[item.id_item].tipo_entrega_seleccionado
 
+            imagenes = db.query(Imagen).filter(
+                Imagen.entity_id == item.id_producto,
+                Imagen.entity_type == "producto"
+            ).order_by(Imagen.orden).all()
+
             url_img = None
-            if producto.imagenes:
-                url_img = next((img.url for img in producto.imagenes if img.orden == 0), producto.imagenes[0].url)
+            
+            if imagenes:
+                url_img = next(
+                    (img.url for img in imagenes if img.orden == 0),
+                    imagenes[0].url
+                )
 
             db.add(ItemPedido(
                 id_pedido=nuevo_pedido.id_pedido,
