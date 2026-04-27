@@ -10,8 +10,17 @@ from app.core.database import get_db
 from .service import ImageUploadService
 from .schemas import ImageResponse, ImagesListResponse
 
+# Proteccion de roles
+from app.core.deps import require_cliente, require_emprendedora
 
-router = APIRouter(prefix="/imagenes", tags=["Imagenes"])
+router = APIRouter(
+    prefix="/imagenes", 
+    tags=["Imagenes"], 
+    dependencies=[
+        Depends(require_cliente),
+        Depends(require_emprendedora)
+    ]
+)
 
 #AWS ONLY ALLOWS 1 week of duration for presigned urls
 ONE_WEEK = 7 * 24 * 60 * 60

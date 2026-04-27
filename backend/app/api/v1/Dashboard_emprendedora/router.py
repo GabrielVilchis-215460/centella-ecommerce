@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-#
+from app.core.deps import require_emprendedora
 
 from app.services.analytics.emprendedora_metrics import (
     get_full_dashboard,
     
 )
 
-router = APIRouter(prefix="/emprendedora/dashboard", tags=["Dashboard Emprendedora"])
+router = APIRouter(prefix="/emprendedora/dashboard", tags=["Dashboard Emprendedora"], dependencies=[Depends(require_emprendedora)])
 
 
 @router.get("/")
