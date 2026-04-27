@@ -8,7 +8,7 @@ from app.models.enum import EstadoPedidoEnum
 from app.core.deps import require_cliente, require_emprendedora
 from app.models.usuario import Usuario
 
-router = APIRouter()
+router = APIRouter(prefix="/pagos",tags=["Pagos"])
 
 @router.post("/pay", response_model=PayResponseList)
 async def pagar(payload: PayRequest, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
