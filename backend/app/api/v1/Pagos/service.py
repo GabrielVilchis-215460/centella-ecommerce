@@ -9,6 +9,10 @@ from app.services.paypal_service import paypal_service
 from app.config import settings
 from app.api.v1.Envios.service import service_asignar_envio, _generar_qr_base64
 from app.services.email_service import enviar_correo_pedido
+###
+from app.services.archivos_service import CloudflareR2Client
+import base64
+##
 
 class PaymentService:
 
@@ -162,9 +166,19 @@ class PaymentService:
 
         if tiene_fisica:
             try:
+                #qr_base64 = _generar_qr_base64(pedido.id_pedido)
+                #pedido.codigo_qr_url = qr_base64
+                #db.commit()
                 qr_base64 = _generar_qr_base64(pedido.id_pedido)
-                pedido.codigo_qr_url = qr_base64
-                db.commit()
+                img_bytes = base64.b64decode(qr_base64)
+
+                # Subir a R2
+                r2 = CloudflareR2Client()
+                resultado = r2.upload_image(img_bytes, f"qr_pedido_{pedido.id_pedido}.png")
+
+                if resultado.get("success"):
+                    pedido.codigo_qr_url = resultado["url"]  # ← URL pública de R2
+                    db.commit()
 
                 await enviar_correo_pedido(
                     email_destino=pedido.cliente.email,

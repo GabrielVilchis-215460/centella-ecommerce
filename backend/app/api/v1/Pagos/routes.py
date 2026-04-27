@@ -14,6 +14,7 @@ router = APIRouter()
 async def pagar(payload: PayRequest, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     return await payment_service.procesar_pagos(db, payload.ids_pedido)
 
+# Estos 2 endpoints pueden quitarse las protecciones mas adelante (de ser requerido)
 @router.get("/confirm/paypal/{id_pedido}", response_model=PaymentResponse)
 async def confirmar_paypal(
     id_pedido: int,
