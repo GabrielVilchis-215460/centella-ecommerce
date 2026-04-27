@@ -139,8 +139,7 @@ async def enviar_correo_pedido(
             qr_base64=qr_base64,
         )
         
-async def enviar_correo_verificacion(email_destino: str, nombre: str, token: str):
-    url_verificacion = f"{settings.APP_URL}/api/v1/auth/verify?token={token}"
+async def enviar_correo_verificacion(email_destino: str, nombre: str, codigo: str):
     html = f"""
     <html>
     <head>{FONT_IMPORT}</head>
@@ -148,14 +147,13 @@ async def enviar_correo_verificacion(email_destino: str, nombre: str, token: str
         <div style="{BASE_STYLE}">
             <h2 style="{TITLE_STYLE}">Verifica tu cuenta en Centella</h2>
             <p>Hola <strong>{nombre}</strong>,</p>
-            <p>Gracias por registrarte. Haz clic en el botón para verificar tu correo:</p>
-            <div style="margin: 25px 0;">
-                <a href="{url_verificacion}"
-                   style="background-color: #872B3D; color: white; padding: 12px 25px;
-                          text-decoration: none; border-radius: 5px; display: inline-block; font-weight: 600;">
-                   Verificar mi cuenta
-                </a>
+            <p>Gracias por registrarte. Tu código de verificación es:</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <span style="font-size: 36px; font-weight: bold; color: #872B3D; letter-spacing: 8px;">
+                    {codigo}
+                </span>
             </div>
+            <p>Este código expira en <strong>15 minutos</strong>.</p>
             <p style="font-size: 12px; color: #7f8c8d;">
                 Si no creaste una cuenta, ignora este correo.
             </p>
