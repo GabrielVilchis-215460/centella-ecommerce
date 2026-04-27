@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
-from app.models.enum import TipoUsuarioEnum
+from app.models.emprendedora import Emprendedora
+from app.models.enum import TipoUsuarioEnum, EstadoVerificacionEnum
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token
 from app.services.email_service import enviar_correo_verificacion, enviar_correo_reset
 from app.api.v1.Auth.schemas import RegistroRequest, LoginRequest, ResetPasswordRequest, ForgotPasswordRequest, ConfirmResetRequest, NewPasswordRequest
@@ -49,9 +50,21 @@ def verify_email(email: str, codigo: str, db: Session):
         raise HTTPException(status_code=400, detail="Código inválido o expirado")
     if datetime.utcnow() > user.codigo_verificacion_expira:
         raise HTTPException(status_code=400, detail="El código ha expirado")
+    
     user.email_verificado = True
     user.codigo_verificacion = None
     user.codigo_verificacion_expira = None
+
+    if user.tipo_usuario == TipoUsuarioEnum.emprendedora:
+        emprendedora = Emprendedora(
+            id_usuario=user.id_usuario,
+            nombre_negocio="Sin nombre",
+            estado_verificacion=EstadoVerificacionEnum.pendiente,
+            enlace_redes_sociales={},
+            color_emprendedora_hex="#000000"
+        )
+        db.add(emprendedora)
+
     db.commit()
     return {"message": "Correo verificado exitosamente"}
 
@@ -120,6 +133,7 @@ def confirm_reset(data: ConfirmResetRequest, db: Session):
     user.codigo_reset_expira = None
     db.commit()
     return {"message": "Código verificado. Ahora puedes cambiar tu contraseña."}
+
 
 def new_password(data: NewPasswordRequest, db: Session):
     user = db.query(Usuario).filter(Usuario.email == data.email).first()
