@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     APP_NAME: str = "Centella E-Commerce API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
+    
+    # Auth / JWT
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # BD
     DATABASE_URL: str
