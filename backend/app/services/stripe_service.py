@@ -3,7 +3,7 @@ import stripe
 from typing import Dict, Optional
 from app.config import settings
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_API
 
 class StripeService:
     
