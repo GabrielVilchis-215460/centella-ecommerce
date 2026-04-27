@@ -3,11 +3,11 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
-from app.models.enum import TipoUsuarioEnum
+from app.models.enum import TipoUsuarioEnum, EstadoVerificacionEnum
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token
 from app.services.email_service import enviar_correo_verificacion, enviar_correo_reset
 from app.api.v1.Auth.schemas import RegistroRequest, LoginRequest, ResetPasswordRequest, ForgotPasswordRequest, ConfirmResetRequest, NewPasswordRequest
-
+from app.models.emprendedora import Emprendedora
 
 async def register_user(data: RegistroRequest, db: Session):
     if db.query(Usuario).filter(Usuario.email == data.email).first():
@@ -52,6 +52,16 @@ def verify_email(email: str, codigo: str, db: Session):
     user.email_verificado = True
     user.codigo_verificacion = None
     user.codigo_verificacion_expira = None
+    # Crea el registro de emprendedora al verificar el correo
+    if user.tipo_usuario == TipoUsuarioEnum.emprendedora:
+        emprendedora = Emprendedora(
+            id_usuario=user.id_usuario,
+            nombre_negocio="Sin nombre",
+            estado_verificacion=EstadoVerificacionEnum.pendiente,
+            enlace_redes_sociales={},
+            color_emprendedora_hex="#000000"
+        )
+        db.add(emprendedora)
     db.commit()
     return {"message": "Correo verificado exitosamente"}
 
