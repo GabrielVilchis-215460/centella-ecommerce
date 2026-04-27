@@ -9,7 +9,6 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from app.services.email_service import enviar_correo_verificacion, enviar_correo_reset
 from app.api.v1.Auth.schemas import RegistroRequest, LoginRequest, ResetPasswordRequest, ForgotPasswordRequest, ConfirmResetRequest, NewPasswordRequest
 
-
 async def register_user(data: RegistroRequest, db: Session):
     if db.query(Usuario).filter(Usuario.email == data.email).first():
         raise HTTPException(status_code=400, detail="El email ya está registrado")
@@ -55,6 +54,7 @@ def verify_email(email: str, codigo: str, db: Session):
     user.codigo_verificacion = None
     user.codigo_verificacion_expira = None
 
+    # Crea el registro de emprendedora al verificar el correo
     if user.tipo_usuario == TipoUsuarioEnum.emprendedora:
         emprendedora = Emprendedora(
             id_usuario=user.id_usuario,
