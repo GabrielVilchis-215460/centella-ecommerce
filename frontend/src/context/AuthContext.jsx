@@ -10,29 +10,36 @@ export function AuthProvider({ children }) {
 
   // verificar si hay sesion guardada
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    const usuarioGuardado = localStorage.getItem("usuario")
-
-    if (token && usuarioGuardado) {
-      setUsuario(JSON.parse(usuarioGuardado))
+    const iniciarSesion = async () => {
+      const token = localStorage.getItem("token")
+      if (!token) { setCargando(false); return }
+      try {
+        const me = await authService.getMe()
+        setUsuario(me)
+      } catch {
+        localStorage.removeItem("token")
+        localStorage.removeItem("refresh_token")
+      } finally {
+        setCargando(false)
+      }
     }
-
-    setCargando(false)
+    iniciarSesion()
   }, [])
 
   // login
   const login = async (email, contrasena) => {
     const data = await authService.login(email, contrasena)
-
-    localStorage.setItem("token", data.token)
-    localStorage.setItem("usuario", JSON.stringify(data.usuario))
-    setUsuario(data.usuario)
+    localStorage.setItem("token",         data.access_token)
+    localStorage.setItem("refresh_token", data.refresh_token)
+    // Obtener datos completos del usuario
+    const me = await authService.getMe()
+    setUsuario(me)
   }
 
   // logout
   const logout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("usuario")
+    localStorage.removeItem("refresh_token")
     setUsuario(null)
   }
 
