@@ -18,7 +18,7 @@ import { GestionPedidos }       from "./pages/emprendedora/GestionPedidos"
 import { PaginaEmprendimiento } from "./pages/emprendedora/PaginaEmprendimiento"
 
 // rutas de admin
-import { AdminPanel }    from "./pages/admin/AdminPanel"
+import { AdminPanel }    from "./features/admin/AdminPanel"
 import { Emprendedoras } from "./pages/admin/Emprendedoras"
 import { Insignias }     from "./pages/admin/Insignias"
 import { Moderacion }    from "./pages/admin/Moderacion"
