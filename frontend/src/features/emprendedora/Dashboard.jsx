@@ -1,4 +1,6 @@
-import { Navigate } from "react-router-dom"
+//import { Navigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { useRef, useState, useEffect } from "react"
 // import de iconos
 import {
   IconBrandAsana,
@@ -9,6 +11,9 @@ import {
   IconShoppingCart,
   IconHandFinger,
   IconDots,
+  IconSettings,
+  IconAward,
+  IconRosetteDiscountCheck
 } from "@tabler/icons-react"
 import {
   Chart as ChartJS,
@@ -30,6 +35,7 @@ import { Header }        from "../../components/layout/Header"
 import { Footer }        from "../../components/layout/Footer"
 import { useAuth }       from "../../context/AuthContext"
 import { useDashboard }  from "../../hooks/useEmprendedoraPanel"
+import { emprendedoraService } from "../../services/emprendedoraService"
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement,
@@ -106,6 +112,97 @@ function MetricCard({ icon, value, label, iconBg, iconColor }) {
     </div>
   )
 }
+function MenuEmprendimiento() {
+  const [abierto, setAbierto] = useState(false)
+  const [cargando, setCargando] = useState(null) // "insignia" | "verificacion" | null
+  const ref = useRef(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setAbierto(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  const handlePagina = async () => {
+    setCargando("pagina")
+    try {
+      await emprendedoraService.actualizarPagina()
+    } finally {
+      setCargando(null)
+      setAbierto(false)
+    }
+  }
+
+  const handleInsignia = async () => {
+    setCargando("insignia")
+    try {
+      await emprendedoraService.solicitarInsignia()
+    } finally {
+      setCargando(null)
+      setAbierto(false)
+    }
+  }
+
+  const handleVerificacion = async () => {
+    setCargando("verificacion")
+    try {
+      await emprendedoraService.solicitarVerificacion()
+    } finally {
+      setCargando(null)
+      setAbierto(false)
+    }
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setAbierto(!abierto)}
+        className="rounded-full p-1 hover:bg-bg-dark transition-colors"
+      >
+        <Icon icon={IconDots} size={18} color="var(--color-text-light)" />
+      </button>
+
+      {abierto && (
+        <div className="absolute left-0 top-[calc(100%+8px)] z-50 w-72 rounded-xl
+                        bg-bg-light shadow-lg p-2 flex flex-col">
+          {/* CAMBIAR ESTO CUANDO HAYA UNA PAGINA DE LA EDICION DE PAGINA */}
+          <button
+            onClick={() => { navigate("/dashboard/pagina"); setAbierto(false) }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-text-regular
+                      hover:bg-bg-dark transition-colors text-left"
+          >
+            <Icon icon={IconSettings} size={18} color="var(--color-text-regular)" />
+            Editar perfil de emprendimiento
+          </button>
+
+          <button
+            onClick={handleInsignia}
+            disabled={cargando === "insignia"}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-text-regular
+                       hover:bg-bg-dark transition-colors text-left disabled:opacity-50"
+          >
+            <Icon icon={IconAward} size={18} color="var(--color-text-regular)" />
+            {cargando === "insignia" ? "Solicitando..." : 'Solicitar insignia "Hecho en Juárez"'}
+          </button>
+
+          <button
+            onClick={handleVerificacion}
+            disabled={cargando === "verificacion"}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-text-regular
+                       hover:bg-bg-dark transition-colors text-left disabled:opacity-50"
+          >
+            <Icon icon={IconRosetteDiscountCheck} size={18} color="var(--color-text-regular)" />
+            {cargando === "verificacion" ? "Solicitando..." : "Solicitar verificación"}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
@@ -256,9 +353,7 @@ export function Dashboard() {
                 <h1 className="font-heading text-xl font-bold text-text-dark">
                   {emprendimiento.nombre || "Mi emprendimiento"}
                 </h1>
-                <button className="rounded-full p-1 hover:bg-bg-dark transition-colors">
-                  <Icon icon={IconDots} size={18} color="var(--color-text-light)" />
-                </button>
+                <MenuEmprendimiento />
               </div>
             </>
           )}
