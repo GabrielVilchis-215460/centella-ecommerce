@@ -1,27 +1,28 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 
+/* ----- IR DESCOMENTANDO CADA RUTA CONFORME SE VAYA INCORPORANDO O YAMA ------*/
 // public
 import { Login }    from "./features/auth/Login"
-import { Registro } from "./features/auth/Registro"
+//import { Registro } from "./features/auth/Registro"
 
 // rutas del cliente
-import { Catalogo }         from "./features/cliente/Catalogo"
-import { Checkout }         from "./features/cliente/Checkout"
-import { HistorialCompras } from "./features/cliente/HistorialCompras"
+// import { Catalogo }         from "./features/cliente/Catalogo"
+// import { Checkout }         from "./features/cliente/Checkout"
+// import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
-import { Dashboard }            from "./features/emprendedora/Dashboard"
-import { GestionProductos }     from "./features/emprendedora/GestionProductos"
-import { GestionServicios }     from "./features/emprendedora/GestionServicios"
-import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
-import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
+// import { Dashboard }            from "./features/emprendedora/Dashboard"
+// import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+// import { GestionServicios }     from "./features/emprendedora/GestionServicios"
+// import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
+// import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
-import { Emprendedoras } from "./features/admin/Emprendedoras"
-import { Insignias }     from "./features/admin/Insignias"
-import { Moderacion }    from "./features/admin/Moderacion"
+//import { Emprendedoras } from "./features/admin/Emprendedoras"
+//import { Insignias }     from "./features/admin/Insignias"
+//import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
 function ProtectedRoute({ children, roles = [] }) {
@@ -35,15 +36,28 @@ function ProtectedRoute({ children, roles = [] }) {
   return children
 }
 
+function RutaRaiz() {
+  const { usuario } = useAuth()
+  if (usuario.tipo_usuario === "administrador") return <Navigate to="/admin" replace />
+  if (usuario.tipo_usuario === "emprendedora")  return <Navigate to="/dashboard" replace />
+  return <Navigate to="/catalogo" replace />
+}
+
 export function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={
+        <ProtectedRoute>
+          <RutaRaiz />
+        </ProtectedRoute>
+      } />
 
       {/* Públicas */}
       <Route path="/login"    element={<Login />}    />
-      <Route path="/registro" element={<Registro />} />
+      {/*<Route path="/registro" element={<Registro />} />*/}
 
       {/* Cliente */}
+      {/*}
       <Route path="/" element={<Catalogo />} />
       <Route path="/catalogo"                   element={<Catalogo />}         />
       <Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
@@ -68,10 +82,10 @@ export function AppRoutes() {
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
         </ProtectedRoute>
-      } />
+      } />*/}
 
       {/* Emprendedora */}
-      <Route path="/dashboard" element={
+      {/*<Route path="/dashboard" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <Dashboard />
         </ProtectedRoute>
@@ -95,7 +109,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["emprendedora"]}>
           <PaginaEmprendimiento />
         </ProtectedRoute>
-      } />
+      } />*/}
 
       {/* Admin */}
       <Route path="/admin" element={
@@ -103,6 +117,7 @@ export function AppRoutes() {
           <AdminPanel />
         </ProtectedRoute>
       } />
+      {/*
       <Route path="/admin/emprendedoras" element={
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
@@ -118,7 +133,7 @@ export function AppRoutes() {
           <Moderacion />
         </ProtectedRoute>
       } />
-
+        */}
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
 

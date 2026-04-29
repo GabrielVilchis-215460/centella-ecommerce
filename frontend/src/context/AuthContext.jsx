@@ -28,13 +28,20 @@ export function AuthProvider({ children }) {
 
   // login
   const login = async (email, contrasena) => {
+  try {
     const data = await authService.login(email, contrasena)
     localStorage.setItem("token",         data.access_token)
     localStorage.setItem("refresh_token", data.refresh_token)
     // Obtener datos completos del usuario
     const me = await authService.getMe()
     setUsuario(me)
+    return me
+  } catch (err) {
+    console.log("Error en AuthContext:", err)
+    console.log("Error response:", err?.response)
+    throw err
   }
+}
 
   // logout
   const logout = () => {
