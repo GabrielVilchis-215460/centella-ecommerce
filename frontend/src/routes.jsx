@@ -2,26 +2,26 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 
 // public
-import { Login }    from "./pages/auth/Login"
-import { Registro } from "./pages/auth/Registro"
+import { Login }    from "./features/auth/Login"
+import { Registro } from "./features/auth/Registro"
 
 // rutas del cliente
-import { Catalogo }         from "./pages/cliente/Catalogo"
-import { Checkout }         from "./pages/cliente/Checkout"
-import { HistorialCompras } from "./pages/cliente/HistorialCompras"
+import { Catalogo }         from "./features/cliente/Catalogo"
+import { Checkout }         from "./features/cliente/Checkout"
+import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
-import { Dashboard }            from "./pages/emprendedora/Dashboard"
-import { GestionProductos }     from "./pages/emprendedora/GestionProductos"
-import { GestionServicios }     from "./pages/emprendedora/GestionServicios"
-import { GestionPedidos }       from "./pages/emprendedora/GestionPedidos"
-import { PaginaEmprendimiento } from "./pages/emprendedora/PaginaEmprendimiento"
+import { Dashboard }            from "./features/emprendedora/Dashboard"
+import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+import { GestionServicios }     from "./features/emprendedora/GestionServicios"
+import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
+import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
-import { Emprendedoras } from "./pages/admin/Emprendedoras"
-import { Insignias }     from "./pages/admin/Insignias"
-import { Moderacion }    from "./pages/admin/Moderacion"
+import { Emprendedoras } from "./features/admin/Emprendedoras"
+import { Insignias }     from "./features/admin/Insignias"
+import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
 function ProtectedRoute({ children, roles = [] }) {
