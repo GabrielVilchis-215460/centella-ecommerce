@@ -13,7 +13,7 @@ import { Terminos } from "./features/auth/Terminos"
 // import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
-// import { Dashboard }            from "./features/emprendedora/Dashboard"
+import { Dashboard }            from "./features/emprendedora/Dashboard"
 // import { GestionProductos }     from "./features/emprendedora/GestionProductos"
 // import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 // import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
@@ -87,12 +87,12 @@ export function AppRoutes() {
       } />*/}
 
       {/* Emprendedora */}
-      {/*<Route path="/dashboard" element={
+      <Route path="/dashboard" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <Dashboard />
         </ProtectedRoute>
       } />
-      <Route path="/dashboard/productos" element={
+      {/*<Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
         </ProtectedRoute>

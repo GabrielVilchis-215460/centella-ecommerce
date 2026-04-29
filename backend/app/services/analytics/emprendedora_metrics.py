@@ -8,7 +8,7 @@ from app.models import (
     PaginaEmprendimiento,
     EstadoPedidoEnum,
 )
-
+from app.models.emprendedora import Emprendedora
 
 
 # -------------------------
@@ -126,10 +126,21 @@ def get_top_productos(db: Session, emprendedora_id: int, limit: int = 5):
         ],
     }
 
+# nueva funcion
+def get_emprendimiento_info(db: Session, emprendedora_id: int):
+    result = db.execute(
+        select(Emprendedora.nombre_negocio, Emprendedora.logo_url)
+        .where(Emprendedora.id_emprendedora == emprendedora_id)
+    ).first()
 
+    return {
+        "nombre": result.nombre_negocio if result else "",
+        "logo_url": result.logo_url if result else None,
+    }
 
 def get_full_dashboard(db: Session, emprendedora_id: int):
     return {
+        "emprendimiento": get_emprendimiento_info(db, emprendedora_id), 
         "summary": get_dashboard_metrics(db, emprendedora_id),
         "ventas_30_dias": get_ventas_30_dias(db, emprendedora_id),
         "top_productos": get_top_productos(db, emprendedora_id),
