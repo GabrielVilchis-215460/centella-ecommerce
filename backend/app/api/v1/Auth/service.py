@@ -169,3 +169,32 @@ async def resend_verification_code(data, db: Session):
     )
 
     return generic_response
+
+async def resend_reset_code(data, db: Session):
+    user = db.query(Usuario).filter(Usuario.email == data.email).first()
+    
+    # Respuesta genérica por seguridad
+    generic_response = {"message": "Si el correo existe, recibirás un nuevo código."}
+    
+    if not user:
+        return generic_response
+
+    # Throttle: evitar spam si el código anterior aún no expiró
+    if user.codigo_reset_expira and datetime.utcnow() < user.codigo_reset_expira:
+        raise HTTPException(
+            status_code=429,
+            detail="Ya tienes un código activo. Espera antes de solicitar otro."
+        )
+
+    codigo = str(random.randint(100000, 999999))
+    user.codigo_reset = codigo
+    user.codigo_reset_expira = datetime.utcnow() + timedelta(minutes=15)
+    db.commit()
+
+    await enviar_correo_reset(
+        email_destino=user.email,
+        nombre=user.nombre,
+        codigo=codigo
+    )
+
+    return generic_response
