@@ -13,6 +13,7 @@ from app.api.v1.Auth.schemas import (
     ConfirmResetRequest,
     VerifyEmailRequest,
     NewPasswordRequest,
+    ResendVerificationRequest,
 )
 from app.api.v1.Auth.service import (
     register_user,
@@ -23,6 +24,7 @@ from app.api.v1.Auth.service import (
     forgot_password,
     confirm_reset,
     new_password,
+    resend_verification_code,
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -78,3 +80,8 @@ def confirm_reset_pwd(data: ConfirmResetRequest, db: Session = Depends(get_db)):
 def set_new_password(data: NewPasswordRequest, db: Session = Depends(get_db)):
     """Establece la nueva contraseña tras confirmar el código."""
     return new_password(data, db)
+
+@router.post("/resend-verification", summary="Reenviar código de verificación")
+async def resend_verification(data: ResendVerificationRequest, db: Session = Depends(get_db)):
+    """Reenvía el código de verificación al correo, si aún no está verificado."""
+    return await resend_verification_code(data, db)
