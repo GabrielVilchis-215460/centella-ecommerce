@@ -85,7 +85,7 @@ export function AppRoutes() {
       } />*/}
 
       {/* Emprendedora */}
-      <Route path="/dashboard" element={
+      {/*<Route path="/dashboard" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <Dashboard />
         </ProtectedRoute>
