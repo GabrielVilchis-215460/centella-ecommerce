@@ -26,17 +26,13 @@ export function useDashboard() {
     return () => { cancelado = true }
   }, [])
 
-  const summary     = dashboard?.summary       ?? {}
-  const ventas30d   = dashboard?.ventas_30_dias ?? []
-  const topCantidad = dashboard?.top_productos?.por_cantidad ?? []
-  const topIngresos = dashboard?.top_productos?.por_ingresos ?? []
-
   return {
     cargando,
     error,
-    summary,      // { saldo_actual, pedidos_activos, visitas_perfil }
-    ventas30d,    // [{ fecha, total }]
-    topCantidad,  // [{ id_producto, nombre, total }]
-    topIngresos,  // [{ id_producto, nombre, total }]
+    emprendimiento: dashboard?.emprendimiento ?? {},   // { nombre, logo_url }
+    summary:        dashboard?.summary        ?? {},   // { saldo_actual, pedidos_activos, visitas_perfil }
+    ventas30d:      dashboard?.ventas_30_dias ?? [],   // [{ fecha, total }]
+    topCantidad:    dashboard?.top_productos?.por_cantidad ?? [],
+    topIngresos:    dashboard?.top_productos?.por_ingresos ?? [],
   }
 }

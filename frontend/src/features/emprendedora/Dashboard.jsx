@@ -1,4 +1,5 @@
 import { Navigate } from "react-router-dom"
+// import de iconos
 import {
   IconBrandAsana,
   IconHeartHandshake,
@@ -22,7 +23,7 @@ import {
   Filler,
 } from "chart.js"
 import { Line, Doughnut } from "react-chartjs-2"
-
+// import de componentes generales y archivos de apoyo
 import { Icon }          from "../../components/common/Icon"
 import { DashboardCard } from "../../components/common/DashboardCard"
 import { Header }        from "../../components/layout/Header"
@@ -110,7 +111,7 @@ function MetricCard({ icon, value, label, iconBg, iconColor }) {
 
 export function Dashboard() {
   const { usuario, cargando: cargandoAuth } = useAuth()
-  const { cargando, error, summary, ventas30d, topCantidad, topIngresos } = useDashboard()
+  const { cargando, error, emprendimiento, summary, ventas30d, topCantidad, topIngresos } = useDashboard()
 
   // Protección por rol
   if (!cargandoAuth && usuario?.tipo_usuario !== "emprendedora") {
@@ -163,7 +164,7 @@ export function Dashboard() {
   }
 
   // ── Donut ─────────────────────────────────────────────────────────────────
-  const totalCantidad = topCantidad?.reduce((s, p) => s + Number(p.total ?? 0), 0) || 0
+  /*const totalCantidad = topCantidad?.reduce((s, p) => s + Number(p.total ?? 0), 0) || 0
   const totalIngresos = topIngresos?.reduce((s, p) => s + Number(p.total ?? 0), 0) || 0
 
   const donutDataConfig = {
@@ -171,6 +172,18 @@ export function Dashboard() {
     datasets: [{
       data:            [totalCantidad, totalIngresos],
       backgroundColor: [C.donutSold, C.donutRest],
+      borderWidth:     0,
+      hoverOffset:     4,
+    }],
+  }*/
+  const totalCantidad = topCantidad?.reduce((s, p) => s + Number(p.total ?? 0), 0) || 0
+  const totalIngresos = topIngresos?.reduce((s, p) => s + Number(p.total ?? 0), 0) || 0
+
+  const donutDataConfig = {
+    labels: topCantidad?.map((p) => p.nombre) || [],
+    datasets: [{
+      data:            topCantidad?.map((p) => Number(p.total ?? 0)) || [],
+      backgroundColor: [C.donutSold, C.donutRest, "#A5B4FC", "#818CF8", "#4F46E5"],
       borderWidth:     0,
       hoverOffset:     4,
     }],
@@ -194,10 +207,7 @@ export function Dashboard() {
       },
       tooltip: {
         callbacks: {
-          label: (ctx) =>
-            ctx.dataIndex === 0
-              ? ` ${ctx.raw} uds. vendidas`
-              : ` ${fmt(ctx.raw)}`,
+          label: (ctx) => ` ${ctx.raw} uds. vendidas`,
         },
       },
     },
@@ -224,16 +234,33 @@ export function Dashboard() {
         {/* ── Encabezado ── */}
         <section className="flex items-center gap-4">
           {cargando ? (
-            <Skeleton className="h-7 w-56" />
+            <>
+              <Skeleton className="h-20 w-20 rounded-xl flex-shrink-0" />
+              <Skeleton className="h-7 w-56" />
+            </>
           ) : (
-            <div className="flex items-center gap-2">
-              <h1 className="font-heading text-xl font-bold text-text-dark">
-                Mi emprendimiento
-              </h1>
-              <button className="rounded-full p-1 hover:bg-bg-dark transition-colors">
-                <Icon icon={IconDots} size={18} color="var(--color-text-light)" />
-              </button>
-            </div>
+            <>
+              {emprendimiento.logo_url ? (
+                <img
+                  src={emprendimiento.logo_url}
+                  alt={emprendimiento.nombre}
+                  className="h-20 w-20 flex-shrink-0 rounded-xl object-contain shadow-sm bg-white"
+                />
+              ) : (
+                <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center
+                                rounded-xl bg-bg-dark text-text-light text-xs font-bold uppercase">
+                  {(emprendimiento.nombre ?? "?").slice(0, 2)}
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <h1 className="font-heading text-xl font-bold text-text-dark">
+                  {emprendimiento.nombre || "Mi emprendimiento"}
+                </h1>
+                <button className="rounded-full p-1 hover:bg-bg-dark transition-colors">
+                  <Icon icon={IconDots} size={18} color="var(--color-text-light)" />
+                </button>
+              </div>
+            </>
           )}
         </section>
 
