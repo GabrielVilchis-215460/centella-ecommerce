@@ -88,6 +88,7 @@ export function Login() {
                 type={mostrarPass ? "text" : "password"}
                 value={contrasena}
                 onChange={(e) => setContrasena(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit() }}
                 className="w-full px-3 py-2 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular"
               />
               <div className="flex justify-end mt-1">
