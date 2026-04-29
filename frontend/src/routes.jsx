@@ -2,17 +2,17 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 
 // public
-import { Login }    from "./features/auth/Login"
+/*import { Login }    from "./features/auth/Login"
 import { Registro } from "./features/auth/Registro"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
 import { Checkout }         from "./features/cliente/Checkout"
 import { HistorialCompras } from "./features/cliente/HistorialCompras"
-
+*/
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
-import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+/*import { GestionProductos }     from "./features/emprendedora/GestionProductos"
 import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
@@ -21,7 +21,7 @@ import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimien
 import { AdminPanel }    from "./features/admin/AdminPanel"
 import { Emprendedoras } from "./features/admin/Emprendedoras"
 import { Insignias }     from "./features/admin/Insignias"
-import { Moderacion }    from "./features/admin/Moderacion"
+import { Moderacion }    from "./features/admin/Moderacion"*/
 
 // rutas protegidas
 function ProtectedRoute({ children, roles = [] }) {
@@ -39,11 +39,11 @@ export function AppRoutes() {
   return (
     <Routes>
 
-      {/* Públicas */}
+      {/* Públicas 
       <Route path="/login"    element={<Login />}    />
       <Route path="/registro" element={<Registro />} />
 
-      {/* Cliente */}
+      {/* Cliente 
       <Route path="/" element={<Catalogo />} />
       <Route path="/catalogo"                   element={<Catalogo />}         />
       <Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
@@ -68,7 +68,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
         </ProtectedRoute>
-      } />
+      } />*/}
 
       {/* Emprendedora */}
       <Route path="/dashboard" element={
@@ -76,6 +76,7 @@ export function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
+      {/* Emprendedora 
       <Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
@@ -97,7 +98,7 @@ export function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* Admin */}
+      {/* Admin 
       <Route path="/admin" element={
         <ProtectedRoute roles={["administrador"]}>
           <AdminPanel />
@@ -117,7 +118,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["administrador"]}>
           <Moderacion />
         </ProtectedRoute>
-      } />
+      } />*/}
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
