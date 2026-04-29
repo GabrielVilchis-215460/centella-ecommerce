@@ -19,7 +19,7 @@ import { Dashboard }            from "./features/emprendedora/Dashboard"
 // import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
 
 // rutas de admin
-//import { AdminPanel }    from "./features/admin/AdminPanel"
+import { AdminPanel }    from "./features/admin/AdminPanel"
 //import { Emprendedoras } from "./features/admin/Emprendedoras"
 //import { Insignias }     from "./features/admin/Insignias"
 //import { Moderacion }    from "./features/admin/Moderacion"
@@ -90,8 +90,7 @@ export function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
-      {/* Emprendedora  
-      <Route path="/dashboard/productos" element={
+      {/*<Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
         </ProtectedRoute>
@@ -112,9 +111,8 @@ export function AppRoutes() {
         </ProtectedRoute>
       } />*/}
 
-      {/* DESCOMENTAR ESTO CUANDO SE HAGA MERGE EN MAIN PLIS*/}
       {/* Admin */}
-      {/*<Route path="/admin" element={
+      <Route path="/admin" element={
         <ProtectedRoute roles={["administrador"]}>
           <AdminPanel />
         </ProtectedRoute>
