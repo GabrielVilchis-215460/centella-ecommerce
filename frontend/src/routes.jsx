@@ -4,7 +4,8 @@ import { useAuth } from "./context/AuthContext"
 /* ----- IR DESCOMENTANDO CADA RUTA CONFORME SE VAYA INCORPORANDO O YAMA ------*/
 // public
 import { Login }    from "./features/auth/Login"
-//import { Registro } from "./features/auth/Registro"
+import { Registro } from "./features/auth/Registro"
+import { Terminos } from "./features/auth/Terminos"
 
 // rutas del cliente
 // import { Catalogo }         from "./features/cliente/Catalogo"
@@ -54,7 +55,8 @@ export function AppRoutes() {
 
       {/* Públicas */}
       <Route path="/login"    element={<Login />}    />
-      {/*<Route path="/registro" element={<Registro />} />*/}
+      <Route path="/registro" element={<Registro />} />
+      <Route path="/terminos" element={<Terminos />} />
 
       {/* Cliente */}
       {/*}
