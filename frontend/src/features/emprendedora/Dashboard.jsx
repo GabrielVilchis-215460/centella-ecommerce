@@ -99,7 +99,7 @@ function MetricCard({ icon, value, label, iconBg, iconColor }) {
         <Icon icon={icon} size={22} color={iconColor} />
       </div>
       <div>
-        <p className="font-heading text-lg font-bold text-text-dark leading-none">{value}</p>
+        <p className="font-body text-lg font-bold text-text-dark leading-none">{value}</p>
         <p className="mt-0.5 text-sm text-text-light">{label}</p>
       </div>
     </div>
