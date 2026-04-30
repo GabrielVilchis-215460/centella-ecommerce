@@ -9,15 +9,25 @@ import { perfilService } from "../../services/perfilService"
 import { enviosService } from "../../services/enviosService"
 
 export function Checkout() {
-  const navigate                = useNavigate()
-  const { items, totalPagar }   = useCart()
-  const { usuario }             = useAuth()
+  const navigate  = useNavigate()
+  const { items, totalPagar, cargando }  = useCart()
+  const { usuario } = useAuth()
+  const [redirigiendo, setRedirigiendo] = useState(false)
+  const [direcciones, setDirecciones] = useState([])
+  const [direccionId, setDireccionId] = useState(null)
+  const [costoEnvio, setCostoEnvio] = useState(null)
+  const [cotizando, setCotizando] = useState(false)
+  const [cargandoDirs, setCargandoDirs] = useState(true)
 
-  const [direcciones, setDirecciones]         = useState([])
-  const [direccionId, setDireccionId]         = useState(null)
-  const [costoEnvio, setCostoEnvio]           = useState(null)
-  const [cotizando, setCotizando]             = useState(false)
-  const [cargandoDirs, setCargandoDirs]       = useState(true)
+  // redirigir si el carrito esta vacio
+  useEffect(() => {
+    // debug
+    // console.log("cargando:", cargando, "items:", items.length)
+    if (!cargando && items.length === 0) {
+      setRedirigiendo(true)
+      setTimeout(() => navigate("/catalogo", { replace: true }), 2000)
+    }
+  }, [items, cargando])
 
   // ¿algún item requiere envío?
   const tieneEnvio = items.some(
@@ -93,6 +103,19 @@ export function Checkout() {
   sessionStorage.setItem("checkout_total", total)
   navigate("/checkout/pago")
 }
+
+    if (redirigiendo) return (
+    <div className="min-h-screen flex flex-col bg-bg-dark">
+      <Header />
+      <main className="flex-1 flex flex-col items-center justify-center gap-3">
+        <span className="font-heading text-lg text-text-dark">Tu carrito está vacío</span>
+        <span className="font-body text-sm text-text-regular">
+          Redirigiendo al catálogo...
+        </span>
+      </main>
+      <Footer />
+    </div>
+  )
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-dark">
