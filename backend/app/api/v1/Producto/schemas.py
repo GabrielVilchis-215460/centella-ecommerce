@@ -36,3 +36,11 @@ class ProductoRead(ProductoBase):
     fecha_creacion: datetime
 
     model_config = {"from_attributes": True}
+
+class ImagenRead(BaseModel):
+    id_imagen: int
+    url: str
+    filename: str
+    orden: int
+
+    model_config = {"from_attributes": True}

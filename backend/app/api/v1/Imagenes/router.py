@@ -27,10 +27,10 @@ def get_service(db: Session = Depends(get_db)) -> ImageUploadService:
     return ImageUploadService(db)
  
  
-@router.post("/upload", response_model=ImageResponse,  dependencies=[
-        Depends(require_cliente),
-        Depends(require_emprendedora)
-    ])
+@router.post("/upload", response_model=ImageResponse#,  dependencies=[
+        #Depends(require_cliente),
+        #Depends(require_emprendedora)]
+        )
 async def upload_image(
     file: UploadFile = File(...),
     entity_id: int = Form(...),
