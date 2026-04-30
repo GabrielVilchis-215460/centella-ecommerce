@@ -88,10 +88,11 @@ export function Checkout() {
   const total = totalPagar + (costoEnvio ?? 0)
 
   const handleProceder = () => {
-    // Guardar dirección seleccionada en sessionStorage para usarla en el siguiente paso
-    sessionStorage.setItem("checkout_id_direccion", direccionId ?? "")
-    navigate("/checkout/pago")
-  }
+  sessionStorage.setItem("checkout_id_direccion", direccionId ?? "")
+  sessionStorage.setItem("checkout_costo_envio", costoEnvio ?? 0)  // ← ¿está esto?
+  sessionStorage.setItem("checkout_total", total)
+  navigate("/checkout/pago")
+}
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-dark">
