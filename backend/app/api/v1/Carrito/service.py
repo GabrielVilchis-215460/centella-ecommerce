@@ -152,8 +152,7 @@ def calcular_totales(db: Session, carrito_id: int):
 
         subtotal = float(item.cantidad * producto.precio)
         total_general += subtotal
-        subtotal = float(item.cantidad * producto.precio)
-        total_general += subtotal
+     
         detalles.append(
             schemas.ItemCarritoDetallado(
                 id_item=item.id_item,
