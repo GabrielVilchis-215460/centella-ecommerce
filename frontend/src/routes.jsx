@@ -11,7 +11,7 @@ import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 
 // rutas del cliente
-// import { Catalogo }         from "./features/cliente/Catalogo"
+import { Catalogo }         from "./features/cliente/Catalogo"
 import { Checkout }         from "./features/cliente/Checkout"
 // import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
@@ -67,9 +67,9 @@ export function AppRoutes() {
 
       {/* Cliente */}
       
-      {/*<Route path="/" element={<Catalogo />} />
-      <Route path="/catalogo"                   element={<Catalogo />}         />
-      <Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
+      <Route path="/" element={<Catalogo />} />
+      <Route path="/catalogo" element={<Catalogo />}         />
+      {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
       <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
       <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />*/}
       <Route path="/checkout" element={
