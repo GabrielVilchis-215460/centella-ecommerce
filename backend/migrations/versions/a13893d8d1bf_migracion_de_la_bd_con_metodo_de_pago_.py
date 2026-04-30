@@ -1,8 +1,8 @@
-"""Initial migration
+"""Migracion de la BD con metodo de pago efectivo en enum
 
-Revision ID: 1968fda91dac
+Revision ID: a13893d8d1bf
 Revises: 
-Create Date: 2026-04-22 18:35:47.016643
+Create Date: 2026-04-29 23:54:00.976888
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1968fda91dac'
+revision: str = 'a13893d8d1bf'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -54,6 +54,12 @@ def upgrade() -> None:
     sa.Column('fecha_nacimiento', sa.Date(), nullable=True),
     sa.Column('foto_perfil_url', sa.String(length=500), nullable=True),
     sa.Column('fecha_registro', sa.DateTime(), nullable=False),
+    sa.Column('email_verificado', sa.Boolean(), nullable=False),
+    sa.Column('token_verificacion', sa.String(length=255), nullable=True),
+    sa.Column('codigo_verificacion', sa.String(length=6), nullable=True),
+    sa.Column('codigo_verificacion_expira', sa.DateTime(), nullable=True),
+    sa.Column('codigo_reset', sa.String(length=6), nullable=True),
+    sa.Column('codigo_reset_expira', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id_usuario'),
     sa.UniqueConstraint('email')
     )
@@ -124,7 +130,7 @@ def upgrade() -> None:
     sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('costo_envio', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('total', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('metodo_pago', sa.Enum('stripe', 'paypal', name='metodopagoenum'), nullable=False),
+    sa.Column('metodo_pago', sa.Enum('stripe', 'paypal', 'efectivo', name='metodopagoenum'), nullable=False),
     sa.Column('id_direccion_envio', sa.Integer(), nullable=True),
     sa.Column('numero_rastreo', sa.String(length=200), nullable=True),
     sa.Column('codigo_qr_url', sa.String(length=500), nullable=True),
