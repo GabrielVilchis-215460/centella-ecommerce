@@ -6,6 +6,9 @@ import { useAuth } from "./context/AuthContext"
 import { Login }    from "./features/auth/Login"
 import { Registro } from "./features/auth/Registro"
 import { Terminos } from "./features/auth/Terminos"
+import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
+import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
+import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 
 // rutas del cliente
 // import { Catalogo }         from "./features/cliente/Catalogo"
@@ -57,6 +60,10 @@ export function AppRoutes() {
       <Route path="/login"    element={<Login />}    />
       <Route path="/registro" element={<Registro />} />
       <Route path="/terminos" element={<Terminos />} />
+      <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+      <Route path="/verificar-correo"     element={<VerificarCodigo />}     />
+      <Route path="/verificar-codigo"     element={<VerificarCodigo />}     />
+      <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
 
       {/* Cliente */}
       
