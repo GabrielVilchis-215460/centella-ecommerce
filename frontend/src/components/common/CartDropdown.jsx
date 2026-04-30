@@ -88,7 +88,7 @@ export function CartDropdown({ items = [], onEliminar, onCantidadChange, onClose
         </div>
         <Button
           size="sm"
-          onClick={() => { navigate("/carrito"); onClose() }}
+          onClick={() => { navigate("/checkout"); onClose() }}
         >
           Realizar pago
         </Button>

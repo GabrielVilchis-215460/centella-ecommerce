@@ -12,6 +12,7 @@ import {
 import { useAuth } from "../../context/AuthContext"
 import logo from "../../assets/Logo_sm_white.png"
 import { CartDropdown } from "../common/CartDropdown"
+import { useCart } from "../../context/CartContext"
 
 // Nav 
 const NAV_EMPRENDEDORA = [
@@ -106,50 +107,44 @@ function ProfileDropdown({ onClose }) {
 // Header Cliente
 function HeaderCliente() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [busqueda, setBusqueda] = useState("")
-  const navigate = useNavigate()
-  const dropdownRef = useRef(null)
+  const [busqueda, setBusqueda]         = useState("")
+  const navigate                        = useNavigate()
+  const dropdownRef                     = useRef(null)
+  const carritoRef                      = useRef(null)
   const [carritoAbierto, setCarritoAbierto] = useState(false)
-  const [itemsCarrito, setItemsCarrito] = useState([])
 
-  const handleEliminar = (id) => setItemsCarrito((prev) => prev.filter((i) => i.id !== id))
-  const handleCantidad = (id, val) => setItemsCarrito((prev) => prev.map((i) => i.id === id ? { ...i, cantidad: val } : i))
-
-  const carritoRef = useRef(null)
-  
-    useEffect(() => {
-      const handler = (e) => {
-        if (carritoRef.current && !carritoRef.current.contains(e.target)) {
-          setCarritoAbierto(false)
-        }
-      }
-      document.addEventListener("mousedown", handler)
-      return () => document.removeEventListener("mousedown", handler)
-    }, [])
+  // ← Consumir contexto en lugar de estado local
+  const { items, eliminarItem, actualizarCantidad } = useCart()
 
   useEffect(() => {
     const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false)
-      }
+      if (carritoRef.current && !carritoRef.current.contains(e.target))
+        setCarritoAbierto(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
   }, [])
 
-  const handleBuscar = (e) => { // puede que cambie dependiendo de la logica de busqueda
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+        setDropdownOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  const handleBuscar = (e) => {
     e.preventDefault()
     if (busqueda.trim()) navigate(`/catalogo?q=${busqueda}`)
   }
 
   return (
     <header className="w-full bg-primary px-6 py-3 flex items-center gap-10">
-
       <Link to="/">
         <img src={logo} alt="Centella" className="h-10 w-auto" />
       </Link>
 
-      {/* search bar */}
       <form onSubmit={handleBuscar} className="flex-1 flex items-center bg-bg-light rounded-full px-6 py-2 gap-2">
         <input
           type="text"
@@ -163,7 +158,6 @@ function HeaderCliente() {
         </button>
       </form>
 
-      {/* Acciones */}
       <div className="flex items-center gap-8">
 
         {/* Carrito */}
@@ -173,15 +167,15 @@ function HeaderCliente() {
           </button>
           {carritoAbierto && (
             <CartDropdown
-              items={itemsCarrito}
-              onEliminar={handleEliminar}
-              onCantidadChange={handleCantidad}
+              items={items}                        // ← del contexto
+              onEliminar={eliminarItem}            // ← del contexto
+              onCantidadChange={actualizarCantidad} // ← del contexto
               onClose={() => setCarritoAbierto(false)}
             />
           )}
         </div>
 
-        {/* perfil */}
+        {/* Perfil */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -190,7 +184,6 @@ function HeaderCliente() {
             <IconMenu2 size={18} stroke={2} color="var(--color-primary)" />
             <IconUser size={18} stroke={2} color="var(--color-primary)" />
           </button>
-
           {dropdownOpen && (
             <ProfileDropdown onClose={() => setDropdownOpen(false)} />
           )}
