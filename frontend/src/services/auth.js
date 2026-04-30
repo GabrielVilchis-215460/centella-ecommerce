@@ -22,7 +22,7 @@ export const authService = {
   },
 
   verificarEmail: async (email, codigo) => {
-    const { data } = await api.post("/api/v1/auth/verify-email", { email, codigo })
+    const { data } = await api.post("/api/v1/auth/verify", { email, codigo })
     return data
   },
 
@@ -40,5 +40,14 @@ export const authService = {
     const { data } = await api.post("/api/v1/auth/new-password", { email, contrasena_nueva })
     return data
   },
+  
+  reenviarCodigo: async (email) => {
+  const { data } = await api.post("/api/v1/auth/resend-verification", { email })
+  return data
+  },
 
+  reenviarCodigoReset: async (email) => {
+  const { data } = await api.post("/api/v1/auth/resend-reset-code", { email })
+  return data
+  },
 }
