@@ -8,7 +8,7 @@ import { Login }    from "./features/auth/Login"
 
 // rutas del cliente
 // import { Catalogo }         from "./features/cliente/Catalogo"
-// import { Checkout }         from "./features/cliente/Checkout"
+import { Checkout }         from "./features/cliente/Checkout"
 // import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
@@ -57,18 +57,18 @@ export function AppRoutes() {
       {/*<Route path="/registro" element={<Registro />} />*/}
 
       {/* Cliente */}
-      {/*}
-      <Route path="/" element={<Catalogo />} />
+      
+      {/*<Route path="/" element={<Catalogo />} />
       <Route path="/catalogo"                   element={<Catalogo />}         />
       <Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
       <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
-      <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />
+      <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />*/}
       <Route path="/checkout" element={
       <ProtectedRoute roles={["cliente"]}>
           <Checkout />
       </ProtectedRoute>
       } />
-      <Route path="/checkout/pago" element={
+      {/*<Route path="/checkout/pago" element={
       <ProtectedRoute roles={["cliente"]}>
           <Pago />
       </ProtectedRoute>
