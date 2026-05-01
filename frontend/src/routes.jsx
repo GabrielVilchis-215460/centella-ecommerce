@@ -23,7 +23,7 @@ import { Dashboard }            from "./features/emprendedora/Dashboard"
 // import { GestionProductos }     from "./features/emprendedora/GestionProductos"
 // import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 // import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
-import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
+import { Pagina } from "./features/emprendedora/Pagina"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
 
 // rutas de admin
@@ -71,7 +71,7 @@ export function AppRoutes() {
 
       {/* Cliente */}
       
-      <Route path="/" element={<Catalogo />} />
+      {/*<Route path="/" element={<Catalogo />} />
       {/*<Route path="/catalogo" element={<Catalogo />}         />
       {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
       <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
@@ -135,7 +135,7 @@ export function AppRoutes() {
       } />*/}
       <Route path="/dashboard/pagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
-          <PaginaEmprendimiento />
+          <Pagina />
         </ProtectedRoute>
       } />
       <Route path="/dashboard/gestionpagina" element={

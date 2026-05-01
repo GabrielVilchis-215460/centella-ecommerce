@@ -170,7 +170,7 @@ function MenuEmprendimiento() {
                         bg-bg-light shadow-lg p-2 flex flex-col">
           {/* CAMBIAR ESTO CUANDO HAYA UNA PAGINA DE LA EDICION DE PAGINA */}
           <button
-            onClick={() => { navigate("/dashboard/pagina"); setAbierto(false) }}
+            onClick={() => { navigate("/dashboard/GestionPagina"); setAbierto(false) }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-text-regular
                       hover:bg-bg-dark transition-colors text-left"
           >

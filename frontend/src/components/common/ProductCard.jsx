@@ -1,9 +1,11 @@
 import { useState } from "react"
 import { IconShoppingCart, IconStar } from "@tabler/icons-react"
 import { Button } from "./Button"
+import { useAuth } from "../../context/AuthContext"
 
 export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar }) {
   const [hover, setHover] = useState(false)
+  const { esEmprendedora } = useAuth() 
 
   return (
     <div
@@ -13,14 +15,16 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar })
     >
 
       {/* Imagen */}
-      <img
-        src={imagen}
-        alt={nombre}
-        className="w-full h-56 object-cover"
-      />
+      {imagen ? (
+        <img src={imagen} alt={nombre} className="w-full h-56 object-cover" />
+      ) : (
+        <div className="w-full h-56 bg-bg-dark flex items-center justify-center">
+          <span className="text-text-light text-xs">Sin imagen</span>
+        </div>
+      )}
 
       {/* agregar a carrito - solo en hover */}
-      {hover && (
+      {hover && !esEmprendedora() && (
         <div className="absolute top-3 right-3">
           <Button
             size="sm"
