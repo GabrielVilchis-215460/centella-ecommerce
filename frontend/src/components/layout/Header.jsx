@@ -162,7 +162,10 @@ function HeaderCliente() {
 
         {/* Carrito */}
         <div className="relative" ref={carritoRef}>
-          <button onClick={() => setCarritoAbierto(!carritoAbierto)}>
+          <button 
+            onClick={() => setCarritoAbierto(!carritoAbierto)}
+            className="flex items-center"
+          >
             <IconShoppingCart size={26} stroke={1.5} color="white" />
           </button>
           {carritoAbierto && (

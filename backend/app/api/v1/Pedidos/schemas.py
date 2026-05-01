@@ -21,6 +21,7 @@ class DireccionConfirmacion(BaseModel):
     ciudad: str
     estado: str
     codigo_postal: str
+    imagen_url: str | None = None
 
     class Config:
         from_attributes = True

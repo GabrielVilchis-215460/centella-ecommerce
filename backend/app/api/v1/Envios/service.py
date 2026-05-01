@@ -90,6 +90,7 @@ async def service_asignar_envio(pedido_id: int, db: Session):
     # Construir destino
     destino = {
         "name": f"{cliente.nombre} {cliente.apellido}",
+        "company": f"{cliente.nombre} {cliente.apellido}",
         "phone": direccion.numero_telefonico, 
         "street": direccion.calle,
         "number": direccion.numero_ext or "S/N",

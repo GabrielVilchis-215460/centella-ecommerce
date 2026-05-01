@@ -12,7 +12,10 @@ import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 
 // rutas del cliente
 // import { Catalogo }         from "./features/cliente/Catalogo"
-// import { Checkout }         from "./features/cliente/Checkout"
+import { Checkout }         from "./features/cliente/Checkout"
+import { CheckoutPago } from "./features/cliente/CheckoutPago"
+import { ConfirmacionPago } from "./features/cliente/ConfirmacionPago"
+import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
 // import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
@@ -66,23 +69,38 @@ export function AppRoutes() {
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
 
       {/* Cliente */}
-      {/*}
+      
       <Route path="/" element={<Catalogo />} />
-      <Route path="/catalogo"                   element={<Catalogo />}         />
-      <Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
+      {/*<Route path="/catalogo" element={<Catalogo />}         />
+      {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
       <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
-      <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />
+      <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />*/}
       <Route path="/checkout" element={
-      <ProtectedRoute roles={["cliente"]}>
-          <Checkout />
-      </ProtectedRoute>
+        <ProtectedRoute roles={["cliente"]}>
+            <Checkout />
+        </ProtectedRoute>
       } />
       <Route path="/checkout/pago" element={
-      <ProtectedRoute roles={["cliente"]}>
-          <Pago />
-      </ProtectedRoute>
+        <ProtectedRoute roles={["cliente"]}>
+            <CheckoutPago />
+        </ProtectedRoute>
+      } />
+      <Route path="/pagos/confirm/stripe/:id_pedido" element={
+        <ProtectedRoute roles={["cliente"]}>
+          <ConfirmacionPago />
+        </ProtectedRoute>
+      } />
+      <Route path="/pagos/confirm/paypal/:id_pedido" element={
+        <ProtectedRoute roles={["cliente"]}>
+          <ConfirmacionPago />
+        </ProtectedRoute>
       } />
       <Route path="/checkout/confirmacion" element={
+        <ProtectedRoute roles={["cliente"]}>
+          <CheckoutConfirmacion />
+        </ProtectedRoute>
+      } />
+      {/*<Route path="/checkout/confirmacion" element={
       <ProtectedRoute roles={["cliente"]}>
           <Confirmacion />
       </ProtectedRoute>
