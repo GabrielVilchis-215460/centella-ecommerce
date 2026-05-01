@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { Header } from "../../components/layout/Header"
@@ -13,9 +13,13 @@ export function CheckoutConfirmacion() {
   const navigate = useNavigate()
   const [pedidos, setPedidos]     = useState([])
   const [cargando, setCargando]   = useState(true)
-  const [error, setError]         = useState(null)
+  const [error, setError] = useState(null)
+  const cargado = useRef(false)
 
   useEffect(() => {
+    if (cargado.current) return
+    cargado.current = true
+    
     const cargar = async () => {
       try {
         const raw = sessionStorage.getItem("checkout_pedidos")
@@ -171,6 +175,11 @@ export function CheckoutConfirmacion() {
               <div className="flex flex-col divide-y divide-text-light/10">
                 {pedido.items.map((item, i) => (
                   <div key={i} className="flex items-center gap-3 py-3">
+                    <img
+                      src={item.imagen_url}
+                      alt={item.nombre_producto}
+                      className="w-14 h-14 object-cover rounded-md shrink-0"
+                    />
                     <div className="flex-1 flex flex-col">
                       <span className="font-body text-sm text-text-dark">{item.nombre_producto}</span>
                       <span className="font-body text-xs text-text-regular">
