@@ -135,24 +135,23 @@ def calcular_totales(db: Session, carrito_id: int):
 
     for item in items:
         producto = get_producto(db, item.id_producto)
-        # para jalar las imagenes de los productos
+        # Query directa en lugar de relación
         imagenes = db.query(Imagen).filter(
             Imagen.entity_id == item.id_producto,
             Imagen.entity_type == "producto"
         ).order_by(Imagen.orden).all()
-
+        # para jalar las imagenes de los productos
         url_principal = None
-
         if imagenes:
-            img_principal = next(
-                (img.url for img in producto.imagenes if img.orden == 0),
-                producto.imagenes[0].url
+            url_principal = next(
+                (img.url for img in imagenes if img.orden == 0),
+                imagenes[0].url
             )
-            url_principal = img_principal
 
+        #subtotal = float(item.cantidad * producto.precio)
+        #total_general += subtotal
         subtotal = float(item.cantidad * producto.precio)
         total_general += subtotal
-     
         detalles.append(
             schemas.ItemCarritoDetallado(
                 id_item=item.id_item,
@@ -284,19 +283,21 @@ async def convertir_a_pedido(
             producto = productos[item.id_producto]
             tipo_entrega = selecciones[item.id_item].tipo_entrega_seleccionado
 
+            #url_img = None
+           # if producto.imagenes:
+              #  url_img = next((img.url for img in producto.imagenes if img.orden == 0), producto.imagenes[0].url)
+
             imagenes = db.query(Imagen).filter(
                 Imagen.entity_id == item.id_producto,
                 Imagen.entity_type == "producto"
             ).order_by(Imagen.orden).all()
 
             url_img = None
-            
             if imagenes:
                 url_img = next(
                     (img.url for img in imagenes if img.orden == 0),
                     imagenes[0].url
                 )
-
             db.add(ItemPedido(
                 id_pedido=nuevo_pedido.id_pedido,
                 id_producto=item.id_producto,
