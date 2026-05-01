@@ -192,6 +192,6 @@ def get_pagina_publica(
 
     return {
         "pagina": pagina,
-        "productos": productos,
-        "servicios": servicios,
+        "productos": [dict(p) for p in productos],
+        "servicios": [dict(s) for s in servicios],
     }
