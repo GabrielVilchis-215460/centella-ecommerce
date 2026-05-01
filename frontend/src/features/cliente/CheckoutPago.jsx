@@ -1,8 +1,11 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+
 import { Header } from "../../components/layout/Header"
 import { Footer } from "../../components/layout/Footer"
+import { Button } from "../../components/common/Button"
 import { useCart } from "../../context/CartContext"
+
 import { carritoService } from "../../services/carritoService"
 import { pagosService } from "../../services/pagosService"
 import { useAuth } from "../../context/AuthContext"
@@ -90,7 +93,7 @@ export function CheckoutPago() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-dark">
+    <div className="min-h-screen flex flex-col bg-bg">
       <Header />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 flex flex-col gap-8">
@@ -113,10 +116,10 @@ export function CheckoutPago() {
                 }`}
               >
                 {/* Header del método */}
-                <div className="flex items-center justify-between px-5 py-4 bg-bg-light">
+                <div className="flex items-center justify-between px-5 py-4 bg-bg-dark">
                   <div className="flex items-center gap-3">
                     <span className="text-text-regular">{m.icon}</span>
-                    <span className="font-body text-sm font-medium text-text-dark">
+                    <span className="font-heading text-sm font-medium text-text-dark">
                       {m.label}
                     </span>
                   </div>
@@ -166,7 +169,7 @@ export function CheckoutPago() {
           </div>
 
           {/* Resumen */}
-          <div className="w-64 shrink-0 bg-bg-light rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+          <div className="w-64 shrink-0 bg-bg-dark rounded-xl p-5 flex flex-col gap-3 shadow-sm">
 
             {/* Items */}
             <div className="flex flex-col gap-3 pb-3 border-b border-text-light/20">
@@ -212,13 +215,13 @@ export function CheckoutPago() {
               </span>
             </div>
 
-            <button
+            <Button
+              size="sm"
               onClick={handleComprar}
               disabled={procesando}
-              className="w-full bg-primary text-white font-body text-sm py-2.5 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               {procesando ? "Procesando..." : "Comprar ahora"}
-            </button>
+            </Button>
 
           </div>
         </div>

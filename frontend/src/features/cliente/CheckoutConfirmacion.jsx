@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+
 import { Header } from "../../components/layout/Header"
 import { Footer } from "../../components/layout/Footer"
+import { Button } from "../../components/common/Button"
+
 import { pedidosService } from "../../services/pedidosService"
 import { Stepper } from "./Checkout"
 import { IconCircleCheck, IconTruck, IconQrcode } from "@tabler/icons-react"
@@ -72,7 +75,7 @@ export function CheckoutConfirmacion() {
   const totalGlobal     = pedidos.reduce((acc, p) => acc + parseFloat(p.total), 0)
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-dark">
+    <div className="min-h-screen flex flex-col bg-bg">
       <Header />
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-6 py-10 flex flex-col gap-8">
@@ -94,11 +97,11 @@ export function CheckoutConfirmacion() {
           <div key={pedido.id_pedido} className="flex flex-col gap-4">
 
             {/* Número de pedido */}
-            <div className="bg-bg-light rounded-xl p-5 flex flex-col items-center gap-1 text-center">
+            <div className="bg-bg-dark rounded-xl p-5 flex flex-col items-center gap-1 text-center">
               <span className="font-body text-xs text-text-light uppercase tracking-wider">
                 Número de pedido
               </span>
-              <span className="font-heading text-lg text-text-dark">
+              <span className="font-body text-lg text-text-dark">
                 ORD-{new Date().getFullYear()}-{String(pedido.id_pedido).padStart(4, "0")}
               </span>
               <span className="font-body text-xs text-text-regular">
@@ -107,7 +110,7 @@ export function CheckoutConfirmacion() {
             </div>
 
             {/* Método de pago */}
-            <div className="bg-bg-light rounded-xl p-5 flex flex-col items-center gap-1 text-center">
+            <div className="bg-bg-dark rounded-xl p-5 flex flex-col items-center gap-1 text-center">
               <span className="font-body text-xs text-text-light uppercase tracking-wider">
                 Método de pago
               </span>
@@ -119,7 +122,7 @@ export function CheckoutConfirmacion() {
 
             {/* Envío */}
             {pedido.tiene_envio && pedido.numero_rastreo && (
-              <div className="bg-bg-light rounded-xl p-5 flex flex-col gap-2">
+              <div className="bg-bg-dark rounded-xl p-5 flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <IconTruck size={18} stroke={1.5} className="text-text-regular" />
                   <span className="font-body text-sm font-medium text-text-dark">
@@ -142,7 +145,7 @@ export function CheckoutConfirmacion() {
 
             {/* QR entrega física */}
             {pedido.tiene_fisica && pedido.codigo_qr_url && (
-              <div className="bg-bg-light rounded-xl p-5 flex flex-col items-center gap-3">
+              <div className="bg-bg-dark rounded-xl p-5 flex flex-col items-center gap-3">
                 <div className="flex items-center gap-2">
                   <IconQrcode size={18} stroke={1.5} className="text-text-regular" />
                   <span className="font-body text-sm font-medium text-text-dark">
@@ -161,7 +164,7 @@ export function CheckoutConfirmacion() {
             )}
 
             {/* Resumen de compra */}
-            <div className="bg-bg-light rounded-xl p-5 flex flex-col gap-4">
+            <div className="bg-bg-dark rounded-xl p-5 flex flex-col gap-4">
               <h3 className="font-heading text-base text-text-dark border-b border-text-light/20 pb-2">
                 Resumen de compra
               </h3>
@@ -187,18 +190,18 @@ export function CheckoutConfirmacion() {
         ))}
 
         {/* Resumen del pedido global */}
-        <div className="bg-bg-light rounded-xl p-5 flex flex-col gap-3">
+        <div className="bg-bg-dark rounded-xl p-5 flex flex-col gap-3">
           <h3 className="font-heading text-base text-text-dark border-b border-text-light/20 pb-2">
             Resumen del pedido
           </h3>
           <div className="flex justify-between items-center">
-            <span className="font-body text-sm text-text-regular">Subtotal productos</span>
+            <span className="font-body text-sm text-text-dark">Subtotal productos</span>
             <span className="font-body text-sm text-text-dark">
               ${subtotalGlobal.toLocaleString("es-MX", { minimumFractionDigits: 2 })} MXN
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-body text-sm text-text-regular">Envío</span>
+            <span className="font-body text-sm text-text-dark">Envío</span>
             <span className="font-body text-sm text-text-dark">
               ${envioGlobal.toLocaleString("es-MX", { minimumFractionDigits: 2 })} MXN
             </span>
@@ -211,12 +214,12 @@ export function CheckoutConfirmacion() {
           </div>
         </div>
 
-        <button
+        <Button
+          size="sm"
           onClick={handleSeguir}
-          className="w-full bg-primary text-white font-body text-sm py-3 rounded-lg hover:bg-primary/90 transition-colors"
         >
           Seguir comprando &gt;
-        </button>
+        </Button>
 
       </main>
 

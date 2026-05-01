@@ -1,8 +1,12 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+// imports de compos
 import { Header } from "../../components/layout/Header"
 import { Footer } from "../../components/layout/Footer"
+import { Button } from "../../components/common/Button"
+
+// imports de servicios y contextos requeridos
 import { useCart } from "../../context/CartContext"
 import { useAuth } from "../../context/AuthContext"
 import { perfilService } from "../../services/perfilService"
@@ -99,7 +103,7 @@ export function Checkout() {
 
   const handleProceder = () => {
   sessionStorage.setItem("checkout_id_direccion", direccionId ?? "")
-  sessionStorage.setItem("checkout_costo_envio", costoEnvio ?? 0)  // ← ¿está esto?
+  sessionStorage.setItem("checkout_costo_envio", costoEnvio ?? 0)  
   sessionStorage.setItem("checkout_total", total)
   navigate("/checkout/pago")
 }
@@ -118,7 +122,7 @@ export function Checkout() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-dark">
+    <div className="min-h-screen flex flex-col bg-bg">
       <Header />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 flex flex-col gap-8">
@@ -126,16 +130,16 @@ export function Checkout() {
         {/* Stepper */}
         <Stepper paso={1} />
 
-        <div className="flex gap-8 items-start">
+        <div className="flex gap-35 items-start">
 
           {/* Tabla de productos */}
           <div className="flex-1 flex flex-col gap-4">
 
             {/* Encabezado tabla */}
             <div className="grid grid-cols-[2fr_1fr_1fr] px-2">
-              <span className="font-body text-sm text-text-regular">Producto</span>
-              <span className="font-body text-sm text-text-regular text-center">Cantidad</span>
-              <span className="font-body text-sm text-text-regular text-right">Precio</span>
+              <span className="font-heading text-md text-text-regular">Producto</span>
+              <span className="font-heading text-md text-text-regular text-center">Cantidad</span>
+              <span className="font-heading text-md text-text-regular text-right">Precio</span>
             </div>
 
             <div className="flex flex-col divide-y divide-text-light/20">
@@ -216,7 +220,7 @@ export function Checkout() {
           </div>
 
           {/* Resumen */}
-          <div className="w-64 shrink-0 bg-bg-light rounded-xl p-5 flex flex-col gap-3 shadow-sm">
+          <div className="w-64 shrink-0 bg-bg-dark rounded-xl p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex justify-between items-center">
               <span className="font-body text-sm text-text-regular">Subtotal</span>
               <span className="font-body text-sm text-text-dark">
@@ -226,8 +230,8 @@ export function Checkout() {
 
             {tieneEnvio && (
               <div className="flex justify-between items-center">
-                <span className="font-body text-sm text-text-regular">Envío</span>
-                <span className="font-body text-sm text-text-dark">
+                <span className="font-body text-base text-text-regular">Envío</span>
+                <span className="font-body text-base text-text-dark">
                   {cotizando
                     ? "Cotizando..."
                     : costoEnvio !== null
@@ -245,13 +249,13 @@ export function Checkout() {
               </span>
             </div>
 
-            <button
+            <Button
+              size="sm"
               onClick={handleProceder}
               disabled={cotizando || (tieneEnvio && !direccionId)}
-              className="w-full bg-primary text-white font-body text-sm py-2.5 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               Procede al pago
-            </button>
+            </Button>
           </div>
 
         </div>
@@ -274,7 +278,7 @@ export function Stepper({ paso }) {
       {pasos.map((p, i) => (
         <div key={p.num} className="flex items-center">
           <div className="flex flex-col items-center gap-1">
-            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-body text-sm transition-colors ${
+            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-body text-base transition-colors ${
               paso >= p.num
                 ? "bg-primary border-primary text-white"
                 : "bg-transparent border-text-light/40 text-text-light"
@@ -286,7 +290,7 @@ export function Stepper({ paso }) {
             </span>
           </div>
           {i < pasos.length - 1 && (
-            <div className="w-24 border-t-2 border-dashed border-text-light/40 mb-4 mx-2" />
+            <div className="w-64 border-t-2 border-dashed border-text-light/40 mb-4 mx-2" />
           )}
         </div>
       ))}
