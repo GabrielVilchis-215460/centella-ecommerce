@@ -10,6 +10,7 @@ export function useGestionPagina() {
   const [cargando, setCargando]   = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [error, setError]         = useState(null)
+  const [servicios, setServicios] = useState([])
 
   useEffect(() => {
     let cancelado = false
@@ -43,6 +44,10 @@ export function useGestionPagina() {
         if (cancelado) return
         const emp = catalogo.find((e) => e.id_emprendedora === id)
         setEtiquetas(emp?.etiquetas ?? [])
+
+        const serviciosData = await emprendedoraService.getServiciosNegocio()
+        if (cancelado) return
+        setServicios(serviciosData)
 
       } catch (err) {
         console.log(">>> error completo:", err)
@@ -81,5 +86,6 @@ export function useGestionPagina() {
     htmlContenido,
     productos,
     guardarCambios,
+    servicios,
   }
 }

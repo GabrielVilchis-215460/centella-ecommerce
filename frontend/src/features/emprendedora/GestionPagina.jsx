@@ -30,6 +30,7 @@ import { useAuth }          from "../../context/AuthContext"
 import { useGestionPagina } from "../../hooks/useGestionPagina"
 import { emprendedoraService } from "../../services/emprendedoraService"
 import { Button } from "../../components/common/Button"
+import { ServiceCard } from "../../components/common/ServiceCard"
 
 function Skeleton({ className = "" }) {
   return <div className={`animate-pulse rounded-md bg-bg-dark ${className}`} />
@@ -276,6 +277,57 @@ function CarruselProductos({ productos, cargando }) {
   )
 }
 
+function CarruselServicios({ servicios, cargando, colorNegocio }) {
+  const ref = useRef(null)
+  const scroll = (dir) => {
+    if (ref.current) ref.current.scrollBy({ left: dir * 220, behavior: "smooth" })
+  }
+
+  if (cargando) {
+    return (
+      <div className="flex gap-4 overflow-hidden px-6">
+        {[1,2,3].map((i) => <Skeleton key={i} className="h-40 w-48 flex-shrink-0 rounded-xl" />)}
+      </div>
+    )
+  }
+
+  if (!servicios.length) return null
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => scroll(-1)}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-bg-light shadow-md
+                   rounded-full p-1 hover:bg-bg-dark transition-colors"
+      >
+        <Icon icon={IconChevronLeft} size={20} color="var(--color-text-regular)" />
+      </button>
+      <div ref={ref} className="flex gap-4 overflow-x-auto scrollbar-hide px-8 scroll-smooth">
+        {servicios.map((s) => (
+          <div key={s.id_servicio} className="flex-shrink-0 w-56">
+            <ServiceCard
+              nombre={s.nombre}
+              descripcion={s.descripcion}
+              precio={Number(s.precio)}
+              calificacion={Number(s.calificacion_promedio ?? 0).toFixed(1)}
+              categoria={s.nombre_categoria}
+              color={colorNegocio}
+              onClick={() => {}}
+            />
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={() => scroll(1)}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-bg-light shadow-md
+                   rounded-full p-1 hover:bg-bg-dark transition-colors"
+      >
+        <Icon icon={IconChevronRight} size={20} color="var(--color-text-regular)" />
+      </button>
+    </div>
+  )
+}
+
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export function GestionPagina() {
@@ -286,7 +338,7 @@ export function GestionPagina() {
     etiquetas, rating,
     htmlContenido, productos,
     guardarCambios,
-    idEmprendedora,
+    idEmprendedora, servicios
   } = useGestionPagina()
 
   const imageInputRef = useRef(null)
@@ -393,6 +445,14 @@ export function GestionPagina() {
           <CarruselProductos productos={productos} cargando={cargando} />
         </div>
 
+        {/* Servicios */}
+        {(cargando || servicios.length > 0) && (
+          <div className="space-y-3">
+            <h2 className="font-heading text-md font-semibold text-text-dark px-6">Servicios</h2>
+            <hr className="border-bg-dark mx-6" />
+            <CarruselServicios servicios={servicios} cargando={cargando} />
+          </div>
+        )}
       </main>
 
       <Footer />
