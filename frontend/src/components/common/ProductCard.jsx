@@ -14,13 +14,13 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar })
 
       {/* Imagen */}
       <img
-        src={imagen}
+        src={imagen || "https://placehold.co/400x300?text=sin+imagen"}
         alt={nombre}
         className="w-full h-56 object-cover"
       />
 
       {/* agregar a carrito - solo en hover */}
-      {hover && (
+      {hover && onAgregar && (
         <div className="absolute top-3 right-3">
           <Button
             size="sm"
@@ -53,7 +53,7 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar })
           </span>
           <div className="flex items-center gap-1">
             <IconStar size={16} className="text-white" />
-            <span className="font-body text-sm text-white">{calificacion}</span>
+            <span className="font-body text-sm text-white">{calificacion.toFixed(1)}</span>
           </div>
         </div>
 

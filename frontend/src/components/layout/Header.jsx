@@ -140,7 +140,7 @@ function HeaderCliente() {
   }
 
   return (
-    <header className="w-full bg-primary px-6 py-3 flex items-center gap-10">
+    <header className="w-full bg-primary px-6 py-3 flex items-center gap-10 sticky top-0 z-40">
       <Link to="/">
         <img src={logo} alt="Centella" className="h-10 w-auto" />
       </Link>
@@ -214,7 +214,7 @@ function HeaderNav({ navItems }) {
   }, [])
 
   return (
-    <header className="w-full bg-primary px-6 py-3 flex items-center justify-between">
+    <header className="w-full bg-primary px-6 py-3 flex items-center justify-between sticky top-0 z-40">
 
       <Link to="/">
         <img src={logo} alt="Centella" className="h-10 w-auto" />
