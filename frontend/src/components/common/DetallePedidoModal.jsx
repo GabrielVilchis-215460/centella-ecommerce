@@ -25,8 +25,8 @@ export function DetallePedidoModal({ onClose, pedido, onEstadoChange }) {
   const [estado,          setEstado]          = useState(pedido?.estado || "pendiente")
   const [dropdownAbierto, setDropdownAbierto] = useState(false)
 
-  const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado)
-
+  //const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado)
+  const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado) ?? ESTADOS_PEDIDO[0]
   const handleEstadoChange = (nuevoEstado) => {
     setEstado(nuevoEstado)
     onEstadoChange?.(nuevoEstado)

@@ -74,4 +74,24 @@ export const emprendedoraService = {
   // endpoints para crud de productos
   // endpoints para crud de servicios
   // endpoints para gestion de estado de pedidos
+  getPedidos: async ({ skip = 0, limit = 10, ordenar_por } = {}) => {
+    const { data } = await api.get("/api/v1/pedidos/", {
+      params: {
+        skip,
+        limit,
+        ...(ordenar_por && { ordenar_por }),
+      }
+    })
+    return data
+  },
+
+  getDetallePedido: async (idPedido) => {
+    const { data } = await api.get(`/api/v1/pedidos/${idPedido}`)
+    return data
+  },
+
+  actualizarPedido: async (idPedido, body) => {
+    const { data } = await api.patch(`/api/v1/pedidos/${idPedido}`, body)
+    return data
+  },
 }
