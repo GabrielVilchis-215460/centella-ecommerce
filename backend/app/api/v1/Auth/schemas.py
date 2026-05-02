@@ -67,3 +67,9 @@ class NewPasswordRequest(BaseModel):
     @classmethod
     def validar_contrasena_nueva(cls, v):
         return validar_contrasena_segura(v)
+    
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr

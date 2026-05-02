@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from .schemas import ServicioCreate, ServicioUpdate, ServicioRead
 from . import service
+from app.core.deps import require_emprendedora_or_admin
 
 router = APIRouter(prefix="/servicios", tags=["Servicios"])
 
@@ -17,16 +18,16 @@ def obtener(id_servicio: int, db: Session = Depends(get_db)):
     return service.get_by_id(db, id_servicio)
 
 
-@router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_emprendedora_or_admin)])
 def crear(data: ServicioCreate, db: Session = Depends(get_db)):
     return service.create(db, data)
 
 
-@router.put("/{id_servicio}", response_model=ServicioRead)
+@router.put("/{id_servicio}", response_model=ServicioRead, dependencies=[Depends(require_emprendedora_or_admin)]) 
 def actualizar(id_servicio: int, data: ServicioUpdate, db: Session = Depends(get_db)):
     return service.update(db, id_servicio, data)
 
 
-@router.delete("/{id_servicio}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id_servicio}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)])
 def eliminar(id_servicio: int, db: Session = Depends(get_db)):
     service.delete(db, id_servicio)

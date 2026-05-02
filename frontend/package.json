@@ -13,6 +13,7 @@
     "@paypal/react-paypal-js": "^9.1.1",
     "@stripe/react-stripe-js": "^6.2.0",
     "@stripe/stripe-js": "^9.2.0",
+    "@tabler/icons-react": "^3.41.1",
     "@tailwindcss/postcss": "^4.2.2",
     "axios": "^1.15.1",
     "chart.js": "^4.5.1",

@@ -15,11 +15,7 @@ from app.core.deps import require_cliente, require_emprendedora
 
 router = APIRouter(
     prefix="/imagenes", 
-    tags=["Imagenes"], 
-    dependencies=[
-        Depends(require_cliente),
-        Depends(require_emprendedora)
-    ]
+    tags=["Imagenes"]
 )
 
 #AWS ONLY ALLOWS 1 week of duration for presigned urls
@@ -31,7 +27,10 @@ def get_service(db: Session = Depends(get_db)) -> ImageUploadService:
     return ImageUploadService(db)
  
  
-@router.post("/upload", response_model=ImageResponse)
+@router.post("/upload", response_model=ImageResponse#,  dependencies=[
+        #Depends(require_cliente),
+        #Depends(require_emprendedora)]
+        )
 async def upload_image(
     file: UploadFile = File(...),
     entity_id: int = Form(...),
@@ -62,7 +61,10 @@ async def get_images(
     return service.get_entity_images(entity_id, entity_type)
  
  
-@router.delete("/image/{id_imagen}")
+@router.delete("/image/{id_imagen}",  dependencies=[
+        Depends(require_cliente),
+        Depends(require_emprendedora)
+    ])
 async def delete_image(
     id_imagen: int,
     service: ImageUploadService = Depends(get_service)

@@ -10,11 +10,12 @@ from app.core.database import get_db
 from app.models.enum import TipoResenaEnum
 from . import service
 from .schemas import ResenaCreate, ResenaUpdate
+from app.core.deps import require_cliente
 
 router = APIRouter(prefix="/resenas", tags=["Reseñas"])
 
 
-@router.post("/create")
+@router.post("/create", dependencies=[Depends(require_cliente)])
 def create_resena(
     data: ResenaCreate,
     db: Session = Depends(get_db)

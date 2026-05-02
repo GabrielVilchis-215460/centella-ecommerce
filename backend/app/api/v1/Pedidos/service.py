@@ -200,7 +200,7 @@ def get_pedido_by_id(
                 "cantidad": item.cantidad,
                 "precio_unitario": float(item.precio_unitario),
                 "subtotal": float(item.precio_unitario * item.cantidad),
-                "imagen": item.imagen_url,
+                "imagen_url": item.imagen_url,
             }
             for item in pedido.items
         ],

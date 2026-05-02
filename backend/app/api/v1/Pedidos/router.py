@@ -8,7 +8,7 @@ from app.models.usuario import Usuario
 from app.models.enum import EstadoPedidoEnum, TipoUsuarioEnum, MetodoPagoEnum
 from typing import Optional, List
 
-router = APIRouter()
+router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.get("/{id_pedido}/confirmacion", response_model=ConfirmacionPedidoResponse)
 def confirmacion_pedido(

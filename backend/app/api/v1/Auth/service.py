@@ -144,3 +144,61 @@ def new_password(data: NewPasswordRequest, db: Session):
     user.contrasena = hash_password(data.contrasena_nueva)
     db.commit()
     return {"message": "Contraseña actualizada exitosamente"}
+
+async def resend_verification_code(data, db: Session):
+    user = db.query(Usuario).filter(Usuario.email == data.email).first()
+    
+    # Respuesta genérica por seguridad (no revelar si el email existe)
+    generic_response = {"message": "Si el correo existe y no está verificado, recibirás un nuevo código."}
+    
+    if not user or user.email_verificado:
+        return generic_response
+
+    # Throttle: evitar spam si el código anterior aún no expiró
+    if user.codigo_verificacion_expira and datetime.utcnow() < user.codigo_verificacion_expira:
+        raise HTTPException(
+            status_code=429,
+            detail="Ya tienes un código activo. Espera antes de solicitar otro."
+        )
+
+    codigo = str(random.randint(100000, 999999))
+    user.codigo_verificacion = codigo
+    user.codigo_verificacion_expira = datetime.utcnow() + timedelta(minutes=15)
+    db.commit()
+
+    await enviar_correo_verificacion(
+        email_destino=user.email,
+        nombre=user.nombre,
+        codigo=codigo
+    )
+
+    return generic_response
+
+async def resend_reset_code(data, db: Session):
+    user = db.query(Usuario).filter(Usuario.email == data.email).first()
+    
+    # Respuesta genérica por seguridad
+    generic_response = {"message": "Si el correo existe, recibirás un nuevo código."}
+    
+    if not user:
+        return generic_response
+
+    # Throttle: evitar spam si el código anterior aún no expiró
+    if user.codigo_reset_expira and datetime.utcnow() < user.codigo_reset_expira:
+        raise HTTPException(
+            status_code=429,
+            detail="Ya tienes un código activo. Espera antes de solicitar otro."
+        )
+
+    codigo = str(random.randint(100000, 999999))
+    user.codigo_reset = codigo
+    user.codigo_reset_expira = datetime.utcnow() + timedelta(minutes=15)
+    db.commit()
+
+    await enviar_correo_reset(
+        email_destino=user.email,
+        nombre=user.nombre,
+        codigo=codigo
+    )
+
+    return generic_response

@@ -42,7 +42,7 @@ def get_public_page(
 
     return result
 
-@router.post("/", response_model=PaginaRead)
+@router.post("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)])
 def create(
     data: PaginaCreate,
     db: Session = Depends(get_db),
@@ -59,7 +59,7 @@ def create(
         raise HTTPException(403, str(e))
 
 
-@router.patch("/", response_model=PaginaRead)
+@router.patch("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)])
 def update(
     data: PaginaUpdate,
     db: Session = Depends(get_db),
@@ -80,7 +80,7 @@ def update(
 def get_image_service(db: Session = Depends(get_db)) -> ImageUploadService:
     return ImageUploadService(db)
 
-@router.post("/logo", response_model=dict)
+@router.post("/logo", response_model=dict, dependencies=[Depends(require_emprendedora)])
 async def upload_logo(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),

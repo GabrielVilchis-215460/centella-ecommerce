@@ -5,8 +5,9 @@ from app.core.database import get_db
 from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead
 from app.models.enum import TipoEntregaEnum
 from . import service
+from app.core.deps import require_cliente, require_emprendedora_or_admin
 
-router = APIRouter(prefix="/catalogo", tags=["Catálogo"])
+router = APIRouter(prefix="/catalogo", tags=["Catálogo"])#, dependencies=[Depends(require_cliente), Depends(require_emprendedora_or_admin)])
 
 
 @router.get("/productos", response_model=list[ProductoCatalogoRead])
