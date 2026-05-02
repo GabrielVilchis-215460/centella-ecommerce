@@ -55,3 +55,6 @@ class CrearEmprendedoraRequest(BaseModel):
     descripcion_negocio: Optional[str] = None
     enlace_redes_sociales: dict = {}
     color_emprendedora_hex: str = "#872B3D"
+
+class ActualizarPaginaRequest(BaseModel):
+    contenido: Optional[dict] = None

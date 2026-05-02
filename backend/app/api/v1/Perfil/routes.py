@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import get_current_user, require_emprendedora
@@ -8,6 +8,7 @@ from app.api.v1.Perfil.schemas import (
     DireccionRequest,
     ActualizarEmprendedoraRequest,
     CrearEmprendedoraRequest,
+    ActualizarPaginaRequest
 )
 from app.api.v1.Perfil.service import (
     get_perfil,
@@ -23,7 +24,12 @@ from app.api.v1.Perfil.service import (
     solicitar_insignia,
     subir_foto_perfil,
     solicitar_verificacion,
+    get_pagina,
+    actualizar_pagina,
+    get_productos_negocio,
+    get_servicios_negocio
 )
+from app.models.emprendedora import Emprendedora
 
 router = APIRouter(prefix="/perfil", tags=["Perfil"])
 
@@ -138,3 +144,51 @@ def pedir_verificacion(
     db: Session = Depends(get_db),
 ):
     return solicitar_verificacion(current_user, db)
+
+#  Página de emprendimiento 
+@router.get("/negocio/pagina", summary="Obtener página de emprendimiento")
+def obtener_pagina(
+    current_user: Usuario = Depends(require_emprendedora),
+    db: Session = Depends(get_db),
+):
+    return get_pagina(current_user, db)
+
+
+@router.put("/negocio/pagina", summary="Actualizar página de emprendimiento")
+def editar_pagina(
+    data: ActualizarPaginaRequest,
+    current_user: Usuario = Depends(require_emprendedora),
+    db: Session = Depends(get_db),
+):
+    return actualizar_pagina(data, current_user, db)
+
+###############################################
+# NUEVO #
+################################################
+@router.get("/negocio/productos", summary="Obtener productos del negocio")
+def obtener_productos_negocio(
+    skip: int = 0,
+    limit: int = 20,
+    current_user: Usuario = Depends(require_emprendedora),
+    db: Session = Depends(get_db),
+):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+    return get_productos_negocio(db, emp.id_emprendedora, skip, limit)
+
+@router.get("/negocio/servicios", summary="Obtener servicios del negocio")
+def obtener_servicios_negocio(
+    skip: int = 0,
+    limit: int = 20,
+    current_user: Usuario = Depends(require_emprendedora),
+    db: Session = Depends(get_db),
+):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+    return get_servicios_negocio(db, emp.id_emprendedora, skip, limit)

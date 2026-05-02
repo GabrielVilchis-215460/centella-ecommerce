@@ -11,9 +11,16 @@ from app.api.v1.Perfil.schemas import (
     DireccionRequest,
     ActualizarEmprendedoraRequest,
     CrearEmprendedoraRequest,
+    ActualizarPaginaRequest,
 )
 from app.api.v1.Imagenes.service import ImageUploadService
-
+from app.models.imagen import Imagen
+from app.models.producto import Producto
+from app.models.categoria import Categoria
+from app.models.resena import Resena
+from app.models.enum import TipoResenaEnum
+from sqlalchemy import select, func
+from app.models.servicio import Servicio
 
 # Perfil general
 
@@ -203,3 +210,103 @@ def solicitar_verificacion(current_user: Usuario, db: Session):
     emp.estado_verificacion = EstadoVerificacionEnum.pendiente
     db.commit()
     return {"message": "Solicitud de verificación enviada exitosamente"}
+
+
+def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limit: int = 20):
+    calificacion_sq = (
+        select(
+            Resena.id_referencia,
+            func.avg(Resena.calificacion_item).label("calificacion_promedio"),
+        )
+        .where(Resena.tipo_resena == TipoResenaEnum.producto)
+        .group_by(Resena.id_referencia)
+        .subquery()
+    )
+
+    # Subquery para obtener la primera imagen de cada producto
+    imagen_sq = (
+        select(
+            Imagen.entity_id,
+            Imagen.url.label("imagen_url"),
+        )
+        .where(Imagen.entity_type == "producto")
+        .order_by(Imagen.entity_id, Imagen.orden)
+        .distinct(Imagen.entity_id)
+        .subquery()
+    )
+
+    query = (
+        select(
+            Producto.id_producto,
+            Producto.nombre,
+            Producto.descripcion,
+            Producto.precio,
+            Producto.cantidad_stock,
+            Producto.tipo_entrega,
+            Producto.fecha_creacion,
+            Categoria.nombre.label("nombre_categoria"),
+            func.coalesce(calificacion_sq.c.calificacion_promedio, 0).label("calificacion_promedio"),
+            imagen_sq.c.imagen_url,
+        )
+        .join(Categoria, Categoria.id_categoria == Producto.id_categoria)
+        .outerjoin(
+            calificacion_sq,
+            calificacion_sq.c.id_referencia == Producto.id_producto,
+        )
+        .outerjoin(
+            imagen_sq,
+            imagen_sq.c.entity_id == Producto.id_producto,
+        )
+        .where(
+            Producto.activo == True,
+            Producto.id_emprendedora == id_emprendedora,
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+
+    return db.execute(query).mappings().all()
+
+#  Página de emprendimiento 
+
+def get_pagina(current_user: Usuario, db: Session):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
+    return emp.pagina
+
+
+def actualizar_pagina(data: ActualizarPaginaRequest, current_user: Usuario, db: Session):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp or not emp.pagina:
+        raise HTTPException(status_code=404, detail="Página no encontrada")
+    emp.pagina.contenido = data.contenido
+    emp.pagina.ultima_actualizacion = datetime.utcnow()
+    db.commit()
+    return {"message": "Página actualizada exitosamente"}
+
+def get_servicios_negocio(db: Session, id_emprendedora: int, skip: int = 0, limit: int = 20):
+    query = (
+        select(
+            Servicio.id_servicio,
+            Servicio.nombre,
+            Servicio.descripcion,
+            Servicio.precio,
+            Servicio.enlace_reservacion,
+            Servicio.activo,
+            Servicio.fecha_creacion,
+            Categoria.nombre.label("nombre_categoria"),
+        )
+        .join(Categoria, Categoria.id_categoria == Servicio.id_categoria)
+        .where(
+            Servicio.activo == True,
+            Servicio.id_emprendedora == id_emprendedora,
+        )
+        .offset(skip)
+        .limit(limit)
+    )
+    return [dict(r) for r in db.execute(query).mappings().all()]
