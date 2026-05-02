@@ -191,7 +191,13 @@ def get_pagina_publica(
     )
 
     return {
-        "pagina": pagina,
+        "pagina": {
+            "id_pagina": pagina.id_pagina,
+            "id_emprendedora": pagina.id_emprendedora,
+            "contenido": pagina.contenido,
+            "ultima_actualizacion": str(pagina.ultima_actualizacion),
+            "visitas": pagina.visitas,
+        },
         "productos": [dict(p) for p in productos],
         "servicios": [dict(s) for s in servicios],
     }

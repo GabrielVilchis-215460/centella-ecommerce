@@ -150,6 +150,9 @@ function MenuEmprendimiento() {
     setCargando("verificacion")
     try {
       await emprendedoraService.solicitarVerificacion()
+      alert("Solicitud de verificación enviada exitosamente")
+    } catch (err) {
+      alert(err?.response?.data?.detail || "Error al solicitar verificación")
     } finally {
       setCargando(null)
       setAbierto(false)
