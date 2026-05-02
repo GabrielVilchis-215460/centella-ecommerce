@@ -16,7 +16,7 @@ export function SellerCard({ nombre, emprendimiento, calificacion, descripcion, 
       <div className="p-4 flex flex-col gap-3 h-full">
 
         {/* info general (superior) */}
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3">
 
           {/* izquierda */}
           <div className="flex flex-col gap-1 flex-1">
@@ -39,13 +39,13 @@ export function SellerCard({ nombre, emprendimiento, calificacion, descripcion, 
               </div>
               <div className="flex items-center gap-1">
                 <IconStar size={14} className="text-white" />
-                <span className="font-body text-sm text-white">{calificacion}</span>
+                <span className="font-body text-sm text-white">{calificacion.toFixed(1)}</span>
               </div>
             </div>
 
             {/* Descripcion — max 4 líneas */}
-            <p className="font-body text-xs text-white/90 leading-snug line-clamp-4 mt-1">
-              {descripcion}
+            <p className="font-body text-xs text-white/90 leading-snug line-clamp-4 mt-1 min-h-15">
+              {descripcion || ""}
             </p>
 
           </div>

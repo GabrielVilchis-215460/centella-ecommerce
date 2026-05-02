@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.core.database import get_db
-from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead
+from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead, PaginatedResponse, CategoriaCatalogoRead
 from app.models.enum import TipoEntregaEnum
 from . import service
 from app.core.deps import require_cliente, require_emprendedora_or_admin
@@ -10,7 +10,7 @@ from app.core.deps import require_cliente, require_emprendedora_or_admin
 router = APIRouter(prefix="/catalogo", tags=["Catálogo"])#, dependencies=[Depends(require_cliente), Depends(require_emprendedora_or_admin)])
 
 
-@router.get("/productos", response_model=list[ProductoCatalogoRead])
+@router.get("/productos", response_model=PaginatedResponse[ProductoCatalogoRead])
 def listar_productos(
     skip: int = 0,
     limit: int = 20,
@@ -29,7 +29,7 @@ def listar_productos(
     )
 
 
-@router.get("/servicios", response_model=list[ServicioCatalogoRead])
+@router.get("/servicios", response_model=PaginatedResponse[ServicioCatalogoRead])
 def listar_servicios(
     skip: int = 0,
     limit: int = 20,
@@ -46,12 +46,22 @@ def listar_servicios(
     )
 
 
-@router.get("/emprendedoras", response_model=list[EmprendedoraCatalogoRead])
+@router.get("/emprendedoras", response_model=PaginatedResponse[EmprendedoraCatalogoRead])
 def listar_emprendedoras(
     skip: int = 0,
     limit: int = 20,
     nombre: Optional[str] = Query(None),
     ordenar_por: Optional[str] = Query(None, enum=["calificacion", "nombre_negocio", "recientes"]),
+    verificadas: Optional[bool] = Query(None),
+    solo_productos: Optional[bool] = Query(None),
+    solo_servicios: Optional[bool] = Query(None),
     db: Session = Depends(get_db),
 ):
-    return service.get_emprendedoras(db, skip, limit, nombre, ordenar_por)
+    return service.get_emprendedoras(db, skip, limit, nombre, ordenar_por, verificadas, solo_productos, solo_servicios)
+
+@router.get("/categorias", response_model=list[CategoriaCatalogoRead])
+def listar_categorias(
+    tipo: Optional[str] = Query(None, enum=["producto", "servicio"]),
+    db: Session = Depends(get_db),
+):
+    return service.get_categorias(db, tipo)

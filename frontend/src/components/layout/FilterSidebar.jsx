@@ -35,43 +35,82 @@ export function FilterSidebar({
 
   // Precio
   mostrarPrecio,
+  precioMinValue,
+  precioMaxValue,
+  onPrecioMinChange,
+  onPrecioMaxChange,
+  onBuscarPrecio,
 
   // Origen
   mostrarOrigen,
+  hechosJuarezValue,
+  onHechosJuarezChange,
 
   // Tipo de entrega
   mostrarTipoEntrega,
+  paqueteValue,
+  onPaqueteChange,
+  puntoMedioValue,
+  onPuntoMedioChange,
 
   // Verificación
   mostrarVerificacion,
+  verificadasValue,
+  onVerificadasChange,
 
   // Particularidad (productos/servicios)
   mostrarParticularidad,
+  soloProductosValue,
+  onSoloProductosChange,
+  soloServiciosValue,
+  onSoloServiciosChange,
 }) {
-  const [precioMin,   setPrecioMin]   = useState("")
-  const [precioMax,   setPrecioMax]   = useState("")
-  const [hechosJuarez, setHechosJuarez] = useState(false)
-  const [paquete,     setPaquete]     = useState(false)
-  const [puntoMedio,  setPuntoMedio]  = useState(false)
-  const [verificadas, setVerificadas] = useState(false)
-  const [productos,   setProductos]   = useState(false)
-  const [servicios,   setServicios]   = useState(false)
+  // Estado interno solo si no se pasa externamente
+  const [precioMinInterno, setPrecioMinInterno] = useState(0)
+  const [precioMaxInterno, setPrecioMaxInterno] = useState(0)
+  const [hechosJuarezInterno, setHechosJuarezInterno] = useState(false)
+  const [paqueteInterno,      setPaqueteInterno]      = useState(false)
+  const [puntoMedioInterno,   setPuntoMedioInterno]   = useState(false)
+  const [verificadasInterno,  setVerificadasInterno]  = useState(false)
+  const [soloProductosInterno,setSoloProductosInterno]= useState(false)
+  const [soloServiciosInterno,setSoloServiciosInterno]= useState(false)
+
+  // Usa el valor externo si existe, si no el interno
+  const precioMin     = precioMinValue     ?? precioMinInterno
+  const precioMax     = precioMaxValue     ?? precioMaxInterno
+  const hechosJuarez  = hechosJuarezValue  ?? hechosJuarezInterno
+  const paquete       = paqueteValue       ?? paqueteInterno
+  const puntoMedio    = puntoMedioValue    ?? puntoMedioInterno
+  const verificadas   = verificadasValue   ?? verificadasInterno
+  const soloProductos = soloProductosValue ?? soloProductosInterno
+  const soloServicios = soloServiciosValue ?? soloServiciosInterno
+
+  const setPrecioMin    = onPrecioMinChange    ?? setPrecioMinInterno
+  const setPrecioMax    = onPrecioMaxChange    ?? setPrecioMaxInterno
+  const setHechosJuarez = onHechosJuarezChange ?? setHechosJuarezInterno
+  const setPaquete      = onPaqueteChange      ?? setPaqueteInterno
+  const setPuntoMedio   = onPuntoMedioChange   ?? setPuntoMedioInterno
+  const setVerificadas  = onVerificadasChange  ?? setVerificadasInterno
+  const setSoloProductos= onSoloProductosChange?? setSoloProductosInterno
+  const setSoloServicios= onSoloServiciosChange?? setSoloServiciosInterno
 
   return (
-    <aside className="flex flex-col gap-6 w-70 border-r border-text-light/40 pr-8">
+    <aside className="flex flex-col gap-6 w-70 pr-8">
 
       {/* Categorías */}
       {categorias?.length > 0 && (
         <SeccionFiltro titulo="Categorías">
           <ul className="flex flex-col gap-2">
             {categorias.map((cat) => (
-              <li key={cat.id}>
+              <li key={cat.id_categoria}>
                 <button
-                  onClick={() => onCategoriaChange?.(cat.id)}
+                  onClick={() => onCategoriaChange?.(
+                    categoriaActiva === cat.id_categoria ? null : cat.id_categoria
+                  )}
                   className={`
                     font-body text-sm text-left w-full
                     transition-colors
-                    ${categoriaActiva === cat.id
+                    ${categoriaActiva === cat.id_categoria
                       ? "text-primary font-medium"
                       : "text-text-regular hover:text-text-dark"
                     }
@@ -92,13 +131,13 @@ export function FilterSidebar({
           {/* Precio */}
           {mostrarPrecio && (
             <div className="flex flex-col gap-2">
-              <span className="font-body text-base text-text-dark font-medium">Precio</span>
+              <span className="font-body text-base text-text-dark font-regular">Precio</span>
               <div className="flex gap-3">
                 <NumberInput label="Mínimo" value={precioMin} onChange={setPrecioMin} prefix="$" min={0} className="w-30" />
                 <NumberInput label="Máximo" value={precioMax} onChange={setPrecioMax} prefix="$" min={0} className="w-30"/>
               </div>
               <div className="flex justify-end">
-                <Button size="sm" className="w-auto! px-6">Buscar</Button>
+                <Button size="sm" className="w-auto! px-6" onClick={onBuscarPrecio}>Buscar</Button>
               </div>
             </div>
           )}
@@ -140,8 +179,8 @@ export function FilterSidebar({
           {mostrarParticularidad && (
             <div className="flex flex-col gap-2">
               <span className="font-body text-md text-text-dark font-regular">Particularidad</span>
-              <FilaSwitch label="Productos" checked={productos} onChange={setProductos} />
-              <FilaSwitch label="Servicios" checked={servicios} onChange={setServicios} />
+              <FilaSwitch label="Productos" checked={soloProductos} onChange={setSoloProductos} />
+              <FilaSwitch label="Servicios" checked={soloServicios} onChange={setSoloServicios} />
             </div>
           )}
 
