@@ -48,4 +48,26 @@ export const emprendedoraService = {
     const { data } = await api.get(`/api/v1/resenas/vendedora/${id_emprendedora}`)
     return data
   },
+  getPerfilNegocio: async () => {
+    const { data } = await api.get("/api/v1/perfil/negocio")
+    return data
+  },
+  subirImagenPagina: async (file, id_emprendedora) => {
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("entity_id", id_emprendedora)
+    formData.append("entity_type", "pagina")
+    const { data } = await api.post("/api/v1/imagenes/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    })
+    return data
+  },
+
+  getImagenesPagina: async (id_emprendedora) => {
+    const { data } = await api.get(`/api/v1/imagenes/pagina/${id_emprendedora}`)
+    return data
+  },
+  // endpoints para crud de productos
+  // endpoints para crud de servicios
+  // endpoints para gestion de estado de pedidos
 }

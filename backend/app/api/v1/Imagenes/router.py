@@ -61,10 +61,7 @@ async def get_images(
     return service.get_entity_images(entity_id, entity_type)
  
  
-@router.delete("/image/{id_imagen}",  dependencies=[
-        Depends(require_cliente),
-        Depends(require_emprendedora)
-    ])
+@router.delete("/image/{id_imagen}")
 async def delete_image(
     id_imagen: int,
     service: ImageUploadService = Depends(get_service)

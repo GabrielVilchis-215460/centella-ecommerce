@@ -72,7 +72,7 @@ export function usePaginaEmprendimiento() {
     etiquetas,
     rating,           // { promedio_item, promedio_vendedora, total_resenas }
     // Contenido
-    bloques:          datos?.pagina?.contenido   ?? {},
+    htmlContenido: datos?.pagina?.contenido?.html ?? "",
     productos,
     servicios:        datos?.servicios            ?? [],
   }
