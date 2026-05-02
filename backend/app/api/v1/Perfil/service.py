@@ -1,23 +1,21 @@
 from datetime import datetime
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
 from app.models.emprendedora import Emprendedora
 from app.models.pagina_emprendimiento import PaginaEmprendimiento
 from app.models.direccion import Direccion
 from app.models.enum import EstadoVerificacionEnum, TipoUsuarioEnum
-from app.api.v1.Auth.schemas import ResetPasswordRequest
-from app.core.security import hash_password, verify_password
 from app.api.v1.Perfil.schemas import (
     ActualizarPerfilRequest,
     DireccionRequest,
     ActualizarEmprendedoraRequest,
     CrearEmprendedoraRequest,
-    ActualizarPaginaRequest,
 )
+from app.api.v1.Imagenes.service import ImageUploadService
 
 
-#  Perfil general 
+# Perfil general
 
 def get_perfil(current_user: Usuario):
     return {
@@ -39,11 +37,19 @@ def actualizar_perfil(data: ActualizarPerfilRequest, current_user: Usuario, db: 
         current_user.apellido = data.apellido
     if data.fecha_nacimiento is not None:
         current_user.fecha_nacimiento = data.fecha_nacimiento
-    if data.foto_perfil_url is not None:
-        current_user.foto_perfil_url = data.foto_perfil_url
     db.commit()
     db.refresh(current_user)
     return {"message": "Perfil actualizado exitosamente"}
+
+
+def subir_foto_perfil(file: UploadFile, current_user: Usuario, db: Session):
+    service = ImageUploadService(db)
+    result = service.upload_image(file, current_user.id_usuario, "usuario")
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Error al subir imagen"))
+    current_user.foto_perfil_url = result["url"]
+    db.commit()
+    return {"message": "Foto de perfil actualizada exitosamente", "foto_perfil_url": result["url"]}
 
 
 def eliminar_cuenta(current_user: Usuario, db: Session):
@@ -52,7 +58,7 @@ def eliminar_cuenta(current_user: Usuario, db: Session):
     return {"message": "Cuenta eliminada exitosamente"}
 
 
-#  Direcciones (solo clientes) 
+# Direcciones (solo clientes)
 
 def get_direcciones(current_user: Usuario, db: Session):
     if current_user.tipo_usuario != TipoUsuarioEnum.cliente:
@@ -114,7 +120,7 @@ def eliminar_direccion(id_direccion: int, current_user: Usuario, db: Session):
     return {"message": "Dirección eliminada exitosamente"}
 
 
-#  Perfil emprendedora 
+# Perfil emprendedora
 
 def get_perfil_emprendedora(current_user: Usuario, db: Session):
     emp = db.query(Emprendedora).filter(
@@ -136,7 +142,6 @@ def crear_perfil_emprendedora(data: CrearEmprendedoraRequest, current_user: Usua
     nueva = Emprendedora(
         id_usuario=current_user.id_usuario,
         nombre_negocio=data.nombre_negocio,
-        logo_url=data.logo_url,
         descripcion_negocio=data.descripcion_negocio,
         enlace_redes_sociales=data.enlace_redes_sociales,
         color_emprendedora_hex=data.color_emprendedora_hex,
@@ -185,24 +190,16 @@ def solicitar_insignia(current_user: Usuario, db: Session):
     return {"message": "Solicitud de insignia enviada exitosamente"}
 
 
-#  Página de emprendimiento 
-
-def get_pagina(current_user: Usuario, db: Session):
+def solicitar_verificacion(current_user: Usuario, db: Session):
     emp = db.query(Emprendedora).filter(
         Emprendedora.id_usuario == current_user.id_usuario
     ).first()
     if not emp:
         raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
-    return emp.pagina
-
-
-def actualizar_pagina(data: ActualizarPaginaRequest, current_user: Usuario, db: Session):
-    emp = db.query(Emprendedora).filter(
-        Emprendedora.id_usuario == current_user.id_usuario
-    ).first()
-    if not emp or not emp.pagina:
-        raise HTTPException(status_code=404, detail="Página no encontrada")
-    emp.pagina.contenido = data.contenido
-    emp.pagina.ultima_actualizacion = datetime.utcnow()
+    if emp.estado_verificacion == EstadoVerificacionEnum.verificada:
+        raise HTTPException(status_code=400, detail="Tu negocio ya está verificado")
+    if emp.estado_verificacion == EstadoVerificacionEnum.pendiente:
+        raise HTTPException(status_code=400, detail="Ya tienes una solicitud de verificación pendiente")
+    emp.estado_verificacion = EstadoVerificacionEnum.pendiente
     db.commit()
-    return {"message": "Página actualizada exitosamente"}
+    return {"message": "Solicitud de verificación enviada exitosamente"}

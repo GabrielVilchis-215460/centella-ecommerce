@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import get_current_user, require_emprendedora
@@ -8,7 +8,6 @@ from app.api.v1.Perfil.schemas import (
     DireccionRequest,
     ActualizarEmprendedoraRequest,
     CrearEmprendedoraRequest,
-    ActualizarPaginaRequest,
 )
 from app.api.v1.Perfil.service import (
     get_perfil,
@@ -22,14 +21,14 @@ from app.api.v1.Perfil.service import (
     crear_perfil_emprendedora,
     actualizar_perfil_emprendedora,
     solicitar_insignia,
-    get_pagina,
-    actualizar_pagina,
+    subir_foto_perfil,
+    solicitar_verificacion,
 )
 
 router = APIRouter(prefix="/perfil", tags=["Perfil"])
 
 
-#  Perfil general 
+# Perfil general
 @router.get("/", summary="Obtener perfil")
 def obtener_perfil(current_user: Usuario = Depends(get_current_user)):
     return get_perfil(current_user)
@@ -44,6 +43,15 @@ def editar_perfil(
     return actualizar_perfil(data, current_user, db)
 
 
+@router.post("/foto", summary="Subir foto de perfil")
+def upload_foto_perfil(
+    file: UploadFile = File(...),
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return subir_foto_perfil(file, current_user, db)
+
+
 @router.delete("/", summary="Eliminar cuenta")
 def borrar_cuenta(
     current_user: Usuario = Depends(get_current_user),
@@ -52,7 +60,7 @@ def borrar_cuenta(
     return eliminar_cuenta(current_user, db)
 
 
-#  Direcciones 
+# Direcciones
 @router.get("/direcciones", summary="Listar direcciones")
 def listar_direcciones(
     current_user: Usuario = Depends(get_current_user),
@@ -89,7 +97,7 @@ def borrar_direccion(
     return eliminar_direccion(id_direccion, current_user, db)
 
 
-#  Emprendedora 
+# Emprendedora
 @router.get("/negocio", summary="Obtener perfil de negocio")
 def obtener_negocio(
     current_user: Usuario = Depends(require_emprendedora),
@@ -124,19 +132,9 @@ def pedir_insignia(
     return solicitar_insignia(current_user, db)
 
 
-#  Página de emprendimiento 
-@router.get("/negocio/pagina", summary="Obtener página de emprendimiento")
-def obtener_pagina(
+@router.post("/negocio/verificacion", summary="Solicitar verificación de negocio")
+def pedir_verificacion(
     current_user: Usuario = Depends(require_emprendedora),
     db: Session = Depends(get_db),
 ):
-    return get_pagina(current_user, db)
-
-
-@router.put("/negocio/pagina", summary="Actualizar página de emprendimiento")
-def editar_pagina(
-    data: ActualizarPaginaRequest,
-    current_user: Usuario = Depends(require_emprendedora),
-    db: Session = Depends(get_db),
-):
-    return actualizar_pagina(data, current_user, db)
+    return solicitar_verificacion(current_user, db)
