@@ -67,6 +67,10 @@ export const emprendedoraService = {
     const { data } = await api.get(`/api/v1/imagenes/pagina/${id_emprendedora}`)
     return data
   },
+  getServiciosNegocio: async (skip = 0, limit = 20) => {
+    const { data } = await api.get(`/api/v1/perfil/negocio/servicios?skip=${skip}&limit=${limit}`)
+    return data
+  },
   // endpoints para crud de productos
   // endpoints para crud de servicios
   // endpoints para gestion de estado de pedidos

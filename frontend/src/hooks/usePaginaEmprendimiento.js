@@ -9,6 +9,7 @@ export function usePaginaEmprendimiento() {
   const [cargando, setCargando] = useState(true)
   const [error, setError]       = useState(null)
   const [productos, setProductos] = useState([])
+  const [servicios, setServicios] = useState([])
 
   useEffect(() => {
     let cancelado = false
@@ -47,6 +48,10 @@ export function usePaginaEmprendimiento() {
         const emp = catalogo.find((e) => e.id_emprendedora === id)
         setEtiquetas(emp?.etiquetas ?? [])
 
+        const serviciosData = await emprendedoraService.getServiciosNegocio()
+        if (cancelado) return
+        setServicios(serviciosData)
+
       } catch (err) {
         console.log(">>> error completo:", err)
         console.log(">>> error response:", err?.response)
@@ -74,6 +79,7 @@ export function usePaginaEmprendimiento() {
     // Contenido
     htmlContenido: datos?.pagina?.contenido?.html ?? "",
     productos,
-    servicios:        datos?.servicios            ?? [],
+    //servicios:        datos?.servicios            ?? [],
+    servicios,
   }
 }
