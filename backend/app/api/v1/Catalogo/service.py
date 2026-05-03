@@ -6,7 +6,8 @@ from app.models.emprendedora import Emprendedora
 from app.models.usuario import Usuario
 from app.models.resena import Resena
 from app.models.categoria import Categoria
-from app.models.enum import TipoResenaEnum, TipoEntregaEnum
+from app.models.enum import TipoResenaEnum, TipoEntregaEnum, EstadoVerificacionEnum
+from app.models.imagen import Imagen
 from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead
 from typing import Optional
 
@@ -34,6 +35,18 @@ def get_productos(
         .subquery()
     )
 
+    # img
+    imagen_sq = (
+        select(
+            Imagen.entity_id,
+            Imagen.url.label("imagen_url")
+        )
+        .where(Imagen.entity_type == "producto")
+        .order_by(Imagen.entity_id, Imagen.orden)
+        .distinct(Imagen.entity_id)
+        .subquery()
+    )
+
     query = (
         select(
             Producto.id_producto,
@@ -47,13 +60,15 @@ def get_productos(
             Producto.tipo_entrega,
             Producto.fecha_creacion,
             calificacion_sq.c.calificacion_promedio,
+            imagen_sq.c.imagen_url,
         )
         .join(Categoria, Categoria.id_categoria == Producto.id_categoria)
         .join(Emprendedora, Emprendedora.id_emprendedora == Producto.id_emprendedora)
         .outerjoin(calificacion_sq, calificacion_sq.c.id_referencia == Producto.id_producto)
+        .outerjoin(imagen_sq, imagen_sq.c.entity_id==Producto.id_producto)
         .where(Producto.activo == True)
     )
-
+    
     if id_categoria:
         query = query.where(Producto.id_categoria == id_categoria)
     if nombre:
@@ -78,8 +93,13 @@ def get_productos(
     elif ordenar_por == "nombre":
         query = query.order_by(Producto.nombre.asc())
 
+    count_query = select(func.count()).select_from(query.subquery())
+    total = db.execute(count_query).scalar()
+
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
-    return [ProductoCatalogoRead(**row) for row in rows]
+    items = [ProductoCatalogoRead(**row) for row in rows]
+    
+    return {"items": items, "total": total, "skip": skip, "limit": limit}
 
 
 def get_servicios(
@@ -115,8 +135,13 @@ def get_servicios(
             Servicio.enlace_reservacion,
             Servicio.fecha_creacion,
             calificacion_sq.c.calificacion_promedio,
+            Usuario.nombre.label("nombre_vendedora"),
+            Emprendedora.estado_verificacion.label("verificada"),
+            Categoria.color_preferencia_hex.label("color_hex"),
         )
         .join(Categoria, Categoria.id_categoria == Servicio.id_categoria)
+        .join(Emprendedora, Emprendedora.id_emprendedora == Servicio.id_emprendedora)
+        .join(Usuario, Usuario.id_usuario == Emprendedora.id_usuario)
         .outerjoin(calificacion_sq, calificacion_sq.c.id_referencia == Servicio.id_servicio)
         .where(Servicio.activo == True)
     )
@@ -140,9 +165,14 @@ def get_servicios(
         query = query.order_by(Servicio.fecha_creacion.desc())
     elif ordenar_por == "nombre":
         query = query.order_by(Servicio.nombre.asc())
+    
+    count_query = select(func.count()).select_from(query.subquery())
+    total = db.execute(count_query).scalar()
 
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
-    return [ServicioCatalogoRead(**row) for row in rows]
+    items = [ServicioCatalogoRead(**row) for row in rows]
+
+    return {"items": items, "total": total, "skip": skip, "limit": limit}
 
 
 def get_emprendedoras(
@@ -151,6 +181,9 @@ def get_emprendedoras(
     limit: int = 20,
     nombre: Optional[str] = None,
     ordenar_por: Optional[str] = None,
+    verificadas: Optional[bool] = None,
+    solo_productos: Optional[bool] = None,
+    solo_servicios: Optional[bool] = None,
 ) -> list[EmprendedoraCatalogoRead]:
 
     calificacion_sq = (
@@ -170,6 +203,8 @@ def get_emprendedoras(
             Emprendedora.logo_url,
             Usuario.foto_perfil_url,
             Emprendedora.insignia_hecho_juarez, 
+            Emprendedora.estado_verificacion,
+            Emprendedora.color_emprendedora_hex,
             Usuario.nombre,
             Usuario.apellido,
             Usuario.fecha_registro,
@@ -186,6 +221,39 @@ def get_emprendedoras(
             Emprendedora.nombre_negocio.ilike(f"%{nombre}%")
         )
 
+    if verificadas is not None:
+        query = query.where(Emprendedora.estado_verificacion == EstadoVerificacionEnum.verificada)
+
+    if solo_productos and not solo_servicios:
+        query = query.where(
+            Emprendedora.id_emprendedora.in_(
+                select(Producto.id_emprendedora)
+                .where(Producto.activo == True)
+                .distinct()
+            )
+        )
+    elif solo_servicios and not solo_productos:
+        query = query.where(
+            Emprendedora.id_emprendedora.in_(
+                select(Servicio.id_emprendedora)
+                .where(Servicio.activo == True)
+                .distinct()
+            )
+        )
+    elif solo_productos and solo_servicios:
+        query = query.where(
+            Emprendedora.id_emprendedora.in_(
+                select(Producto.id_emprendedora)
+                .where(Producto.activo == True)
+                .distinct()
+            ) |
+            Emprendedora.id_emprendedora.in_(
+                select(Servicio.id_emprendedora)
+                .where(Servicio.activo == True)
+                .distinct()
+            )
+        )
+
     if ordenar_por == "calificacion":
         query = query.order_by(calificacion_sq.c.calificacion_promedio.desc().nulls_last())
     elif ordenar_por == "nombre_negocio":
@@ -193,6 +261,9 @@ def get_emprendedoras(
     elif ordenar_por == "recientes":
         query = query.order_by(Usuario.fecha_registro.desc())
 
+    total = db.execute(
+        select(func.count()).select_from(query.subquery())
+    ).scalar()
     rows = db.execute(query.offset(skip).limit(limit)).mappings().all()
 
     result = []
@@ -201,8 +272,7 @@ def get_emprendedoras(
         result.append(EmprendedoraCatalogoRead(
             **{**dict(row), "etiquetas": etiquetas}
         ))
-    return result
-    #return [EmprendedoraCatalogoRead(**row) for row in rows]
+    return {"items": result, "total": total, "skip": skip, "limit": limit}
 
 def _get_etiquetas(db: Session, id_emprendedora: int) -> list[str]:
     """Calcula las etiquetas de tipo_negocio + categorías top para una emprendedora."""
@@ -239,3 +309,15 @@ def _get_etiquetas(db: Session, id_emprendedora: int) -> list[str]:
         etiquetas.extend(nombres_categorias)
 
     return etiquetas
+
+def get_categorias(
+    db: Session,
+    tipo: Optional[str] = None,
+) -> list:
+    from app.models.categoria import Categoria
+
+    query = select(Categoria)
+    if tipo:
+        query = query.where(Categoria.tipo_categoria == tipo)
+
+    return db.execute(query).scalars().all()

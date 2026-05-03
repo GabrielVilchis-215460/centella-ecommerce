@@ -25,7 +25,7 @@ export function ServiceCard({ nombre, descripcion, precio, calificacion, categor
           </div>
           <div className="flex items-center gap-1.5">
             <IconStar size={16} className="text-white" />
-            <span className="font-body text-sm text-white">{calificacion}</span>
+            <span className="font-body text-sm text-white">{calificacion.toFixed(1)}</span>
           </div>
         </div>
 

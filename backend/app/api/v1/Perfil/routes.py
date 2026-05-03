@@ -27,7 +27,8 @@ from app.api.v1.Perfil.service import (
     get_pagina,
     actualizar_pagina,
     get_productos_negocio,
-    get_servicios_negocio
+    get_servicios_negocio,
+    subir_logo_emprendedora,
 )
 from app.models.emprendedora import Emprendedora
 
@@ -192,3 +193,11 @@ def obtener_servicios_negocio(
     if not emp:
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
     return get_servicios_negocio(db, emp.id_emprendedora, skip, limit)
+
+@router.post("/negocio/logo", summary="Subir logo del negocio")
+def upload_logo(
+    file: UploadFile = File(...),
+    current_user: Usuario = Depends(require_emprendedora),
+    db: Session = Depends(get_db),
+):
+    return subir_logo_emprendedora(file, current_user, db)

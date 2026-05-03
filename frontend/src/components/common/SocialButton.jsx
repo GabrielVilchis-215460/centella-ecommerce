@@ -78,10 +78,11 @@ function EnlaceOverlay({ red, enlace, onGuardar, onQuitar, onClose }) {
 }
 
 // boton
-export function SocialButton({ red, enlace, onEnlaceChange, disabled = false }) {
+export function SocialButton({ red, enlace, onEnlaceChange, disabled = false, variant = "default" }) {
   const [overlayAbierto, setOverlayAbierto] = useState(false)
   const { icon: IconComponent, label } = ICONOS[red]
   const tieneEnlace = !!enlace
+  const isLight = variant === "light"
 
   return (
     <>
@@ -94,7 +95,9 @@ export function SocialButton({ red, enlace, onEnlaceChange, disabled = false }) 
             border transition-colors
             ${tieneEnlace
               ? "bg-primary border-primary"
-              : "bg-transparent border-text-light hover:border-text-regular"
+              : isLight
+                ? "bg-transparent border-white/60 hover:border-white"
+                : "bg-transparent border-text-light hover:border-text-regular"
             }
             ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
           `}
@@ -102,10 +105,10 @@ export function SocialButton({ red, enlace, onEnlaceChange, disabled = false }) 
           <IconComponent
             size={22}
             stroke={1.5}
-            color={tieneEnlace ? "white" : "var(--color-text-light)"}
+            color={tieneEnlace ? "white" : isLight ? "white" : "var(--color-text-light)"}
           />
         </button>
-        <span className="font-body text-xs text-text-light">{label}</span>
+        <span className={`font-body text-xs ${isLight ? "text-white/80" : "text-text-light"}`}>{label}</span>
       </div>
 
       {overlayAbierto && (

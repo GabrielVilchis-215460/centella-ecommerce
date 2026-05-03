@@ -9,6 +9,7 @@ import { Terminos } from "./features/auth/Terminos"
 import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
 import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
+import { CrearPerfil } from "./features/auth/CrearPerfil"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
@@ -68,10 +69,11 @@ export function AppRoutes() {
       <Route path="/verificar-correo"     element={<VerificarCodigo />}     />
       <Route path="/verificar-codigo"     element={<VerificarCodigo />}     />
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
+      <Route path="/crear-perfil" element={<CrearPerfil />} />
 
       {/* Cliente */}
       
-      <Route path="/" element={<Catalogo />} />
+      <Route path="/catalogo" element={<Catalogo />} />
       {/*<Route path="/catalogo" element={<Catalogo />}         />
       {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
       <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
