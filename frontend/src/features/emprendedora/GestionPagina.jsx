@@ -259,7 +259,7 @@ function CarruselProductos({ productos, cargando }) {
             <ProductCard
               nombre={p.nombre}
               precio={Number(p.precio)}
-              calificacion={Number(p.calificacion_promedio ?? 0).toFixed(1)}
+              calificacion={Number(p.calificacion_promedio ?? 0)}
               imagen={p.imagen_url ?? null}
               onAgregar={() => {}}
             />
@@ -309,7 +309,7 @@ function CarruselServicios({ servicios, cargando, colorNegocio }) {
               nombre={s.nombre}
               descripcion={s.descripcion}
               precio={Number(s.precio)}
-              calificacion={Number(s.calificacion_promedio ?? 0).toFixed(1)}
+              calificacion={Number(s.calificacion_promedio ?? 0)}
               categoria={s.nombre_categoria}
               color={colorNegocio}
               onClick={() => {}}
