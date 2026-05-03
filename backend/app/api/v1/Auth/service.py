@@ -101,7 +101,9 @@ def get_me_user(current_user: Usuario):
         "nombre": current_user.nombre,
         "apellido": current_user.apellido,
         "tipo_usuario": current_user.tipo_usuario,
-        "fecha_registro": current_user.fecha_registro
+        "fecha_registro": current_user.fecha_registro,
+        "foto_perfil_url": current_user.foto_perfil_url,
+        "fecha_nacimiento": str(current_user.fecha_nacimiento) if current_user.fecha_nacimiento else None,
     }
 
 

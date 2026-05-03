@@ -10,6 +10,8 @@ import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
 import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 import { CrearPerfil } from "./features/auth/CrearPerfil"
+//gen
+import { Ajustes } from "./features/auth/Ajustes"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
@@ -71,6 +73,12 @@ export function AppRoutes() {
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
       <Route path="/crear-perfil" element={<CrearPerfil />} />
 
+      <Route path="/perfil/ajustes" element={
+        <ProtectedRoute roles={["cliente", "emprendedora"]}>
+          <Ajustes />
+        </ProtectedRoute>
+      } />
+      
       {/* Cliente */}
       
       <Route path="/catalogo" element={<Catalogo />} />
