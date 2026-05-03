@@ -40,10 +40,13 @@ export function useGestionPagina() {
         if (cancelado) return
         setRating(ratingData)
 
-        const catalogo = await emprendedoraService.getCatalogoEmprendedoras()
+        /* const catalogo = await emprendedoraService.getCatalogoEmprendedoras()
         if (cancelado) return
         const emp = catalogo.find((e) => e.id_emprendedora === id)
-        setEtiquetas(emp?.etiquetas ?? [])
+        setEtiquetas(emp?.etiquetas ?? []) */
+        const etiquetasData = await emprendedoraService.getEtiquetasNegocio()
+        if (cancelado) return
+        setEtiquetas(etiquetasData?.etiquetas ?? [])
 
         const serviciosData = await emprendedoraService.getServiciosNegocio()
         if (cancelado) return

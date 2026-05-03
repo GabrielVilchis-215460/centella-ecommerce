@@ -39,8 +39,12 @@ export const emprendedoraService = {
     return data
   },
 
-  getCatalogoEmprendedoras: async () => {
+ /*  getCatalogoEmprendedoras: async () => {
     const { data } = await api.get("/api/v1/catalogo/emprendedoras")
+    return data
+  }, */
+  getEtiquetasNegocio: async () => {
+    const { data } = await api.get("/api/v1/perfil/negocio/etiquetas")
     return data
   },
 

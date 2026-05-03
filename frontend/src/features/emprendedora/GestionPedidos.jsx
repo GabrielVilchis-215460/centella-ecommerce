@@ -164,7 +164,7 @@ export function GestionPedidos() {
   const handleEstadoChange = async (nuevoEstado) => {
     if (!pedidoDetalle) return
     await actualizarEstado(pedidoDetalle.id_pedido, nuevoEstado)
-    setPedidoDetalle((prev) => ({ ...prev, estado: nuevoEstado }))
+    setPedidoDetalle(null)
   }
 
   const pedidoModal = pedidoDetalle ? {

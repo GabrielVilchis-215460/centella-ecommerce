@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from app.models.pagina_emprendimiento import PaginaEmprendimiento
 from app.models.usuario import Usuario
 from app.models.emprendedora import Emprendedora
 from app.models.enum import TipoUsuarioEnum, EstadoVerificacionEnum
@@ -64,6 +65,16 @@ def verify_email(email: str, codigo: str, db: Session):
             color_emprendedora_hex="#000000"
         )
         db.add(emprendedora)
+        db.flush()
+
+        # crea la pagina de emprendimiento tmb
+        pagina = PaginaEmprendimiento(
+            id_emprendedora=emprendedora.id_emprendedora,
+            contenido={"html": "<p></p>"},
+            ultima_actualizacion=datetime.utcnow(),
+            visitas=0,
+        )
+        db.add(pagina)
 
     db.commit()
     return {"message": "Correo verificado exitosamente"}
