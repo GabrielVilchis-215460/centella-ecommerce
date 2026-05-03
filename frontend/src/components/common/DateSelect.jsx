@@ -26,7 +26,7 @@ const AÑOS = Array.from({ length: 100 }, (_, i) => ({
   label: String(currentYear - i),
 }))
 
-export function DateSelect({ label, value = {}, onChange, error }) {
+export function DateSelect({ label, value = {}, onChange, error, variant = "default", labelClassName = "" }) {
 
   const handleChange = (field, fieldValue) => {
     onChange({ ...value, [field]: fieldValue })
@@ -36,7 +36,9 @@ export function DateSelect({ label, value = {}, onChange, error }) {
     <div className="flex flex-col gap-1 w-full">
 
       {label && (
-        <label className="font-body text-base text-text-regular">
+        <label className={`font-body text-base ${
+          variant === "light" ? "text-white" : "text-text-regular"
+        } ${labelClassName}`}>
           {label}
         </label>
       )}
@@ -47,18 +49,21 @@ export function DateSelect({ label, value = {}, onChange, error }) {
           value={value.dia || ""}
           onChange={(e) => handleChange("dia", e.target.value)}
           options={DIAS}
+          variant={variant}
         />
         <Select
           placeholder="MM"
           value={value.mes || ""}
           onChange={(e) => handleChange("mes", e.target.value)}
           options={MESES}
+          variant={variant}
         />
         <Select
           placeholder="YYYY"
           value={value.año || ""}
           onChange={(e) => handleChange("año", e.target.value)}
           options={AÑOS}
+          variant={variant}
         />
       </div>
 

@@ -310,3 +310,19 @@ def get_servicios_negocio(db: Session, id_emprendedora: int, skip: int = 0, limi
         .limit(limit)
     )
     return [dict(r) for r in db.execute(query).mappings().all()]
+
+def subir_logo_emprendedora(file: UploadFile, current_user: Usuario, db: Session):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
+    
+    service = ImageUploadService(db)
+    result = service.upload_image(file, emp.id_emprendedora, "emprendedora")
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Error al subir imagen"))
+    
+    emp.logo_url = result["url"]
+    db.commit()
+    return {"message": "Logo actualizado exitosamente", "logo_url": result["url"]}

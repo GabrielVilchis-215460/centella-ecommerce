@@ -50,8 +50,8 @@ export function useRegistro() {
         apellido:    "",
         tipo_usuario: tipoUsuario,
       })
-      // Redirige a verificación de correo pasando el email
-      navigate("/verificar-correo", { state: { email } }) //TODO: add route
+      // Redirige a verificación de correo pasando el email y contraseña para hacer login y obtener token
+      navigate("/verificar-correo", { state: { email, contrasena, modo: "registro"} })
     } catch (err) {
       const detail = err.response?.data?.detail
       if (Array.isArray(detail)) {
