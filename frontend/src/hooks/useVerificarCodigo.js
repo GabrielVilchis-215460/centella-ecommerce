@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { authService } from "../services/auth"
+import { useAuth } from "../context/AuthContext"
 
 export function useVerificarCodigo({ modo }) {
   // modo: "registro" | "reset"
@@ -10,7 +11,9 @@ export function useVerificarCodigo({ modo }) {
   const [cooldown,  setCooldown]  = useState(0)
   const navigate   = useNavigate()
   const location   = useLocation()
+  const { login }  = useAuth()
   const email      = location.state?.email || ""
+  const contrasena = location.state?.contrasena || ""
   const inputsRef  = useRef([])
 
   // Cooldown timer
@@ -83,7 +86,10 @@ export function useVerificarCodigo({ modo }) {
       setCargando(true)
       setError("")
       if (modo === "registro") {
+        console.log("modo:", modo)
+        console.log("endpoint que se llama:", modo === "registro" ? "verify-email" : "confirm-reset")
         await authService.verificarEmail(email, codigoCompleto)
+        await login(email, contrasena) //hace login para tener token
         navigate("/crear-perfil", { state: { email } })
       } else {
         await authService.confirmReset(email, codigoCompleto)

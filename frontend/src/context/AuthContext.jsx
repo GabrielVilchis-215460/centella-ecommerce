@@ -50,6 +50,16 @@ export function AuthProvider({ children }) {
     setUsuario(null)
   }
 
+  //refresh
+  const refreshUsuario = async () => {
+    try {
+      const me = await authService.getMe()
+      setUsuario(me)
+    } catch {
+      console.error("Error al refrescar usuario")
+    }
+  }
+
   // manejo de roles
   const esCliente      = () => usuario?.tipo_usuario === "cliente"
   const esEmprendedora = () => usuario?.tipo_usuario === "emprendedora"
@@ -62,6 +72,7 @@ export function AuthProvider({ children }) {
       cargando,
       login,
       logout,
+      refreshUsuario,
       esCliente,
       esEmprendedora,
       esAdmin,

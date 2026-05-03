@@ -5,6 +5,7 @@
   --color-primary:      var(--color-primary);
   --color-aux:          var(--color-aux);
   --color-secondary:    var(--color-secondary);
+  --color-secondary-dark: var(--color-secondary-dark);
 
   --color-bg:           var(--color-bg);
   --color-bg-dark:      var(--color-bg-dark);
