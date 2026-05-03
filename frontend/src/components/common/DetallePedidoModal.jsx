@@ -5,11 +5,11 @@ import { StatusBadge } from "./StatusBadge"
 import { Button } from "./Button"
 
 const ESTADOS_PEDIDO = [
-  { value: "pendiente",   label: "Pendiente",   color: "gray" },
-  { value: "en_proceso",  label: "En proceso",  color: "orange" },
-  { value: "en_transito", label: "En tránsito", color: "blue"   },
-  { value: "entregado",   label: "Entregado",   color: "green"  },
-  { value: "cancelado",   label: "Cancelado",   color: "red"    },
+  { value: "pendiente",  label: "Pendiente",   color: "gray"   },
+  { value: "confirmado", label: "Confirmado",  color: "orange" },
+  { value: "enviado",    label: "En tránsito", color: "blue"   },
+  { value: "entregado",  label: "Entregado",   color: "green"  },
+  { value: "cancelado",  label: "Cancelado",   color: "red"    },
 ]
 
 function SeccionDetalle({ titulo, children }) {
@@ -25,11 +25,11 @@ export function DetallePedidoModal({ onClose, pedido, onEstadoChange }) {
   const [estado,          setEstado]          = useState(pedido?.estado || "pendiente")
   const [dropdownAbierto, setDropdownAbierto] = useState(false)
 
-  const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado)
-
+  //const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado)
+  const estadoActual = ESTADOS_PEDIDO.find((e) => e.value === estado) ?? ESTADOS_PEDIDO[0]
   const handleEstadoChange = (nuevoEstado) => {
     setEstado(nuevoEstado)
-    onEstadoChange?.(nuevoEstado)
+    //onEstadoChange?.(nuevoEstado)
     setDropdownAbierto(false)
   }
 

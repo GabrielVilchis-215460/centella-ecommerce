@@ -21,6 +21,7 @@ from app.models.resena import Resena
 from app.models.enum import TipoResenaEnum
 from sqlalchemy import select, func
 from app.models.servicio import Servicio
+from app.api.v1.Catalogo.service import _get_etiquetas
 
 # Perfil general
 
@@ -161,7 +162,7 @@ def crear_perfil_emprendedora(data: CrearEmprendedoraRequest, current_user: Usua
     db.refresh(nueva)
     pagina = PaginaEmprendimiento(
         id_emprendedora=nueva.id_emprendedora,
-        contenido={},
+        contenido={"html": "<p></p>"},
         ultima_actualizacion=datetime.utcnow(),
         visitas=0,
     )
@@ -284,6 +285,20 @@ def actualizar_pagina(data: ActualizarPaginaRequest, current_user: Usuario, db: 
     ).first()
     if not emp or not emp.pagina:
         raise HTTPException(status_code=404, detail="Página no encontrada")
+    
+    # Si no existe la página, crearla
+    if not emp.pagina:
+        from app.models.pagina_emprendimiento import PaginaEmprendimiento
+        pagina = PaginaEmprendimiento(
+            id_emprendedora=emp.id_emprendedora,
+            contenido=data.contenido or {"html": "<p></p>"},
+            ultima_actualizacion=datetime.utcnow(),
+            visitas=0,
+        )
+        db.add(pagina)
+        db.commit()
+        return {"message": "Página creada exitosamente"}
+    
     emp.pagina.contenido = data.contenido
     emp.pagina.ultima_actualizacion = datetime.utcnow()
     db.commit()
@@ -326,3 +341,13 @@ def subir_logo_emprendedora(file: UploadFile, current_user: Usuario, db: Session
     emp.logo_url = result["url"]
     db.commit()
     return {"message": "Logo actualizado exitosamente", "logo_url": result["url"]}
+
+def get_etiquetas_negocio(id_emprendedora: int, db: Session):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == id_emprendedora
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
+    
+    etiquetas = _get_etiquetas(db, emp.id_emprendedora)
+    return {"etiquetas": etiquetas}

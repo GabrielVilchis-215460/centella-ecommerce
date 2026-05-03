@@ -170,13 +170,22 @@ def get_pedido_by_id(
 
     else:
         return None
+    
+    tipos = {item.tipo_entrega for item in pedido.items}
+    if len(tipos) > 1:
+        tipo_entrega = "mixto"
+    elif tipos:
+        tipo_entrega = tipos.pop().value
+    else:
+        tipo_entrega = None
 
     return {
         "id_pedido": pedido.id_pedido,
         "fecha": pedido.fecha_pedido,
         "estado": pedido.estado,
         "total": float(pedido.total),
-
+        "metodo_pago": pedido.metodo_pago.value if pedido.metodo_pago else None,
+        "tipo_entrega": tipo_entrega,
         "cliente": {
             "id": pedido.cliente.id_usuario,
             "nombre": f"{pedido.cliente.nombre} {pedido.cliente.apellido}",
@@ -205,7 +214,6 @@ def get_pedido_by_id(
             for item in pedido.items
         ],
     }
-
 
 def delete_pedido(
     db: Session,

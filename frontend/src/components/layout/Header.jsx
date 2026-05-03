@@ -268,5 +268,5 @@ export function Header() {
   if (esCliente())      return <HeaderCliente />
   if (esEmprendedora()) return <HeaderNav navItems={NAV_EMPRENDEDORA} />
   if (esAdmin())        return <HeaderNav navItems={NAV_ADMIN} />
-
+  //return <HeaderCliente />  // ← fallback para no autenticados
 }

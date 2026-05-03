@@ -23,8 +23,9 @@ import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
 import { Dashboard }            from "./features/emprendedora/Dashboard"
 // import { GestionProductos }     from "./features/emprendedora/GestionProductos"
 // import { GestionServicios }     from "./features/emprendedora/GestionServicios"
-// import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
-// import { PaginaEmprendimiento } from "./features/emprendedora/PaginaEmprendimiento"
+import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
+import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
+import { GestionPagina } from "./features/emprendedora/GestionPagina"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
@@ -75,8 +76,8 @@ export function AppRoutes() {
       <Route path="/catalogo" element={<Catalogo />} />
       {/*<Route path="/catalogo" element={<Catalogo />}         />
       {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
-      <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />
-      <Route path="/catalogo/emprendedora/:id"  element={<DetalleEmprendedora />} />*/}
+      <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />*/}
+      <Route path="/catalogo/emprendedora/:id" element={<DetalleEmprendedora />} />
       <Route path="/checkout" element={
         <ProtectedRoute roles={["cliente"]}>
             <Checkout />
@@ -128,17 +129,22 @@ export function AppRoutes() {
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionServicios />
         </ProtectedRoute>
-      } />
+      } />*/}
       <Route path="/dashboard/pedidos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPedidos />
         </ProtectedRoute>
       } />
-      <Route path="/dashboard/pagina" element={
+      {/*<Route path="/dashboard/pagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
-          <PaginaEmprendimiento />
+          <Pagina />
         </ProtectedRoute>
       } />*/}
+      <Route path="/dashboard/gestionpagina" element={
+        <ProtectedRoute roles={["emprendedora"]}>
+          <GestionPagina />
+        </ProtectedRoute>
+      } />
 
       {/* Admin */}
       <Route path="/admin" element={

@@ -29,6 +29,7 @@ from app.api.v1.Perfil.service import (
     get_productos_negocio,
     get_servicios_negocio,
     subir_logo_emprendedora,
+    get_etiquetas_negocio,
 )
 from app.models.emprendedora import Emprendedora
 
@@ -201,3 +202,11 @@ def upload_logo(
     db: Session = Depends(get_db),
 ):
     return subir_logo_emprendedora(file, current_user, db)
+
+@router.get("/negocio/etiquetas", summary="Obtener etiquetas del negocio")
+def obtener_etiquetas_negocio(
+    #current_user: Usuario = Depends(require_emprendedora),
+    id_emprendedora: int,
+    db: Session = Depends(get_db),
+):
+    return get_etiquetas_negocio(id_emprendedora, db)

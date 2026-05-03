@@ -9,8 +9,8 @@ from app.models.usuario import Usuario
 from .schemas import (
     PaginaCreate,
     PaginaUpdate,
-    PaginaRead,
-    PaginaPublica,
+    PaginaRead
+    #PaginaPublica,
 )
 
 from .service import (
@@ -23,7 +23,7 @@ from app.api.v1.Imagenes.service import ImageUploadService
 
 router = APIRouter(prefix="/paginas", tags=["Paginas"])
 
-@router.get("/{id_emprendedora}", response_model=PaginaPublica)
+@router.get("/{id_emprendedora}")#, response_model=PaginaPublica)
 def get_public_page(
     id_emprendedora: int,
     skip: int = 0,

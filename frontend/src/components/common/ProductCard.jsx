@@ -1,9 +1,11 @@
 import { useState } from "react"
 import { IconShoppingCart, IconStar } from "@tabler/icons-react"
 import { Button } from "./Button"
+import { useAuth } from "../../context/AuthContext"
 
 export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar }) {
   const [hover, setHover] = useState(false)
+  const { esEmprendedora } = useAuth() 
 
   return (
     <div
