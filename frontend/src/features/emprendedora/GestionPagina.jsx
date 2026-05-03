@@ -20,7 +20,8 @@ import {
   IconLink,
   IconSeparator,
   IconArrowLeft,
-  IconCarambola
+  IconCarambola,
+  IconRosetteDiscountCheck
 } from "@tabler/icons-react"
 import { Icon }             from "../../components/common/Icon"
 import { Header }           from "../../components/layout/Header"
@@ -38,7 +39,7 @@ function Skeleton({ className = "" }) {
 
 // ─── Encabezado ───────────────────────────────────────────────────────────────
 
-function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, insignia, cargando, accion }) {
+function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, insignia, verificada, cargando, accion }) {
   if (cargando) {
     return (
       <div className="flex items-start gap-5 py-6 px-6">
@@ -77,10 +78,7 @@ function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, ins
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="font-heading text-xl font-bold text-text-dark">{nombreNegocio}</h1>
-            {insignia && <Icon icon={IconRosette} size={18} color="var(--color-primary)" />}
-            {rating?.promedio_vendedora >= 4 && (
-              <Icon icon={IconShieldCheck} size={18} color="var(--color-states-green)" />
-            )}
+            {verificada && (<Icon icon={IconRosetteDiscountCheck} size={24} color="var(--color-text-regular)" />)}
           </div>
           {etiquetas.length > 0 && (
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -334,7 +332,7 @@ export function GestionPagina() {
   const { usuario, cargando: cargandoAuth } = useAuth()
   const {
     cargando, guardando, error,
-    nombreNegocio, logoUrl, insignia,
+    nombreNegocio, logoUrl, insignia, verificada,
     etiquetas, rating,
     htmlContenido, productos,
     guardarCambios,
@@ -389,7 +387,7 @@ export function GestionPagina() {
     <>
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 py-4 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 py-4 space-y-6 bg-bg">
 
         <EncabezadoEmprendedora
           logoUrl={logoUrl}
@@ -397,6 +395,7 @@ export function GestionPagina() {
           etiquetas={etiquetas}
           rating={rating}
           insignia={insignia}
+          verificada={verificada}
           cargando={cargando}
           accion={
             <Button

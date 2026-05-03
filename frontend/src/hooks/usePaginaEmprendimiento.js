@@ -71,7 +71,7 @@ export function usePaginaEmprendimiento() {
         console.log(">>> catalogo:", catalogo)
         console.log(">>> id buscado:", Number(id))
         console.log(">>> emp:", emp)
-        //setEtiquetas(emp?.etiquetas ?? [])
+        setEtiquetas(emp?.etiquetas ?? [])
 
         /*const serviciosData = await emprendedoraService.getServiciosNegocio()
         if (cancelado) return
@@ -99,6 +99,7 @@ export function usePaginaEmprendimiento() {
     logoUrl:          perfil?.logo_url           ?? null,
     descripcion:      perfil?.descripcion_negocio ?? "",
     insignia:         perfil?.insignia_hecho_juarez ?? false,
+    verificada:    perfil?.estado_verificacion === "verificada",
     etiquetas,
     rating,           // { promedio_item, promedio_vendedora, total_resenas }
     // Contenido

@@ -7,7 +7,8 @@ import {
   IconShieldCheck,
   IconDots,
   IconArrowLeft,
-  IconCarambola
+  IconCarambola,
+  IconRosetteDiscountCheck
 } from "@tabler/icons-react"
 import { Icon }                    from "../../components/common/Icon"
 import { Header }                  from "../../components/layout/Header"
@@ -24,7 +25,7 @@ function Skeleton({ className = "" }) {
 
 // ─── Encabezado ───────────────────────────────────────────────────────────────
 
-function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, insignia, cargando }) {
+function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, insignia, verificada, cargando }) {
   const navigate = useNavigate()
 
   if (cargando) {
@@ -66,10 +67,7 @@ function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, ins
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <h1 className="font-heading text-xl font-bold text-text-dark">{nombreNegocio}</h1>
-          {insignia && <Icon icon={IconRosette} size={18} color="var(--color-primary)" />}
-          {rating?.promedio_vendedora >= 4 && (
-            <Icon icon={IconShieldCheck} size={18} color="var(--color-states-green)" />
-          )}
+          {verificada && (<Icon icon={IconRosetteDiscountCheck} size={24} color="var(--color-text-regular)" />)}
         </div>
         {etiquetas.length > 0 && (
           <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -199,7 +197,7 @@ function CarruselServicios({ servicios, cargando, colorNegocio }) {
 export function DetalleEmprendedora() {
   const {
     cargando, error,
-    nombreNegocio, logoUrl, insignia,
+    nombreNegocio, logoUrl, insignia, verificada,
     etiquetas, rating, htmlContenido, productos, servicios
   } = usePaginaEmprendimiento()
 
@@ -226,6 +224,7 @@ export function DetalleEmprendedora() {
           etiquetas={etiquetas}
           rating={rating}
           insignia={insignia}
+          verificada={verificada}
           cargando={cargando}
         />
         {/* Bloques */}

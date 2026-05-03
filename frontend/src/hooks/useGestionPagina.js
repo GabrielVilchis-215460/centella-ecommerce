@@ -84,6 +84,7 @@ export function useGestionPagina() {
     nombreNegocio:  perfil?.nombre_negocio       ?? "",
     logoUrl:        perfil?.logo_url              ?? null,
     insignia:       perfil?.insignia_hecho_juarez ?? false,
+    verificada:     perfil?.estado_verificacion === "verificada",
     idEmprendedora: perfil?.id_emprendedora       ?? null,
     etiquetas,
     rating,
