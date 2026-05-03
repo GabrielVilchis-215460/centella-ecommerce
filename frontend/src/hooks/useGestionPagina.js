@@ -44,7 +44,8 @@ export function useGestionPagina() {
         if (cancelado) return
         const emp = catalogo.find((e) => e.id_emprendedora === id)
         setEtiquetas(emp?.etiquetas ?? []) */
-        const etiquetasData = await emprendedoraService.getEtiquetasNegocio()
+        //const etiquetasData = await emprendedoraService.getEtiquetasNegocio()
+        const etiquetasData = await emprendedoraService.getEtiquetasNegocio(perfilData?.id_emprendedora)
         if (cancelado) return
         setEtiquetas(etiquetasData?.etiquetas ?? [])
 

@@ -196,7 +196,7 @@ function CarruselServicios({ servicios, cargando, colorNegocio }) {
 }
 // ─── Componente principal ─────────────────────────────────────────────────────
 
-export function Pagina() {
+export function DetalleEmprendedora() {
   const {
     cargando, error,
     nombreNegocio, logoUrl, insignia,

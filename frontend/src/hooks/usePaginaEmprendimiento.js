@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useParams } from "react-router-dom"
 
 export function usePaginaEmprendimiento() {
   const [datos, setDatos]       = useState(null)
@@ -10,6 +11,7 @@ export function usePaginaEmprendimiento() {
   const [error, setError]       = useState(null)
   const [productos, setProductos] = useState([])
   const [servicios, setServicios] = useState([])
+  const { id } = useParams()
 
   useEffect(() => {
     let cancelado = false
@@ -21,7 +23,7 @@ export function usePaginaEmprendimiento() {
         setError(null)
 
         // 1. Perfil del negocio → obtiene id_emprendedora
-        const perfilData = await emprendedoraService.getPaginaNegocio()
+        /*const perfilData = await emprendedoraService.getPaginaNegocio()
         if (cancelado) return
         setPerfil(perfilData)
 
@@ -31,13 +33,29 @@ export function usePaginaEmprendimiento() {
         // 2. Página pública + productos + servicios
         const paginaData = await emprendedoraService.getPaginaPublica(id)
         if (cancelado) return
-        setDatos(paginaData)
+        setDatos(paginaData)*/
 
-        const productosData = await emprendedoraService.getProductosNegocio()
+       /* const productosData = await emprendedoraService.getProductosNegocio()
         if (cancelado) return
-        setProductos(productosData)
+        setProductos(productosData)*/
 
-        // 3. Rating
+        // 1.  reemplaza getPaginaNegocio por el catálogo
+        const catalogo = await emprendedoraService.getCatalogoEmprendedoras()
+        if (cancelado) return
+        const emp = Array.isArray(catalogo) 
+          ? catalogo.find((e) => e.id_emprendedora === Number(id))
+          : catalogo?.items?.find((e) => e.id_emprendedora === Number(id))
+        setPerfil(emp ?? null)
+        //console.log(">>> catalogo:", catalogo)
+
+        // 2. Página pública
+        const paginaData = await emprendedoraService.getPaginaPublica(id)
+        if (cancelado) return
+        setDatos(paginaData)
+        setProductos(paginaData?.productos ?? [])
+        setServicios(paginaData?.servicios ?? [])
+
+        // 3. Rating  
         const ratingData = await emprendedoraService.getRatingEmprendedora(id)
         if (cancelado) return
         setRating(ratingData)
@@ -47,13 +65,17 @@ export function usePaginaEmprendimiento() {
         if (cancelado) return
         const emp = catalogo.find((e) => e.id_emprendedora === id)
         setEtiquetas(emp?.etiquetas ?? []) */
-        const etiquetasData = await emprendedoraService.getEtiquetasNegocio()
+        const etiquetasData = await emprendedoraService.getEtiquetasNegocio(id)
         if (cancelado) return
         setEtiquetas(etiquetasData?.etiquetas ?? [])
+        console.log(">>> catalogo:", catalogo)
+        console.log(">>> id buscado:", Number(id))
+        console.log(">>> emp:", emp)
+        //setEtiquetas(emp?.etiquetas ?? [])
 
-        const serviciosData = await emprendedoraService.getServiciosNegocio()
+        /*const serviciosData = await emprendedoraService.getServiciosNegocio()
         if (cancelado) return
-        setServicios(serviciosData)
+        setServicios(serviciosData)*/
 
       } catch (err) {
         console.log(">>> error completo:", err)
@@ -67,7 +89,7 @@ export function usePaginaEmprendimiento() {
 
     cargar()
     return () => { cancelado = true }
-  }, [])
+  }, [id])
 
   return {
     cargando,

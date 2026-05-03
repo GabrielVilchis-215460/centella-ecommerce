@@ -205,7 +205,8 @@ def upload_logo(
 
 @router.get("/negocio/etiquetas", summary="Obtener etiquetas del negocio")
 def obtener_etiquetas_negocio(
-    current_user: Usuario = Depends(require_emprendedora),
+    #current_user: Usuario = Depends(require_emprendedora),
+    id_emprendedora: int,
     db: Session = Depends(get_db),
 ):
-    return get_etiquetas_negocio(current_user, db)
+    return get_etiquetas_negocio(id_emprendedora, db)

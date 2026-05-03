@@ -11,6 +11,7 @@ import { OrderByDropdown } from "../../components/common/Dropdown"
 import { useCatalogo }     from "../../hooks/useCatalogo"
 import { useCart }         from "../../context/CartContext"
 import { useAuth }         from "../../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 const ORDEN_PRODUCTOS = [
   { value: "newest",      label: "Más recientes"                      },
@@ -37,6 +38,7 @@ export function Catalogo() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { agregarItem } = useCart()
   const { esCliente, usuario }   = useAuth()
+  const navigate = useNavigate()
 
   const {
     tab, items, totalPaginas, cargando, error,
@@ -204,6 +206,7 @@ export function Catalogo() {
                       etiquetas={v.etiquetas}
                       verificada={v.estado_verificacion === "verificada"}
                       color={v.color_emprendedora_hex || undefined}
+                      onClick={() => navigate(`/catalogo/emprendedora/${v.id_emprendedora}`)}
                     />
                   ))}
                 </div>

@@ -43,8 +43,10 @@ export const emprendedoraService = {
     const { data } = await api.get("/api/v1/catalogo/emprendedoras")
     return data
   }, */
-  getEtiquetasNegocio: async () => {
-    const { data } = await api.get("/api/v1/perfil/negocio/etiquetas")
+  getEtiquetasNegocio: async (id) => {
+    const { data } = await api.get(`/api/v1/perfil/negocio/etiquetas`, {
+      params: { id_emprendedora: id }
+    })
     return data
   },
 
@@ -73,6 +75,10 @@ export const emprendedoraService = {
   },
   getServiciosNegocio: async (skip = 0, limit = 20) => {
     const { data } = await api.get(`/api/v1/perfil/negocio/servicios?skip=${skip}&limit=${limit}`)
+    return data
+  },
+  getCatalogoEmprendedoras: async () => {
+    const { data } = await api.get("/api/v1/catalogo/emprendedoras")
     return data
   },
   // endpoints para crud de productos

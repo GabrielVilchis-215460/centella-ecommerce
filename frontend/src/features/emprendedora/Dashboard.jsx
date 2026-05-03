@@ -1,4 +1,4 @@
-//import { Navigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { useRef, useState, useEffect } from "react"
 // import de iconos
@@ -171,9 +171,9 @@ function MenuEmprendimiento() {
       {abierto && (
         <div className="absolute left-0 top-[calc(100%+8px)] z-50 w-72 rounded-xl
                         bg-bg-light shadow-lg p-2 flex flex-col">
-          {/* CAMBIAR ESTO CUANDO HAYA UNA PAGINA DE LA EDICION DE PAGINA */}
+          {/* cambiar esto por perfil de negocio - gestion */}
           <button
-            onClick={() => { navigate("/dashboard/GestionPagina"); setAbierto(false) }}
+            onClick={() => { navigate("/dashboard/GestionPerfil"); setAbierto(false) }}
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-text-regular
                       hover:bg-bg-dark transition-colors text-left"
           >
@@ -462,7 +462,7 @@ export function Dashboard() {
             <DashboardCard icon={IconBrandAsana}     label="Gestión de productos"     to="/dashboard/productos" />
             <DashboardCard icon={IconHeartHandshake} label="Gestión de servicios"     to="/dashboard/servicios" />
             <DashboardCard icon={IconPackage}        label="Gestión de pedidos"       to="/dashboard/pedidos"   />
-            <DashboardCard icon={IconPointer}        label="Página de emprendimiento" to="/dashboard/pagina"    />
+            <DashboardCard icon={IconPointer}        label="Página de emprendimiento" to="/dashboard/gestionPagina"    />
           </div>
         </section>
 

@@ -342,9 +342,9 @@ def subir_logo_emprendedora(file: UploadFile, current_user: Usuario, db: Session
     db.commit()
     return {"message": "Logo actualizado exitosamente", "logo_url": result["url"]}
 
-def get_etiquetas_negocio(current_user: Usuario, db: Session):
+def get_etiquetas_negocio(id_emprendedora: int, db: Session):
     emp = db.query(Emprendedora).filter(
-        Emprendedora.id_usuario == current_user.id_usuario
+        Emprendedora.id_usuario == id_emprendedora
     ).first()
     if not emp:
         raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
