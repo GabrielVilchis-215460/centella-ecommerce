@@ -62,9 +62,10 @@ def subir_foto_perfil(file: UploadFile, current_user: Usuario, db: Session):
 
 
 def eliminar_cuenta(current_user: Usuario, db: Session):
-    db.delete(current_user)
+    #db.delete(current_user)
+    current_user.activo = False #soft delete x tibios
     db.commit()
-    return {"message": "Cuenta eliminada exitosamente"}
+    return {"message": "Cuenta desactivada exitosamente"}
 
 def eliminar_foto_perfil(current_user: Usuario, db: Session):
     # Buscar imagen en la tabla

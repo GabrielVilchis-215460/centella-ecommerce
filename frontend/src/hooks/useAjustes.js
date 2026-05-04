@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../context/AuthContext"
 import { perfilService } from "../services/perfilService"
+import { useNavigate } from "react-router-dom"
 
 const REQUISITOS_PASS = [
   { id: "longitud",  label: "Mínimo 8 caracteres", regex: /.{8,}/  },
@@ -11,7 +12,7 @@ const REQUISITOS_PASS = [
 ]
 
 export function useAjustes() {
-  const { usuario, refreshUsuario, esCliente } = useAuth()
+  const { usuario, refreshUsuario, esCliente, logout } = useAuth()
 
   // Perfil general
   const [nombre,          setNombre]          = useState("")
@@ -38,6 +39,9 @@ export function useAjustes() {
   const [exitoPerfil,  setExitoPerfil]  = useState(false)
   const [exitoPass,    setExitoPass]    = useState(false)
 
+  const [modalEliminar, setModalEliminar] = useState(false)
+  const navigate = useNavigate()
+
   // Prellenar con datos actuales
   useEffect(() => {
     if (!usuario) return
@@ -45,7 +49,7 @@ export function useAjustes() {
     setApellido(usuario.apellido || "")
     setFotoActual(usuario.foto_perfil_url || null)
     setFotoPreview(usuario.foto_perfil_url || null)
-    
+
     if (usuario.fecha_nacimiento) {
       const fechaSolo = usuario.fecha_nacimiento.split("T")[0]
       const [año, mes, dia] = fechaSolo.split("-")
@@ -180,6 +184,16 @@ export function useAjustes() {
     }
   }
 
+  const handleEliminarCuenta = async () => {
+    try {
+        await perfilService.eliminarCuenta()
+        logout()
+        navigate("/login")
+    } catch {
+        setErrorPerfil("Error al desactivar la cuenta.")
+    }
+  }
+
   return {
     cargando, guardando,
     // Perfil
@@ -203,5 +217,7 @@ export function useAjustes() {
     modalDireccion, setModalDireccion,
     handleEliminarDireccion,
     handleAgregarDireccion,
+    modalEliminar, setModalEliminar,
+    handleEliminarCuenta,
   }
 }

@@ -86,6 +86,8 @@ def login_user(data: LoginRequest, db: Session):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
     if not user.email_verificado:
         raise HTTPException(status_code=403, detail="Debes verificar tu correo antes de iniciar sesión")
+    if not user.activo:
+        raise HTTPException(status_code=403, detail="Esta cuenta ha sido desactivada")
     return {
         "access_token": create_access_token({"sub": str(user.id_usuario)}),
         "refresh_token": create_refresh_token({"sub": str(user.id_usuario)}),

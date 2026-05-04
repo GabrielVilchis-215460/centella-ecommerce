@@ -40,6 +40,8 @@ export function useLogin() {
         setError("Debes verificar tu correo antes de iniciar sesión.")
       } else if (msg === "Credenciales incorrectas") {
         setError("Correo o contraseña incorrectos.")
+      } else if (msg === "Esta cuenta ha sido desactivada") {
+        setError("Esta cuenta ha sido desactivada. Contacta al administrador.")
       } else {
         setError("Ocurrió un error. Intenta de nuevo.")
       }

@@ -6,8 +6,10 @@ import { Footer }          from "../../components/layout/Footer"
 import { Button }          from "../../components/common/Button"
 import { DateSelect }      from "../../components/common/DateSelect"
 import { DireccionModal }  from "../../components/common/DireccionModal"
+import { Modal } from "../../components/common/Modal"
 import { useAjustes }      from "../../hooks/useAjustes"
 import { useAuth }         from "../../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 function SeccionAjustes({ titulo, children }) {
   return (
@@ -49,6 +51,8 @@ export function Ajustes() {
     modalDireccion, setModalDireccion,
     handleEliminarDireccion,
     handleAgregarDireccion,
+    modalEliminar, setModalEliminar,
+    handleEliminarCuenta,
   } = useAjustes()
 
   if (cargando) return null
@@ -298,9 +302,27 @@ export function Ajustes() {
                 </p>
               </div>
             </div>
-            <Button size="sm" className="w-auto! self-start px-6">
+            <Button size="sm" onClick={() => setModalEliminar(true)} className="w-auto! self-start px-6">
               Eliminar mi cuenta
             </Button>
+
+            {modalEliminar && (
+            <Modal titulo="¿Eliminar cuenta?" onClose={() => setModalEliminar(false)} size="sm">
+                <div className="flex flex-col gap-4">
+                <p className="font-body text-sm text-text-regular">
+                    ¿Estás seguro de que deseas desactivar tu cuenta? No podrás iniciar sesión hasta que un administrador la reactive.
+                </p>
+                <div className="flex gap-3 justify-end">
+                    <Button variant="secondary" size="sm" className="!w-auto px-6" onClick={() => setModalEliminar(false)}>
+                    Cancelar
+                    </Button>
+                    <Button size="sm" className="!w-auto px-6 bg-error hover:bg-error/80" onClick={handleEliminarCuenta}>
+                    Desactivar cuenta
+                    </Button>
+                </div>
+                </div>
+            </Modal>
+            )}
           </div>
         </SeccionAjustes>
 

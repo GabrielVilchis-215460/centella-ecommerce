@@ -58,4 +58,9 @@ export const perfilService = {
     return data
   },
 
+  eliminarCuenta: async () => {
+    const { data } = await api.delete("/api/v1/perfil/")
+    return data
+  },
+
 }

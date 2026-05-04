@@ -23,6 +23,7 @@ class Usuario(Base):
     codigo_verificacion_expira: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     codigo_reset: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
     codigo_reset_expira: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Relationships
     emprendedora: Mapped[Optional["Emprendedora"]] = relationship(back_populates="usuario", uselist=False)
