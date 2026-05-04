@@ -113,3 +113,7 @@ def subir_imagenes_producto(
 def obtener_imagenes_producto(id_producto: int, db: Session = Depends(get_db)):
     """Obtiene la lista de imágenes de un producto"""
     return service.get_imagenes_by_producto(db, id_producto)
+
+@router.get("/{id_producto}/detalle")
+def detalle_producto(id_producto: int, db: Session = Depends(get_db)):
+    return service.get_detalle_completo(db, id_producto)

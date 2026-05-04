@@ -4,6 +4,10 @@ from app.models.producto import Producto
 from .schemas import ProductoCreate, ProductoUpdate
 from fastapi import HTTPException, status
 from app.models.imagen import Imagen
+from app.models.emprendedora import Emprendedora
+from app.models.usuario import Usuario
+from app.models.atributo_producto import AtributoProducto
+
 
 def get_all(db: Session, skip: int = 0, limit: int = 20) -> list[Producto]:
     return db.execute(select(Producto).offset(skip).limit(limit)).scalars().all()
@@ -52,3 +56,44 @@ def get_imagenes_by_producto(db: Session, id_producto: int) -> list[Imagen]:
         )
         .order_by(Imagen.orden)
     ).scalars().all()
+
+def get_detalle_completo(db: Session, id_producto: int) -> dict:
+    producto = get_by_id(db, id_producto)
+    emprendedora = db.query(Emprendedora).filter(
+        Emprendedora.id_emprendedora == producto.id_emprendedora
+    ).first()
+    usuario = db.query(Usuario).filter(
+        Usuario.id_usuario == emprendedora.id_usuario
+    ).first() if emprendedora else None
+    imagenes = get_imagenes_by_producto(db, id_producto)
+    atributos = db.query(AtributoProducto).filter(
+        AtributoProducto.id_producto == id_producto
+    ).all()
+
+    return {
+        "id_producto":      producto.id_producto,
+        "nombre":           producto.nombre,
+        "descripcion":      producto.descripcion,
+        "precio":           float(producto.precio),
+        "cantidad_stock":   producto.cantidad_stock,
+        "tipo_entrega":     producto.tipo_entrega.value,
+        "activo":           producto.activo,
+        "imagenes":         [{"url": img.url, "orden": img.orden} for img in imagenes],
+        "atributos": [
+            {
+                "tipo":  a.tipo,
+                "valor": a.valor,
+                "atributo_activo": a.atributo_activo,
+            }
+            for a in atributos
+        ],
+        "emprendedora": {
+            "id_emprendedora":    emprendedora.id_emprendedora,
+            "nombre_negocio":     emprendedora.nombre_negocio,
+            "descripcion_negocio":emprendedora.descripcion_negocio,
+            "logo_url":           emprendedora.logo_url,
+            "nombre_vendedora":   f"{usuario.nombre} {usuario.apellido}" if usuario else "",
+            "verificada":         emprendedora.estado_verificacion.value == "verificada",
+            "color_hex":          emprendedora.color_emprendedora_hex,
+        } if emprendedora else None,
+    }

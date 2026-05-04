@@ -168,6 +168,7 @@ export function Catalogo() {
                         ? () => agregarItem(p.id_producto)
                         : null
                       }
+                      onClick={() => navigate(`/catalogo/producto/${p.id_producto}`)}
                     />
                   ))}
                 </div>
@@ -187,6 +188,7 @@ export function Catalogo() {
                       vendedora={s.nombre_vendedora}
                       verificada={s.verificada === "verificada"}
                       color={s.color_hex || undefined}
+                      onClick={() => navigate(`/catalogo/servicio/${s.id_servicio}`)}
                     />
                   ))}
                 </div>

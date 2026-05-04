@@ -10,6 +10,7 @@ from sqlalchemy import func
 
 from app.models.resena import Resena
 from app.models.enum import TipoResenaEnum
+from app.models.usuario import Usuario
 
 def create_resena(
     db: Session,
@@ -100,6 +101,12 @@ def get_resenas_by_referencia(
     if resenas:
         promedio_item = sum(r.calificacion_item for r in resenas) / len(resenas)
         promedio_vendedora = sum(r.calificacion_vendedora for r in resenas) / len(resenas)
+
+    ids_clientes = [r.id_cliente for r in resenas]
+    usuarios = {
+        u.id_usuario: u
+        for u in db.query(Usuario).filter(Usuario.id_usuario.in_(ids_clientes)).all()
+    } if ids_clientes else {}
     
     return {
         "success": True,
@@ -107,6 +114,8 @@ def get_resenas_by_referencia(
             {
                 "id_resena": r.id_resena,
                 "id_cliente": r.id_cliente,
+                "nombre_cliente": f"{usuarios[r.id_cliente].nombre} {usuarios[r.id_cliente].apellido}" if r.id_cliente in usuarios else "Usuario",
+                "foto_perfil_url": usuarios[r.id_cliente].foto_perfil_url if r.id_cliente in usuarios else None,
                 "id_emprendedora": r.id_emprendedora,
                 "tipo_resena": r.tipo_resena.value,
                 "id_referencia": r.id_referencia,

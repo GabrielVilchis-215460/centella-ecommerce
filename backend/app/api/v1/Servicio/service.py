@@ -3,7 +3,8 @@ from sqlalchemy import select
 from app.models.servicio import Servicio
 from .schemas import ServicioCreate, ServicioUpdate
 from fastapi import HTTPException, status
-
+from app.models.emprendedora import Emprendedora
+from app.models.usuario import Usuario
 
 def get_all(db: Session, skip: int = 0, limit: int = 20) -> list[Servicio]:
     return db.execute(select(Servicio).offset(skip).limit(limit)).scalars().all()
@@ -37,3 +38,50 @@ def delete(db: Session, id_servicio: int) -> None:
     obj = get_by_id(db, id_servicio)
     db.delete(obj)
     db.commit()
+
+def get_detalle_completo(db: Session, id_servicio: int) -> dict:
+    servicio = get_by_id(db, id_servicio)
+    emprendedora = db.query(Emprendedora).filter(
+        Emprendedora.id_emprendedora == servicio.id_emprendedora
+    ).first()
+    usuario = db.query(Usuario).filter(
+        Usuario.id_usuario == emprendedora.id_usuario
+    ).first() if emprendedora else None
+
+    # Otros servicios de la misma emprendedora
+    otros = db.execute(
+        select(Servicio)
+        .where(
+            Servicio.id_emprendedora == servicio.id_emprendedora,
+            Servicio.id_servicio != id_servicio,
+            Servicio.activo == True,
+        )
+        .limit(6)
+    ).scalars().all()
+
+    return {
+        "id_servicio":       servicio.id_servicio,
+        "nombre":            servicio.nombre,
+        "descripcion":       servicio.descripcion,
+        "precio":            float(servicio.precio),
+        "enlace_reservacion":servicio.enlace_reservacion,
+        "activo":            servicio.activo,
+        "emprendedora": {
+            "id_emprendedora":    emprendedora.id_emprendedora,
+            "nombre_negocio":     emprendedora.nombre_negocio,
+            "descripcion_negocio":emprendedora.descripcion_negocio,
+            "logo_url":           emprendedora.logo_url,
+            "nombre_vendedora":   f"{usuario.nombre} {usuario.apellido}" if usuario else "",
+            "verificada":         emprendedora.estado_verificacion.value == "verificada",
+            "color_hex":          emprendedora.color_emprendedora_hex,
+        } if emprendedora else None,
+        "otros_servicios": [
+            {
+                "id_servicio": s.id_servicio,
+                "nombre":      s.nombre,
+                "descripcion": s.descripcion,
+                "precio":      float(s.precio),
+            }
+            for s in otros
+        ],
+    }
