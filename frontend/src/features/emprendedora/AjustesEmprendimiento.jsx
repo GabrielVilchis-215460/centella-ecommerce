@@ -43,7 +43,7 @@ export function AjustesEmprendimiento() {
     <div className="min-h-screen flex flex-col bg-bg">
       <Header />
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-10">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-10">
 
         {/* Título con flecha */}
         <div className="flex items-center gap-3 mb-8">
@@ -101,38 +101,40 @@ export function AjustesEmprendimiento() {
           {/* ── Columna derecha ── */}
           <div className="flex flex-col gap-5">
 
-            {/* Logo */}
-            <div className="flex flex-col gap-2">
-              <label className="font-body text-sm text-text-regular">Logo</label>
-              <button
-                onClick={() => logoRef.current?.click()}
-                className="relative w-36 h-36 rounded-md bg-bg-light border border-text-light/30 flex items-center justify-center overflow-hidden group"
-              >
-                {logoPreview
-                  ? <>
-                      <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="font-body text-xs text-white text-center px-2">Cambiar imagen</span>
-                      </div>
-                    </>
-                  : <IconPhotoPlus size={32} stroke={1.5} color="var(--color-text-light)" />
-                }
-              </button>
-              <input ref={logoRef} type="file" accept="image/*" onChange={handleLogo} className="hidden" />
-            </div>
+            <div className="flex gap-15 items-start">
+              {/* Logo */}
+              <div className="flex flex-col gap-2">
+                <label className="font-body text-sm text-text-regular">Logo</label>
+                <button
+                  onClick={() => logoRef.current?.click()}
+                  className="relative w-36 h-36 rounded-md bg-bg-light border border-text-light/30 flex items-center justify-center overflow-hidden group"
+                >
+                  {logoPreview
+                    ? <>
+                        <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="font-body text-xs text-white text-center px-2">Cambiar imagen</span>
+                        </div>
+                      </>
+                    : <IconPhotoPlus size={32} stroke={1.5} color="var(--color-text-light)" />
+                  }
+                </button>
+                <input ref={logoRef} type="file" accept="image/*" onChange={handleLogo} className="hidden" />
+              </div>
 
-            {/* Redes sociales */}
-            <div className="flex flex-col gap-2">
-              <label className="font-body text-sm text-text-regular">Redes sociales</label>
-              <div className="grid grid-cols-2 gap-3">
-                {["web", "whatsapp", "facebook", "instagram"].map((red) => (
-                  <SocialButton
-                    key={red}
-                    red={red}
-                    enlace={enlaces[red] ?? null}
-                    onEnlaceChange={handleEnlaceChange}
-                  />
-                ))}
+              {/* Redes sociales */}
+              <div className="flex flex-col gap-2">
+                <label className="font-body text-sm text-text-regular">Redes sociales</label>
+                <div className="grid grid-cols-2 gap-3 w-50">
+                  {["web", "whatsapp", "facebook", "instagram"].map((red) => (
+                    <SocialButton
+                      key={red}
+                      red={red}
+                      enlace={enlaces[red] ?? null}
+                      onEnlaceChange={handleEnlaceChange}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
