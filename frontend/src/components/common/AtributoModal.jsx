@@ -3,8 +3,11 @@ import { IconCirclePlus, IconTrash } from "@tabler/icons-react"
 import { Modal } from "./Modal"
 
 export function AtributoModal({ onClose, onGuardar, atributo = null }) {
-  const [nombre,  setNombre]  = useState(atributo?.nombre || "")
-  const [valores, setValores] = useState(atributo?.valores || [""])
+  const [tipo, setTipo] = useState(atributo?.tipo || "")
+  const valoresIniciales = atributo?.valor
+    ? atributo.valor.split(",").map(v => v.trim())
+    : [""]
+  const [valores, setValores] = useState(valoresIniciales)
 
   const agregarValor = () => setValores((prev) => [...prev, ""])
 
@@ -15,26 +18,29 @@ export function AtributoModal({ onClose, onGuardar, atributo = null }) {
     setValores((prev) => prev.map((v, idx) => idx === i ? val : v))
 
   const handleGuardar = () => {
-    if (!nombre.trim()) return
-    onGuardar({ nombre, valores: valores.filter((v) => v.trim()) })
+    if (!tipo.trim()) return
+    onGuardar({ 
+      id_atributo: atributo?.id_atributo,
+      tipo: tipo, 
+      valor: valores.filter((v) => v.trim()).join(", ") 
+    })
     onClose()
   }
-
-  const todosLlenos = nombre.trim() && valores.every((v) => v.trim())
-
+  const todosLlenos = tipo.trim() && valores.every((v) => v.trim())
+  
   return (
-    <Modal titulo="Agrega un atributo" onClose={onClose} size="sm">
+    <Modal titulo={atributo ? "Editar atributo" : "Agrega un atributo"} onClose={onClose} size="sm">
       <div className="flex flex-col gap-5">
 
-        {/* Nombre */}
+        {/* Tipo (antes Nombre) */}
         <div className="flex flex-col gap-1">
           <label className="font-body text-sm text-text-regular">
             Nombre del atributo
           </label>
           <input
             type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value)}
             placeholder="Ej. Talla, Color, Material..."
             className="w-full px-4 py-3 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular"
           />

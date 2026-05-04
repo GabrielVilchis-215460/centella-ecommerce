@@ -21,8 +21,8 @@ import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
 
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
-// import { GestionProductos }     from "./features/emprendedora/GestionProductos"
-// import { GestionServicios }     from "./features/emprendedora/GestionServicios"
+import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
@@ -120,7 +120,7 @@ export function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
-      {/*<Route path="/dashboard/productos" element={
+      <Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
         </ProtectedRoute>
@@ -129,7 +129,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionServicios />
         </ProtectedRoute>
-      } />*/}
+      } />
       <Route path="/dashboard/pedidos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPedidos />

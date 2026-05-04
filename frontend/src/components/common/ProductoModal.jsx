@@ -7,7 +7,8 @@ import { Switch } from "./Switch"
 import { NumberInput } from "./NumberInput"
 import { AtributoModal } from "./AtributoModal"
 
-export function ProductoModal({ onClose, onGuardar, producto = null }) {
+// tiene como prop ahora las categorias
+export function ProductoModal({ onClose, onGuardar, producto = null, categorias = [] }) {
   const modo = producto ? "editar" : "agregar"
 
   const [nombre,      setNombre]      = useState(producto?.nombre      || "")
@@ -21,6 +22,8 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
   const [imagenes,    setImagenes]    = useState(producto?.imagenes    || [])
   const [atributos,   setAtributos]   = useState(producto?.atributos   || [])
   const [atributoModal, setAtributoModal] = useState(null) // null | "nuevo" | { index, data }
+  const [atributosEliminados, setAtributosEliminados] = useState([])
+  const [imagenesEliminadas, setImagenesEliminadas]   = useState([])
 
   const MAX_IMAGENES = 5
 
@@ -33,8 +36,13 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
     setImagenes((prev) => [...prev, ...nuevas])
   }
 
-  const handleEliminarImagen = (i) =>
+  const handleEliminarImagen = (i) => {
+    const img = imagenes[i]
+    if (img.id_imagen) {
+      setImagenesEliminadas((prev) => [...prev, img.id_imagen])
+    }
     setImagenes((prev) => prev.filter((_, idx) => idx !== i))
+  }
 
   const moverImagen = (i, dir) => {
     const nuevo = [...imagenes]
@@ -46,26 +54,90 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
 
   // atributos
   const handleGuardarAtributo = (data) => {
-    if (atributoModal === "nuevo") {
-      setAtributos((prev) => [...prev, data])
-    } else {
-      setAtributos((prev) =>
-        prev.map((a, i) => i === atributoModal.index ? data : a)
-      )
-    }
-    setAtributoModal(null)
-  }
+    // 1. Damos formato al atributo para asegurarnos de que tenga las llaves correctas
+    const atributoFormateado = {
+      id_atributo: data.id_atributo,
+      tipo: data.tipo,
+      valor: data.valor
+    };
 
-  const handleEliminarAtributo = (i) =>
+    if (atributoModal === "nuevo") {
+      // Si es nuevo, solo lo agregamos a la lista visual
+      setAtributos((prev) => [...prev, atributoFormateado]);
+    } else {
+      // Si estamos editando, buscamos el atributo original
+      const atrOriginal = atributos[atributoModal.index];
+      
+      // Si el original ya estaba en la base de datos (tiene ID)
+      if (atrOriginal.id_atributo) {
+        // Lo mandamos a la "papelera" para que se borre
+        setAtributosEliminados((prev) => [...prev, atrOriginal.id_atributo]);
+        // Le quitamos el ID al nuevo para que se cree desde cero
+        delete atributoFormateado.id_atributo;
+      }
+      
+      // Actualizamos la lista visual
+      setAtributos((prev) =>
+        prev.map((a, i) => i === atributoModal.index ? atributoFormateado : a)
+      );
+    }
+    setAtributoModal(null);
+  };
+
+  const handleEliminarAtributo = (i) => {
+    const atr = atributos[i]
+    if (atr.id_atributo) {
+      setAtributosEliminados((prev) => [...prev, atr.id_atributo])
+    }
     setAtributos((prev) => prev.filter((_, idx) => idx !== i))
+  }
 
   const handleGuardar = () => {
-    if (!nombre.trim() || !precio || !categoria) return
-    onGuardar({ nombre, descripcion, precio, categoria, stock, paquete, puntoMedio, activo, imagenes, atributos })
-    onClose()
-  }
+    // debug
+    //console.log("Valor de categoría en estado:", categoria);
+    if (!nombre.trim() || !precio || !categoria || categoria === "") {
+      alert("Por favor selecciona una categoría válida");
+      return;
+    }
 
-  const formularioValido = nombre.trim() && precio > 0 && categoria
+    if (!nombre.trim() || !precio || !categoria || categoria === "") {
+      alert("Por favor completa los campos obligatorios y selecciona una categoría válida");
+      return;
+    }
+
+    if (!paquete && !puntoMedio) {
+      alert("Por favor selecciona al menos un tipo de entrega (Paquete o Punto medio).");
+      return;
+    }
+    /*const datosParaEnviar = {
+      nombre: nombre,
+      descripcion: descripcion,
+      precio: Number(precio),
+      id_categoria: idCat, // Enviamos el entero validado[cite: 3]
+      cantidad_stock: Number(stock),
+      activo: Boolean(activo),
+      tipo_entrega: paquete && puntoMedio ? "ambas" : paquete ? "envio" : "fisica"
+    };*/
+    const datosParaEnviar = {
+      nombre: nombre,
+      descripcion: descripcion,
+      precio: precio,
+      categoria: categoria,
+      stock: stock,
+      paquete: paquete,    
+      puntoMedio: puntoMedio, 
+      activo: activo,
+      imagenes: imagenes,   
+      atributos: atributos,
+      atributosEliminados: atributosEliminados, 
+      imagenesEliminadas: imagenesEliminadas  
+    };
+
+    onGuardar(datosParaEnviar);
+    onClose();
+  };
+  
+  const formularioValido = nombre.trim() && precio > 0 && categoria && (paquete || puntoMedio);
 
   return (
     <>
@@ -110,13 +182,14 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
                 min={0}
                 prefix="$"
               />
+              {/* ya no tiene el categorias mock */}
               <Select
                 label="Categoría"
                 labelClassName="text-sm"
                 placeholder="Categorias"
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                options={CATEGORIAS_MOCK}
+                options={categorias.map((c) => ({ value: String(c.id_categoria), label: c.nombre }))}
                 className="text-sm py-0"
               />
             </div>
@@ -153,7 +226,7 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
               {/* Lista de imágenes */}
               <div className="flex flex-col gap-2 max-h-52 overflow-y-auto">
                 {imagenes.map((img, i) => (
-                  <div key={i} className="flex items-center gap-2 border border-text-light rounded-md p-2">
+                  <div key={img.id_imagen ? `img-bd-${img.id_imagen}` : `img-local-${img.url}`} className="flex items-center gap-2 border border-text-light rounded-md p-2">
                     <img src={img.url} alt="" className="w-10 h-10 object-cover rounded-md shrink-0" />
                     <span className="font-body text-sm text-text-light truncate flex-1">
                       {img.file?.name || "imagen.jpg"}
@@ -192,8 +265,9 @@ export function ProductoModal({ onClose, onGuardar, producto = null }) {
                 {atributos.map((atr, i) => (
                   <div key={i} className="flex items-start justify-between border border-text-light rounded-md px-3 py-2">
                     <div className="flex flex-col">
-                      <span className="font-body text-sm text-text-dark font-medium">{atr.nombre}</span>
-                      <span className="font-body text-xs text-text-light">{atr.valores.join("; ")}</span>
+                      {/* Cambiamos 'atr.nombre' por 'atr.tipo' y quitamos el .join() usando 'atr.valor' */}
+                      <span className="font-body text-sm text-text-dark font-medium">{atr.tipo}</span>
+                      <span className="font-body text-xs text-text-light">{atr.valor}</span>  
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <button

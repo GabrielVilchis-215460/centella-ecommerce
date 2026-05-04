@@ -157,9 +157,9 @@ export function Catalogo() {
               {/* Productos */}
               {tab === "productos" && (
                 <div className="grid grid-cols-3 gap-6">
-                  {items.map((p) => (
+                  {items.map((p, index) => (
                     <ProductCard
-                      key={p.id_producto}
+                      key={`prod-${p.id_producto}-${index}`}
                       nombre={p.nombre}
                       precio={Number(p.precio)}
                       calificacion={p.calificacion_promedio ?? 0}
@@ -176,9 +176,9 @@ export function Catalogo() {
               {/* Servicios */}
               {tab === "servicios" && (
                 <div className="grid grid-cols-2 gap-6">
-                  {items.map((s) => (
+                  {items.map((s, index) => (
                     <ServiceCard
-                      key={s.id_servicio}
+                      key={`serv-${s.id_servicio}-${index}`}
                       nombre={s.nombre}
                       descripcion={s.descripcion}
                       precio={Number(s.precio)}
@@ -195,9 +195,9 @@ export function Catalogo() {
               {/* Emprendedoras */}
               {tab === "emprendedoras" && (
                 <div className="grid grid-cols-2 gap-6">
-                  {items.map((v) => (
+                  {items.map((v, index) => (
                     <SellerCard
-                      key={v.id_emprendedora}
+                      key={`emp-${v.id_emprendedora}-${index}`}
                       nombre={`${v.nombre} ${v.apellido}`}
                       emprendimiento={v.nombre_negocio}
                       calificacion={v.calificacion_promedio ?? 0}

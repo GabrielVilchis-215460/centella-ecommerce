@@ -5,7 +5,8 @@ import { Switch } from "./Switch"
 import { NumberInput } from "./NumberInput"
 import { SocialButton } from "./SocialButton"
 
-export function ServicioModal({ onClose, onGuardar, servicio = null }) {
+// categorias como prop
+export function ServicioModal({ onClose, onGuardar, servicio = null, categorias = [] }) {
   const modo = servicio ? "editar" : "agregar"
 
   const [nombre,      setNombre]      = useState(servicio?.nombre      || "")
@@ -88,6 +89,7 @@ export function ServicioModal({ onClose, onGuardar, servicio = null }) {
               prefix="$"
               className="w-36"
             />
+            {/* ya no tiene el categorias mock */}
             <div className="flex-1">
               <Select
                 label="Categoría"
@@ -95,7 +97,7 @@ export function ServicioModal({ onClose, onGuardar, servicio = null }) {
                 placeholder="Categorias"
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                options={CATEGORIAS_MOCK}
+                options={categorias.map((c) => ({ value: String(c.id_categoria), label: c.nombre }))}
                 className="text-sm"
               />
             </div>

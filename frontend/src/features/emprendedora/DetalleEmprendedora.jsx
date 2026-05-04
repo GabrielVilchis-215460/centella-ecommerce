@@ -125,7 +125,7 @@ function CarruselProductos({ productos, cargando }) {
               nombre={p.nombre}
               precio={Number(p.precio)}
               calificacion={Number(p.calificacion_promedio ?? 0)}
-              imagen={p.imagen_url ?? null}
+              imagen={p.imagen_url || (p.imagenes && p.imagenes.length > 0 ? p.imagenes[0].url : null)}
               onAgregar={() => {}}
             />
           </div>
