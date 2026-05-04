@@ -29,7 +29,7 @@ import { GestionPagina } from "./features/emprendedora/GestionPagina"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
-//import { Emprendedoras } from "./features/admin/Emprendedoras"
+import { Emprendedoras } from "./features/admin/Emprendedoras"
 //import { Insignias }     from "./features/admin/Insignias"
 //import { Moderacion }    from "./features/admin/Moderacion"
 
@@ -152,13 +152,13 @@ export function AppRoutes() {
           <AdminPanel />
         </ProtectedRoute>
       } />
-      {/*
+      
       <Route path="/admin/emprendedoras" element={
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
         </ProtectedRoute>
       } />
-      <Route path="/admin/insignias" element={
+      {/*<Route path="/admin/insignias" element={
         <ProtectedRoute roles={["administrador"]}>
           <Insignias />
         </ProtectedRoute>

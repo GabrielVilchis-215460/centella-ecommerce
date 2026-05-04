@@ -3,7 +3,7 @@ import api from "./axios";
 // Endpoints del panel de admin
 export const adminService = {
   getDashboard: () => api.get("/api/v1/admin/"),
-  getEmprendedoras: () => api.get("/api/v1/admin/emprendedoras"),
+  getEmprendedoras: (params) => api.get("/api/v1/admin/emprendedoras", { params }),
   verificarEmprendedora: (id) =>
     api.patch(`/api/v1/admin/emprendedoras/${id}/verificar`),
   suspenderEmprendedora: (id) =>
