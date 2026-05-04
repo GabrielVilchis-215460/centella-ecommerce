@@ -3,15 +3,15 @@ import { Modal } from "./Modal"
 import { Button } from "./Button"
 import { Checkbox } from "./Checkbox"
 
-export function DireccionModal({ onClose, onGuardar }) {
-  const [calle,      setCalle]      = useState("")
-  const [colonia,    setColonia]    = useState("")
-  const [numExt,     setNumExt]     = useState("")
-  const [numInt,     setNumInt]     = useState("")
-  const [ciudad,     setCiudad]     = useState("")
-  const [cp,         setCp]         = useState("")
-  const [telefono,   setTelefono]   = useState("")
-  const [principal,  setPrincipal]  = useState(false)
+export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) {
+  const [calle,     setCalle]     = useState(direccionInicial?.calle      || "")
+  const [colonia,   setColonia]   = useState(direccionInicial?.colonia    || "")
+  const [numExt,    setNumExt]    = useState(direccionInicial?.numero_ext || "")
+  const [numInt,    setNumInt]    = useState(direccionInicial?.numero_int || "")
+  const [ciudad,    setCiudad]    = useState(direccionInicial?.ciudad     || "")
+  const [cp,        setCp]        = useState(direccionInicial?.codigo_postal    || "")
+  const [telefono,  setTelefono]  = useState(direccionInicial?.numero_telefonico || "")
+  const [principal, setPrincipal] = useState(direccionInicial?.es_principal     || false)
   const [guardando,  setGuardando]  = useState(false)
   const [error,      setError]      = useState("")
 
@@ -41,7 +41,7 @@ export function DireccionModal({ onClose, onGuardar }) {
   }
 
   return (
-    <Modal titulo="Nueva dirección" onClose={onClose} size="sm">
+    <Modal titulo={direccionInicial ? "Editar dirección" : "Nueva dirección"} onClose={onClose} size="sm">
       <div className="flex flex-col gap-4">
 
         {/* Calle */}
@@ -154,7 +154,7 @@ export function DireccionModal({ onClose, onGuardar }) {
           disabled={guardando || !valido}
           className="mt-2"
         >
-          {guardando ? "Agregando..." : "Agregar dirección"}
+          {guardando ? "Guardando..." : direccionInicial ? "Guardar cambios" : "Agregar dirección"}
         </Button>
 
       </div>

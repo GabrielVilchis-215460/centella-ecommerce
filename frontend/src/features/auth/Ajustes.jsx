@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { IconEye, IconEyeOff, IconX, IconAlertTriangle } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconX, IconAlertTriangle, IconPencil } from "@tabler/icons-react"
 import { useState } from "react"
 import { Header }          from "../../components/layout/Header"
 import { Footer }          from "../../components/layout/Footer"
@@ -51,6 +51,8 @@ export function Ajustes() {
     modalDireccion, setModalDireccion,
     handleEliminarDireccion,
     handleAgregarDireccion,
+    modalEditarDireccion, setModalEditarDireccion,
+    handleEditarDireccion,
     modalEliminar, setModalEliminar,
     handleEliminarCuenta,
   } = useAjustes()
@@ -262,12 +264,20 @@ export function Ajustes() {
               ) : (
                 direcciones.map((d) => (
                   <div key={d.id_direccion} className="relative bg-bg-light rounded-md px-4 py-3 shadow-sm">
+                   <div className="absolute top-3 right-3 flex gap-2">
+                    <button
+                      onClick={() => setModalEditarDireccion(d)}
+                      className="text-text-light hover:text-text-regular transition-colors"
+                    >
+                      <IconPencil size={16} stroke={1.5} />
+                    </button>
                     <button
                       onClick={() => handleEliminarDireccion(d.id_direccion)}
-                      className="absolute top-3 right-3 text-text-light hover:text-error transition-colors"
+                      className="text-text-light hover:text-error transition-colors"
                     >
                       <IconX size={16} stroke={1.5} />
                     </button>
+                  </div>
                     <p className="font-body text-sm text-text-regular">
                       {d.calle} {d.numero_ext}{d.numero_int ? `, ${d.numero_int}` : ""}
                     </p>
@@ -334,6 +344,14 @@ export function Ajustes() {
         <DireccionModal
           onClose={() => setModalDireccion(false)}
           onGuardar={handleAgregarDireccion}
+        />
+      )}
+
+      {modalEditarDireccion && (
+        <DireccionModal
+          direccionInicial={modalEditarDireccion}
+          onClose={() => setModalEditarDireccion(null)}
+          onGuardar={(datos) => handleEditarDireccion(modalEditarDireccion.id_direccion, datos)}
         />
       )}
 

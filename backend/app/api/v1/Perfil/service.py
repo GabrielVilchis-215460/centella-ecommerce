@@ -94,7 +94,13 @@ def get_direcciones(current_user: Usuario, db: Session):
 def agregar_direccion(data: DireccionRequest, current_user: Usuario, db: Session):
     if current_user.tipo_usuario != TipoUsuarioEnum.cliente:
         raise HTTPException(status_code=403, detail="Solo los clientes pueden agregar direcciones")
-    if data.es_principal:
+    # Si no tiene direcciones, forzar como principal
+    count = db.query(Direccion).filter(
+        Direccion.id_usuario == current_user.id_usuario
+    ).count()
+    es_principal = True if count == 0 else data.es_principal
+
+    if es_principal:
         db.query(Direccion).filter(
             Direccion.id_usuario == current_user.id_usuario
         ).update({"es_principal": False})
@@ -108,7 +114,7 @@ def agregar_direccion(data: DireccionRequest, current_user: Usuario, db: Session
         estado=data.estado,
         numero_telefonico=data.numero_telefonico,
         codigo_postal=data.codigo_postal,
-        es_principal=data.es_principal,
+        es_principal=es_principal,
     )
     db.add(nueva)
     db.commit()

@@ -30,7 +30,7 @@ export function useAjustes() {
   // Direcciones
   const [direcciones,        setDirecciones]        = useState([])
   const [modalDireccion,     setModalDireccion]     = useState(false)
-
+  const [modalEditarDireccion, setModalEditarDireccion] = useState(null)
   // Estados
   const [cargando,     setCargando]     = useState(true)
   const [guardando,    setGuardando]    = useState(false)
@@ -165,10 +165,34 @@ export function useAjustes() {
   // Eliminar dirección
   const handleEliminarDireccion = async (id) => {
     try {
+      const eraPrincipal = direcciones.find((d) => d.id_direccion === id)?.es_principal
       await perfilService.eliminarDireccion(id)
-      setDirecciones((prev) => prev.filter((d) => d.id_direccion !== id))
+      const restantes = direcciones.filter((d) => d.id_direccion !== id)
+
+      // Si era principal y quedan otras, marcar la primera como principal
+      if (eraPrincipal && restantes.length > 0) {
+        await perfilService.actualizarDireccion(restantes[0].id_direccion, {
+          ...restantes[0],
+          es_principal: true,
+        })
+        const nuevas = await perfilService.getDirecciones()
+        setDirecciones(nuevas)
+      } else {
+        setDirecciones(restantes)
+      }
     } catch {
       setErrorPerfil("Error al eliminar la dirección.")
+    }
+  }
+
+  const handleEditarDireccion = async (id, datos) => {
+    try {
+      await perfilService.actualizarDireccion(id, datos)
+      const nuevas = await perfilService.getDirecciones()
+      setDirecciones(nuevas)
+      setModalEditarDireccion(null)
+    } catch (err) {
+      throw err
     }
   }
 
@@ -217,6 +241,8 @@ export function useAjustes() {
     modalDireccion, setModalDireccion,
     handleEliminarDireccion,
     handleAgregarDireccion,
+    modalEditarDireccion, setModalEditarDireccion,
+    handleEditarDireccion,
     modalEliminar, setModalEliminar,
     handleEliminarCuenta,
   }

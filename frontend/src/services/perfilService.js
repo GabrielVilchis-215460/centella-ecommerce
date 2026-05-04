@@ -53,6 +53,11 @@ export const perfilService = {
     return data
   },
 
+  actualizarDireccion: async (id, datos) => {
+    const { data } = await api.put(`/api/v1/perfil/direcciones/${id}`, datos)
+    return data
+  },
+
   cambiarContrasena: async (datos) => {
     const { data } = await api.put("/api/v1/auth/reset-password", datos)
     return data
