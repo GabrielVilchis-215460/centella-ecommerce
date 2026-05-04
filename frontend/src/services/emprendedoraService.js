@@ -58,6 +58,10 @@ export const emprendedoraService = {
     const { data } = await api.get("/api/v1/perfil/negocio")
     return data
   },
+  actualizarNegocio: async (datos) => {
+    const { data } = await api.put("/api/v1/perfil/negocio", datos)
+    return data
+  },
   subirImagenPagina: async (file, id_emprendedora) => {
     const formData = new FormData()
     formData.append("file", file)
