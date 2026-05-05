@@ -10,6 +10,8 @@ import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
 import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 import { CrearPerfil } from "./features/auth/CrearPerfil"
+//gen
+import { Ajustes } from "./features/auth/Ajustes"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
@@ -18,16 +20,15 @@ import { CheckoutPago } from "./features/cliente/CheckoutPago"
 import { ConfirmacionPago } from "./features/cliente/ConfirmacionPago"
 import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
 // import { HistorialCompras } from "./features/cliente/HistorialCompras"
-import { DetalleProducto } from "./features/cliente/DetalleProducto"
-import { DetalleServicio } from "./features/cliente/DetalleServicio"
 
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
-// import { GestionProductos }     from "./features/emprendedora/GestionProductos"
-// import { GestionServicios }     from "./features/emprendedora/GestionServicios"
+import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
+import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimiento"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
@@ -73,6 +74,12 @@ export function AppRoutes() {
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
       <Route path="/crear-perfil" element={<CrearPerfil />} />
 
+      <Route path="/perfil/ajustes" element={
+        <ProtectedRoute roles={["cliente", "emprendedora"]}>
+          <Ajustes />
+        </ProtectedRoute>
+      } />
+
       {/* Cliente */}
       
       <Route path="/catalogo" element={<Catalogo />} />
@@ -108,12 +115,12 @@ export function AppRoutes() {
       <ProtectedRoute roles={["cliente"]}>
           <Confirmacion />
       </ProtectedRoute>
-      } />
+      } />*/}
       <Route path="/historial" element={
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
         </ProtectedRoute>
-      } />*/}
+      } />
 
       {/* Emprendedora */}
       <Route path="/dashboard" element={
@@ -121,7 +128,7 @@ export function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
-      {/*<Route path="/dashboard/productos" element={
+      <Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
         </ProtectedRoute>
@@ -130,7 +137,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionServicios />
         </ProtectedRoute>
-      } />*/}
+      } />
       <Route path="/dashboard/pedidos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPedidos />
@@ -144,6 +151,11 @@ export function AppRoutes() {
       <Route path="/dashboard/gestionpagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPagina />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/GestionPerfil" element={
+        <ProtectedRoute roles={["emprendedora"]}>
+          <AjustesEmprendimiento />
         </ProtectedRoute>
       } />
 

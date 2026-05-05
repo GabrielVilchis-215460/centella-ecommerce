@@ -138,6 +138,7 @@ def get_pedidos(
             "tipo_entrega": tipo_entrega,
             "estado": pedido.estado,
             "fecha_pedido": pedido.fecha_pedido,
+            "total": float(pedido.total),
         })
 
     return result

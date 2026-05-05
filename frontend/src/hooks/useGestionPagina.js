@@ -32,7 +32,7 @@ export function useGestionPagina() {
         if (cancelado) return
         setHtmlContenido(paginaData?.pagina?.contenido?.html ?? "")
 
-        const productosData = await emprendedoraService.getProductosNegocio()
+        const productosData = await emprendedoraService.getProductosNegocio(0, 20, true)
         if (cancelado) return
         setProductos(productosData)
 

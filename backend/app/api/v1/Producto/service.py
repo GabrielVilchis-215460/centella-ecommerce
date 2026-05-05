@@ -12,6 +12,12 @@ from app.models.atributo_producto import AtributoProducto
 def get_all(db: Session, skip: int = 0, limit: int = 20) -> list[Producto]:
     return db.execute(select(Producto).offset(skip).limit(limit)).scalars().all()
 
+def get_by_emprendedora(db: Session, id_emprendedora: int, skip: int = 0, limit: int = 20):
+    return db.execute(
+        select(Producto)
+        .where(Producto.id_emprendedora == id_emprendedora)
+        .offset(skip).limit(limit)
+    ).scalars().all()
 
 def get_by_id(db: Session, id_producto: int) -> Producto:
     obj = db.get(Producto, id_producto)
@@ -19,23 +25,34 @@ def get_by_id(db: Session, id_producto: int) -> Producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
     return obj
 
-
-def create(db: Session, data: ProductoCreate) -> Producto:
-    obj = Producto(**data.model_dump())
+def create(db: Session, data: ProductoCreate, id_emprendedora: int) -> Producto:
+    obj = Producto(**data.model_dump(), id_emprendedora=id_emprendedora)
     db.add(obj)
     db.commit()
     db.refresh(obj)
     return obj
 
-
 def update(db: Session, id_producto: int, data: ProductoUpdate) -> Producto:
     obj = get_by_id(db, id_producto)
-    for field, value in data.model_dump(exclude_unset=True).items():
+    
+    update_data = data.model_dump(exclude_unset=True)
+    
+    for field, value in update_data.items():
+        # SI el valor es None y el campo es id_categoria, NO lo actualizamos
+        if field == "id_categoria" and value is None:
+            continue
         setattr(obj, field, value)
-    db.commit()
-    db.refresh(obj)
+    
+    try:
+        db.commit()
+        db.refresh(obj)
+    except Exception as e:
+        db.rollback()
+        raise e
+        
+    # Inyectamos imágenes para que el front no las pierda[cite: 4]
+    obj.imagenes = get_imagenes_by_producto(db, id_producto)
     return obj
-
 
 def delete(db: Session, id_producto: int) -> None:
     obj = get_by_id(db, id_producto)

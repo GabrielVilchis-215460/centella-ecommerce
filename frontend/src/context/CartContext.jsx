@@ -67,18 +67,26 @@ export function CartProvider({ children }) {
   }
 
   const agregarItem = async (id_producto, cantidad = 1, tipo_entrega_seleccionado) => {
+    if (!estaAutenticado() || !usuario) {
+      console.warn("Intento de agregar al carrito sin sesión activa.");
+      return; 
+    }
     try {
       await carritoService.agregarItem(
         usuario.id,
         id_producto,
         cantidad,
         tipo_entrega_seleccionado
-      )
-      await cargarCarrito()
+      );
+      
+      await cargarCarrito();
+
     } catch (err) {
-      console.error("Error al agregar item:", err)
+      // PASO 4: Manejo de errores
+      // Si falla la conexión o la base de datos, lo registramos para poder depurar
+      console.error("Error al agregar item al carrito:", err);
     }
-  }
+  };
 
   const totalItems = items.reduce((acc, i) => acc + i.cantidad, 0)
 

@@ -23,6 +23,9 @@ class Producto(Base):
     # Relationships
     emprendedora: Mapped["Emprendedora"] = relationship(back_populates="productos")
     categoria: Mapped["Categoria"] = relationship(back_populates="productos")
-    atributos:  Mapped[list["AtributoProducto"]] = relationship(back_populates="producto")
+    atributos: Mapped[list["AtributoProducto"]] = relationship(
+        back_populates="producto",
+        cascade="all, delete-orphan"
+    )
     items_carrito: Mapped[list["ItemCarrito"]] = relationship(back_populates="producto")
     items_pedido: Mapped[list["ItemPedido"]]  = relationship(back_populates="producto")

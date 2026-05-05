@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.deps import get_current_user, require_emprendedora
@@ -23,6 +23,7 @@ from app.api.v1.Perfil.service import (
     actualizar_perfil_emprendedora,
     solicitar_insignia,
     subir_foto_perfil,
+    eliminar_foto_perfil,
     solicitar_verificacion,
     get_pagina,
     actualizar_pagina,
@@ -58,6 +59,13 @@ def upload_foto_perfil(
     db: Session = Depends(get_db),
 ):
     return subir_foto_perfil(file, current_user, db)
+
+@router.delete("/foto", summary="Eliminar foto de perfil")
+def borrar_foto_perfil(
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return eliminar_foto_perfil(current_user, db)
 
 
 @router.delete("/", summary="Eliminar cuenta")
@@ -171,6 +179,7 @@ def editar_pagina(
 def obtener_productos_negocio(
     skip: int = 0,
     limit: int = 20,
+    solo_activos: bool = Query(False, description="Filtrar solo productos activos"),
     current_user: Usuario = Depends(require_emprendedora),
     db: Session = Depends(get_db),
 ):
@@ -179,7 +188,7 @@ def obtener_productos_negocio(
     ).first()
     if not emp:
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
-    return get_productos_negocio(db, emp.id_emprendedora, skip, limit)
+    return get_productos_negocio(db, emp.id_emprendedora, skip, limit, solo_activos=solo_activos)
 
 @router.get("/negocio/servicios", summary="Obtener servicios del negocio")
 def obtener_servicios_negocio(

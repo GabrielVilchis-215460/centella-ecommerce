@@ -6,29 +6,45 @@ from . import service
 from app.core.deps import require_emprendedora_or_admin, require_emprendedora
 from app.api.v1.Imagenes.service import ImageUploadService
 from app.api.v1.Imagenes.router import get_service as get_image_service
+from app.models.emprendedora import Emprendedora
+from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
-
 @router.get("/", response_model=list[ProductoRead])
-def listar(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
-    return service.get_all(db, skip, limit)
-
+def listar(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_emprendedora),
+):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+    return service.get_by_emprendedora(db, emp.id_emprendedora, skip, limit)
 
 @router.get("/{id_producto}", response_model=ProductoRead)
 def obtener(id_producto: int, db: Session = Depends(get_db)):
     return service.get_by_id(db, id_producto)
 
-
-@router.post("/", response_model=ProductoRead, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_emprendedora_or_admin)])
-def crear(data: ProductoCreate, db: Session = Depends(get_db)):
-    return service.create(db, data)
-
+@router.post("/", response_model=ProductoRead, status_code=status.HTTP_201_CREATED)
+def crear(
+    data: ProductoCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_emprendedora),
+):
+    emp = db.query(Emprendedora).filter(
+        Emprendedora.id_usuario == current_user.id_usuario
+    ).first()
+    if not emp:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+    return service.create(db, data, emp.id_emprendedora)
 
 @router.put("/{id_producto}", response_model=ProductoRead, dependencies=[Depends(require_emprendedora_or_admin)])
 def actualizar(id_producto: int, data: ProductoUpdate, db: Session = Depends(get_db)):
     return service.update(db, id_producto, data)
-
 
 @router.delete("/{id_producto}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)])
 def eliminar(id_producto: int, db: Session = Depends(get_db)):
@@ -113,7 +129,3 @@ def subir_imagenes_producto(
 def obtener_imagenes_producto(id_producto: int, db: Session = Depends(get_db)):
     """Obtiene la lista de imágenes de un producto"""
     return service.get_imagenes_by_producto(db, id_producto)
-
-@router.get("/{id_producto}/detalle")
-def detalle_producto(id_producto: int, db: Session = Depends(get_db)):
-    return service.get_detalle_completo(db, id_producto)
