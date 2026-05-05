@@ -8,9 +8,17 @@ export const adminService = {
     api.patch(`/api/v1/admin/emprendedoras/${id}/verificar`),
   suspenderEmprendedora: (id) =>
     api.patch(`/api/v1/admin/emprendedoras/${id}/suspender`),
-  getInsignias: () => api.get("/api/v1/admin/insignias"),
+  getInsignias: (params = {}) => api.get("/api/v1/admin/insignias", {
+    params: {
+      q:                params.q                ?? undefined,
+      solicitud_activa: params.solicitud_activa ?? undefined,
+      insignia:         params.insignia         ?? undefined,
+      ordenar_por:      params.ordenar_por      ?? undefined,
+    }
+  }),
   aprobarInsignia: (id) => api.patch(`/api/v1/admin/insignias/${id}/aprobar`),
   rechazarInsignia: (id) => api.patch(`/api/v1/admin/insignias/${id}/rechazar`),
+  revocarInsignia: (id) => api.patch(`/api/v1/admin/insignias/${id}/revocar`),
   getReportes: () => api.get("/api/v1/admin/reportes"),
   eliminarPublicacion: (id) =>
     api.patch(`/api/v1/admin/reportes/${id}/eliminar-publicacion`),
