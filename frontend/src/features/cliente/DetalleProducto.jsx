@@ -173,20 +173,26 @@ export function DetalleProducto() {
                     <div className="flex gap-2 flex-wrap">
                       {producto.atributos
                         .filter((a) => a.tipo === tipo)
+                        .flatMap((a) =>
+                          a.valor.split(",").map((v) => ({
+                            valor: v.trim(),
+                            atributo_activo: a.atributo_activo,
+                          }))
+                        )
                         .map((a) => (
                           <button
                             key={a.valor}
                             onClick={() => {
-                                if (!a.atributo_activo) return
-                                setAtributosSeleccionados((prev) => ({ ...prev, [tipo]: a.valor }))
+                              if (!a.atributo_activo) return
+                              setAtributosSeleccionados((prev) => ({ ...prev, [tipo]: a.valor }))
                             }}
                             disabled={!a.atributo_activo}
                             className={`px-4 py-1.5 rounded-lg font-body text-sm border transition-colors ${
-                                !a.atributo_activo
+                              !a.atributo_activo
                                 ? "bg-text-regular/10 text-text-light border-text-light/40 cursor-not-allowed"
                                 : atributosSeleccionados[tipo] === a.valor
-                                    ? "bg-secondary text-white"
-                                    : "bg-transparent text-text-regular border-text-light hover:border-text-regular"
+                                  ? "bg-secondary text-white"
+                                  : "bg-transparent text-text-regular border-text-light hover:border-text-regular"
                             }`}
                           >
                             {a.valor}

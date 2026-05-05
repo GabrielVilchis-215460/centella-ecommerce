@@ -42,7 +42,7 @@ export function useDetalleProducto() {
       const inicial = {}
       tiposUnicos.forEach((tipo) => {
         const primero = prod.atributos.find((a) => a.tipo === tipo)
-        if (primero) inicial[tipo] = primero.valor
+        if (primero) inicial[tipo] = primero.valor.split(",")[0].trim()
       })
       setAtributosSeleccionados(inicial)
 
