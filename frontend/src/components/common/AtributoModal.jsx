@@ -37,13 +37,20 @@ export function AtributoModal({ onClose, onGuardar, atributo = null }) {
           <label className="font-body text-sm text-text-regular">
             Nombre del atributo
           </label>
-          <input
-            type="text"
+          <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
-            placeholder="Ej. Talla, Color, Material..."
-            className="w-full px-4 py-3 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular"
-          />
+            className="w-full px-4 py-3 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular"
+          >
+            {/* Opción por defecto o "placeholder" */}
+            <option value="" disabled>
+              Selecciona un atributo...
+            </option>
+            <option value="talla">Talla</option>
+            <option value="color">Color</option>
+            <option value="tamanio">Tamaño</option>
+            <option value="material">Material</option>
+          </select>
         </div>
 
         {/* Valores */}

@@ -38,13 +38,12 @@ export function ServicioModal({ onClose, onGuardar, servicio = null, categorias 
   const tieneEnlace = !!redActiva || !!otroEnlace
 
   const handleGuardar = () => {
-    if (!nombre.trim() || !precio || !categoria) return
+    if (!nombre.trim() || !precio || !categoria || !tieneEnlace) return
     onGuardar({ nombre, descripcion, precio, categoria, activo, 
       enlaces: redActiva || (otroEnlace ? { red: "otro", url: otroEnlace } : null) })
     onClose()
   }
-
-  const formularioValido = nombre.trim() && precio > 0 && categoria
+  const formularioValido = nombre.trim() && precio > 0 && categoria && tieneEnlace
 
   return (
     <Modal
