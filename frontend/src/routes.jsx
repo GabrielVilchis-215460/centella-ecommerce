@@ -19,7 +19,7 @@ import { Checkout }         from "./features/cliente/Checkout"
 import { CheckoutPago } from "./features/cliente/CheckoutPago"
 import { ConfirmacionPago } from "./features/cliente/ConfirmacionPago"
 import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
-import { HistorialCompras } from "./features/cliente/HistorialCompras"
+// import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
@@ -83,9 +83,8 @@ export function AppRoutes() {
       {/* Cliente */}
       
       <Route path="/catalogo" element={<Catalogo />} />
-      {/*<Route path="/catalogo" element={<Catalogo />}         />
-      {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
-      <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />*/}
+      <Route path="/catalogo/producto/:id" element={<DetalleProducto />} />
+      <Route path="/catalogo/servicio/:id"  element={<DetalleServicio />} />
       <Route path="/catalogo/emprendedora/:id" element={<DetalleEmprendedora />} />
       <Route path="/checkout" element={
         <ProtectedRoute roles={["cliente"]}>

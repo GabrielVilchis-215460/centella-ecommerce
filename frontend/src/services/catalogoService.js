@@ -59,4 +59,29 @@ export const catalogoService = {
     return data
   },
 
+  getDetalleProducto: async (id) => {
+    const { data } = await api.get(`/api/v1/productos/${id}/detalle`)
+    return data
+  },
+
+  getDetalleServicio: async (id) => {
+    const { data } = await api.get(`/api/v1/servicios/${id}/detalle`)
+    return data
+  },
+
+  getResenasProducto: async (id) => {
+    const { data } = await api.get(`/api/v1/resenas/referencia/${id}/producto`)
+    return data
+  },
+
+  getResenasServicio: async (id) => {
+    const { data } = await api.get(`/api/v1/resenas/referencia/${id}/servicio`)
+    return data
+  },
+
+  crearResena: async (datos) => {
+    const { data } = await api.post("/api/v1/resenas/create", datos)
+    return data
+  },
+
 }

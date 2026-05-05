@@ -47,3 +47,7 @@ def actualizar(id_servicio: int, data: ServicioUpdate, db: Session = Depends(get
 @router.delete("/{id_servicio}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)])
 def eliminar(id_servicio: int, db: Session = Depends(get_db)):
     service.delete(db, id_servicio)
+
+@router.get("/{id_servicio}/detalle")
+def detalle_servicio(id_servicio: int, db: Session = Depends(get_db)):
+    return service.get_detalle_completo(db, id_servicio)
