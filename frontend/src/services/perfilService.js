@@ -32,4 +32,40 @@ export const perfilService = {
     })
     return data
   },
+
+  eliminarFotoPerfil: async () => {
+    const { data } = await api.delete("/api/v1/perfil/foto")
+    return data
+  },
+
+  getDirecciones: async () => {
+    const { data } = await api.get("/api/v1/perfil/direcciones")
+    return data
+  },
+
+  agregarDireccion: async (datos) => {
+    const { data } = await api.post("/api/v1/perfil/direcciones", datos)
+    return data
+  },
+
+  eliminarDireccion: async (id) => {
+    const { data } = await api.delete(`/api/v1/perfil/direcciones/${id}`)
+    return data
+  },
+
+  actualizarDireccion: async (id, datos) => {
+    const { data } = await api.put(`/api/v1/perfil/direcciones/${id}`, datos)
+    return data
+  },
+
+  cambiarContrasena: async (datos) => {
+    const { data } = await api.put("/api/v1/auth/reset-password", datos)
+    return data
+  },
+
+  eliminarCuenta: async () => {
+    const { data } = await api.delete("/api/v1/perfil/")
+    return data
+  },
+
 }

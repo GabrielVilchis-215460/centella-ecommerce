@@ -23,6 +23,7 @@ from app.api.v1.Perfil.service import (
     actualizar_perfil_emprendedora,
     solicitar_insignia,
     subir_foto_perfil,
+    eliminar_foto_perfil,
     solicitar_verificacion,
     get_pagina,
     actualizar_pagina,
@@ -58,6 +59,13 @@ def upload_foto_perfil(
     db: Session = Depends(get_db),
 ):
     return subir_foto_perfil(file, current_user, db)
+
+@router.delete("/foto", summary="Eliminar foto de perfil")
+def borrar_foto_perfil(
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return eliminar_foto_perfil(current_user, db)
 
 
 @router.delete("/", summary="Eliminar cuenta")

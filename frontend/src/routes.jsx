@@ -10,6 +10,8 @@ import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
 import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 import { CrearPerfil } from "./features/auth/CrearPerfil"
+//gen
+import { Ajustes } from "./features/auth/Ajustes"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
@@ -26,6 +28,7 @@ import { Dashboard }            from "./features/emprendedora/Dashboard"
 import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
+import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimiento"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
@@ -70,6 +73,12 @@ export function AppRoutes() {
       <Route path="/verificar-codigo"     element={<VerificarCodigo />}     />
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
       <Route path="/crear-perfil" element={<CrearPerfil />} />
+
+      <Route path="/perfil/ajustes" element={
+        <ProtectedRoute roles={["cliente", "emprendedora"]}>
+          <Ajustes />
+        </ProtectedRoute>
+      } />
 
       {/* Cliente */}
       
@@ -143,6 +152,11 @@ export function AppRoutes() {
       <Route path="/dashboard/gestionpagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPagina />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/GestionPerfil" element={
+        <ProtectedRoute roles={["emprendedora"]}>
+          <AjustesEmprendimiento />
         </ProtectedRoute>
       } />
 

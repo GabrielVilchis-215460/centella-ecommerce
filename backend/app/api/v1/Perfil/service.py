@@ -60,11 +60,28 @@ def subir_foto_perfil(file: UploadFile, current_user: Usuario, db: Session):
     return {"message": "Foto de perfil actualizada exitosamente", "foto_perfil_url": result["url"]}
 
 
-def eliminar_cuenta(current_user: Usuario, db: Session):
-    db.delete(current_user)
-    db.commit()
-    return {"message": "Cuenta eliminada exitosamente"}
 
+def eliminar_cuenta(current_user: Usuario, db: Session):
+    #db.delete(current_user)
+    current_user.activo = False #soft delete x tibios
+    db.commit()
+    return {"message": "Cuenta desactivada exitosamente"}
+
+def eliminar_foto_perfil(current_user: Usuario, db: Session):
+    # Buscar imagen en la tabla
+    imagen = db.query(Imagen).filter(
+        Imagen.entity_id == current_user.id_usuario,
+        Imagen.entity_type == "usuario"
+    ).first()
+
+    if imagen:
+        service = ImageUploadService(db)
+        service.delete_image(imagen.id_imagen)
+
+    # Limpiar URL
+    current_user.foto_perfil_url = None
+    db.commit()
+    return {"message": "Foto eliminada exitosamente"}
 
 # Direcciones (solo clientes)
 
@@ -77,7 +94,13 @@ def get_direcciones(current_user: Usuario, db: Session):
 def agregar_direccion(data: DireccionRequest, current_user: Usuario, db: Session):
     if current_user.tipo_usuario != TipoUsuarioEnum.cliente:
         raise HTTPException(status_code=403, detail="Solo los clientes pueden agregar direcciones")
-    if data.es_principal:
+    # Si no tiene direcciones, forzar como principal
+    count = db.query(Direccion).filter(
+        Direccion.id_usuario == current_user.id_usuario
+    ).count()
+    es_principal = True if count == 0 else data.es_principal
+
+    if es_principal:
         db.query(Direccion).filter(
             Direccion.id_usuario == current_user.id_usuario
         ).update({"es_principal": False})
@@ -91,7 +114,7 @@ def agregar_direccion(data: DireccionRequest, current_user: Usuario, db: Session
         estado=data.estado,
         numero_telefonico=data.numero_telefonico,
         codigo_postal=data.codigo_postal,
-        es_principal=data.es_principal,
+        es_principal=es_principal,
     )
     db.add(nueva)
     db.commit()
