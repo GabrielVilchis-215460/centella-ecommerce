@@ -34,13 +34,8 @@ import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimi
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
-<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
 import { Emprendedoras } from "./features/admin/Emprendedoras"
-//import { Insignias }     from "./features/admin/Insignias"
-=======
-//import { Emprendedoras } from "./features/admin/Emprendedoras"
 import { GestionInsignias }     from "./features/admin/GestionInsignias"
->>>>>>> main
 //import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
@@ -118,11 +113,6 @@ export function AppRoutes() {
           <CheckoutConfirmacion />
         </ProtectedRoute>
       } />
-      {/*<Route path="/checkout/confirmacion" element={
-      <ProtectedRoute roles={["cliente"]}>
-          <Confirmacion />
-      </ProtectedRoute>
-      } />*/}
       <Route path="/historial" element={
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
@@ -150,11 +140,6 @@ export function AppRoutes() {
           <GestionPedidos />
         </ProtectedRoute>
       } />
-      {/*<Route path="/dashboard/pagina" element={
-        <ProtectedRoute roles={["emprendedora"]}>
-          <Pagina />
-        </ProtectedRoute>
-      } />*/}
       <Route path="/dashboard/gestionpagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPagina />
@@ -172,18 +157,12 @@ export function AppRoutes() {
           <AdminPanel />
         </ProtectedRoute>
       } />
-      
       <Route path="/admin/emprendedoras" element={
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
         </ProtectedRoute>
-<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
-      } />
-      {/*<Route path="/admin/insignias" element={
-=======
-      } /> */}
+      } /> 
       <Route path="/admin/insignias" element={
->>>>>>> main
         <ProtectedRoute roles={["administrador"]}>
           <GestionInsignias />
         </ProtectedRoute>
