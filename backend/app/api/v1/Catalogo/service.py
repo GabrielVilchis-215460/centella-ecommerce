@@ -39,11 +39,10 @@ def get_productos(
     imagen_sq = (
         select(
             Imagen.entity_id,
-            Imagen.url.label("imagen_url")
+            func.min(Imagen.url).label("imagen_url") 
         )
         .where(Imagen.entity_type == "producto")
-        .order_by(Imagen.entity_id, Imagen.orden)
-        .distinct(Imagen.entity_id)
+        .group_by(Imagen.entity_id)
         .subquery()
     )
 

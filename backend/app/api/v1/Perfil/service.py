@@ -236,7 +236,7 @@ def solicitar_verificacion(current_user: Usuario, db: Session):
     return {"message": "Solicitud de verificación enviada exitosamente"}
 
 
-def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limit: int = 20):
+def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limit: int = 20, solo_activos: bool = False):
     calificacion_sq = (
         select(
             Resena.id_referencia,
@@ -251,11 +251,10 @@ def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limi
     imagen_sq = (
         select(
             Imagen.entity_id,
-            Imagen.url.label("imagen_url"),
+            func.min(Imagen.url).label("imagen_url"),  # ← usa min en lugar de distinct
         )
         .where(Imagen.entity_type == "producto")
-        .order_by(Imagen.entity_id, Imagen.orden)
-        .distinct(Imagen.entity_id)
+        .group_by(Imagen.entity_id)  # ← agrupa por producto
         .subquery()
     )
 
@@ -268,7 +267,8 @@ def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limi
             Producto.cantidad_stock,
             Producto.tipo_entrega,
             Producto.fecha_creacion,
-            Categoria.nombre.label("nombre_categoria"),
+            Producto.activo,
+            Categoria.id_categoria, 
             func.coalesce(calificacion_sq.c.calificacion_promedio, 0).label("calificacion_promedio"),
             imagen_sq.c.imagen_url,
         )
@@ -282,12 +282,17 @@ def get_productos_negocio(db: Session, id_emprendedora: int, skip: int = 0, limi
             imagen_sq.c.entity_id == Producto.id_producto,
         )
         .where(
-            Producto.activo == True,
+            #Producto.activo == True,
             Producto.id_emprendedora == id_emprendedora,
         )
         .offset(skip)
         .limit(limit)
     )
+
+    if solo_activos:
+        query = query.where(Producto.activo == True)
+
+    query = query.offset(skip).limit(limit)
 
     return db.execute(query).mappings().all()
 

@@ -9,7 +9,12 @@ export function DataTable({ columnas = [], datos = [], onEliminar, onRowClick })
         style={{ gridTemplateColumns: columnas.map((c) => c.width || "1fr").join(" ") }}
       >
         {columnas.map((col) => (
-          <span key={col.key} className="font-body text-sm text-text-light">
+          <span 
+            key={col.key} 
+            className={`font-body text-sm text-text-light ${
+              col.key === "eliminar" ? "text-center" : ""
+            }`}
+          >
             {col.label}
           </span>
         ))}
@@ -34,7 +39,12 @@ export function DataTable({ columnas = [], datos = [], onEliminar, onRowClick })
             style={{ gridTemplateColumns: columnas.map((c) => c.width || "1fr").join(" ") }}
           >
             {columnas.map((col) => (
-              <div key={col.key} className="flex items-center">
+              <div 
+                key={col.key} 
+                className={`flex items-center ${
+                  col.key === "eliminar" ? "justify-center" : ""
+                }`}
+              >
                 {col.key === "eliminar"
                   ? (
                     <button

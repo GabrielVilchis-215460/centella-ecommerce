@@ -3,7 +3,6 @@ from decimal import Decimal
 from datetime import datetime
 from typing import Optional
 
-
 class ServicioBase(BaseModel):
     nombre: str = Field(..., max_length=200)
     descripcion: Optional[str] = None
@@ -12,11 +11,9 @@ class ServicioBase(BaseModel):
     activo: bool = True
     id_categoria: int
 
-
 class ServicioCreate(ServicioBase):
-    id_emprendedora: int
+    #id_emprendedora: int
     fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
-
 
 class ServicioUpdate(BaseModel):
     nombre: Optional[str] = Field(None, max_length=200)

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from typing import Optional, List
 from datetime import datetime
-
+from app.models.imagen import Imagen
 from app.models.pagina_emprendimiento import PaginaEmprendimiento
 from app.models.usuario import Usuario
 from app.models.producto import Producto
@@ -88,6 +88,16 @@ def get_productos_by_emprendedora(
         .where(Resena.tipo_resena == TipoResenaEnum.producto)
         .group_by(Resena.id_referencia)
         .subquery()
+    )   
+
+    imagen_sq = (
+        select(
+            Imagen.entity_id,
+            func.min(Imagen.url).label("imagen_url")
+        )
+        .where(Imagen.entity_type == "producto")
+        .group_by(Imagen.entity_id)
+        .subquery()
     )
 
     query = (
@@ -103,11 +113,16 @@ def get_productos_by_emprendedora(
             Producto.tipo_entrega,
             Producto.fecha_creacion,
             calificacion_sq.c.calificacion_promedio,
+            imagen_sq.c.imagen_url,
         )
         .join(Categoria, Categoria.id_categoria == Producto.id_categoria)
         .outerjoin(
             calificacion_sq,
             calificacion_sq.c.id_referencia == Producto.id_producto,
+        )
+        .outerjoin(  
+            imagen_sq,
+            imagen_sq.c.entity_id == Producto.id_producto,
         )
         .where(
             Producto.activo == True,
