@@ -89,6 +89,9 @@ export function useGestionProductos() {
     return await emprendedoraService.eliminarAtributo(idProducto, idAtributo)
     }
 
+    async function editarAtributo(idProducto, idAtributo, tipo, valor) {
+      return await emprendedoraService.editarAtributo(idProducto, idAtributo, tipo, valor)
+    }
    async function eliminarImagen(idImagen) {
       try {
         console.log("Intentando borrar imagen con ID: ",idImagen);
@@ -127,6 +130,7 @@ export function useGestionProductos() {
     eliminarAtributo,
     eliminarImagen,
     reordenarImagenes,
+    editarAtributo,
     refrescar: cargar,
   }
 }

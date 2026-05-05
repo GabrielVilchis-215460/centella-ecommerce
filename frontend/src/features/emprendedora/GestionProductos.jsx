@@ -143,7 +143,7 @@ export function GestionProductos() {
     productos, total, pagina, setPagina, totalPaginas,
     categorias, cargando, error,
     crearProducto, actualizarProducto, eliminarProducto, 
-    obtenerImagenes, obtenerAtributos, crearAtributo, eliminarAtributo, eliminarImagen, reordenarImagenes, refrescar
+    obtenerImagenes, obtenerAtributos, crearAtributo, eliminarAtributo, eliminarImagen, reordenarImagenes, editarAtributo, refrescar
   } = useGestionProductos()
 
   const [busqueda, setBusqueda]           = useState("")
@@ -205,6 +205,7 @@ export function GestionProductos() {
 
   const handleGuardar = async (datos) => {
     try {
+      console.log(">>> datos recibidos del modal:", datos)
       let tipo_entrega = "envio"; 
       if (datos.paquete && datos.puntoMedio) {
         tipo_entrega = "ambas";
@@ -257,10 +258,18 @@ export function GestionProductos() {
       for (const idAtr of atrsEliminados) {
         await eliminarAtributo(idProducto, idAtr);
       }
-
+      // Atributos editados (tienen id_atributo)
+      const atributosEditados = (datos.atributos ?? []).filter(
+        (a) => a.id_atributo && !datos.atributosEliminados?.includes(a.id_atributo)
+      )
+        for (const atr of atributosEditados) {
+          await editarAtributo(idProducto, atr.id_atributo, atr.tipo, atr.valor)
+      }
+      console.log(">>> atributos detalle:", datos.atributos)
+      // Atributos nuevos (no tienen id_atributo)
       const atributosNuevos = (datos.atributos ?? []).filter((a) => !a.id_atributo)
-      for (const atr of atributosNuevos) {
-        await crearAtributo(idProducto, atr.tipo, atr.valor)
+        for (const atr of atributosNuevos) {
+          await crearAtributo(idProducto, atr.tipo, atr.valor)
       }
 
       const ordenImagenes = datos.imagenes

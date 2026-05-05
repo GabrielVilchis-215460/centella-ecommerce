@@ -163,3 +163,24 @@ def eliminar_atributo(id_producto: int, id_atributo: int, db: Session = Depends(
         raise HTTPException(status_code=404, detail="Atributo no encontrado")
     atributo.atributo_activo = False
     db.commit()
+
+@router.put("/{id_producto}/atributos/{id_atributo}", status_code=200, dependencies=[Depends(require_emprendedora)])
+def editar_atributo(
+    id_producto: int,
+    id_atributo: int,
+    tipo: TipoAtributoEnum,
+    valor: str,
+    db: Session = Depends(get_db),
+):
+    atributo = db.query(AtributoProducto).filter(
+        AtributoProducto.id_atributo == id_atributo,
+        AtributoProducto.id_producto == id_producto,
+        AtributoProducto.atributo_activo == True
+    ).first()
+    if not atributo:
+        raise HTTPException(status_code=404, detail="Atributo no encontrado")
+    atributo.tipo = tipo
+    atributo.valor = valor
+    db.commit()
+    db.refresh(atributo)
+    return atributo

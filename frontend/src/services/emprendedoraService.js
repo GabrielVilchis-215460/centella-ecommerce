@@ -122,6 +122,14 @@ export const emprendedoraService = {
   eliminarAtributo: async (idProducto, idAtributo) => {
     await api.delete(`/api/v1/productos/${idProducto}/atributos/${idAtributo}`)
   },
+  editarAtributo: async (idProducto, idAtributo, tipo, valor) => {
+    const { data } = await api.put(
+      `/api/v1/productos/${idProducto}/atributos/${idAtributo}`,
+      null,
+      { params: { tipo, valor } }
+    )
+    return data
+  },
   eliminarImagen: async (idImagen) => {
     await api.delete(`/api/v1/imagenes/image/${idImagen}`)
   },

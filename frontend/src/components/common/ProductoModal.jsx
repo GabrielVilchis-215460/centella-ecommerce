@@ -54,35 +54,21 @@ export function ProductoModal({ onClose, onGuardar, producto = null, categorias 
 
   // atributos
   const handleGuardarAtributo = (data) => {
-    // 1. Damos formato al atributo para asegurarnos de que tenga las llaves correctas
     const atributoFormateado = {
       id_atributo: data.id_atributo,
       tipo: data.tipo,
       valor: data.valor
-    };
+    }
 
     if (atributoModal === "nuevo") {
-      // Si es nuevo, solo lo agregamos a la lista visual
-      setAtributos((prev) => [...prev, atributoFormateado]);
+      setAtributos((prev) => [...prev, atributoFormateado])
     } else {
-      // Si estamos editando, buscamos el atributo original
-      const atrOriginal = atributos[atributoModal.index];
-      
-      // Si el original ya estaba en la base de datos (tiene ID)
-      if (atrOriginal.id_atributo) {
-        // Lo mandamos a la "papelera" para que se borre
-        setAtributosEliminados((prev) => [...prev, atrOriginal.id_atributo]);
-        // Le quitamos el ID al nuevo para que se cree desde cero
-        delete atributoFormateado.id_atributo;
-      }
-      
-      // Actualizamos la lista visual
       setAtributos((prev) =>
         prev.map((a, i) => i === atributoModal.index ? atributoFormateado : a)
-      );
+      )
     }
-    setAtributoModal(null);
-  };
+    setAtributoModal(null)
+  }
 
   const handleEliminarAtributo = (i) => {
     const atr = atributos[i]
