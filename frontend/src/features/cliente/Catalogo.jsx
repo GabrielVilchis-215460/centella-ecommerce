@@ -164,10 +164,6 @@ export function Catalogo() {
                       precio={Number(p.precio)}
                       calificacion={p.calificacion_promedio ?? 0}
                       imagen={p.imagen_url}
-                      onAgregar={esCliente()
-                        ? () => agregarItem(p.id_producto)
-                        : null
-                      }
                       onClick={() => navigate(`/catalogo/producto/${p.id_producto}`)}
                     />
                   ))}

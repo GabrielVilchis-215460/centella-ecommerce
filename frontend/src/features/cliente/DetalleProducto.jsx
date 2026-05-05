@@ -197,26 +197,27 @@ export function DetalleProducto() {
                 ))}
 
                 {/* Tipo de entrega */}
-                {opcionesTipoEntrega.length > 1 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="font-body text-sm text-text-regular">Tipo de entrega</span>
-                    <div className="flex gap-2 flex-wrap">
-                      {opcionesTipoEntrega.map((op) => (
-                        <button
-                          key={op}
-                          onClick={() => setTipoEntrega(op)}
-                          className={`px-4 py-1.5 rounded-lg font-body text-sm border transition-colors ${
-                            tipoEntrega === op
-                              ? "bg-secondary text-white"
+                <div className="flex flex-col gap-2">
+                  <span className="font-body text-sm text-text-regular">Tipo de entrega</span>
+                  <div className="flex gap-2 flex-wrap">
+                    {opcionesTipoEntrega.map((op) => (
+                      <button
+                        key={op}
+                        onClick={() => opcionesTipoEntrega.length > 1 && setTipoEntrega(op)}
+                        disabled={opcionesTipoEntrega.length === 1}
+                        className={`px-4 py-1.5 rounded-lg font-body text-sm border transition-colors ${
+                          tipoEntrega === op
+                            ? "bg-secondary text-white border-secondary"
+                            : opcionesTipoEntrega.length === 1
+                              ? "bg-text-regular/10 text-text-light border-text-light/40 cursor-not-allowed"
                               : "bg-transparent text-text-regular border-text-light hover:border-text-regular"
-                          }`}
-                        >
-                          {LABEL_ENTREGA[op] ?? op}
-                        </button>
-                      ))}
-                    </div>
+                        }`}
+                      >
+                        {LABEL_ENTREGA[op] ?? op}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
 
                 {/* Cantidad + agregar */}
                 <div className="flex items-center gap-4 mt-2">
