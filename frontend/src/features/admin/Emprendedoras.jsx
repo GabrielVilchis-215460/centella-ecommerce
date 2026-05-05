@@ -33,8 +33,8 @@ function ModalVerificar({ emprendedora, onClose, onConfirm }) {
   return (
     <Modal titulo="Verificar Cuenta" onClose={onClose} size="sm">
       <div className="flex flex-col gap-4">
-        <div className="flex items-start gap-3 p-4 bg-states-green/10 rounded-lg">
-          <IconRosetteDiscountCheck  size={20} stroke={1.5} className="text-states-green mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 p-4 bg-states-green/30 rounded-lg">
+          <IconRosetteDiscountCheck  size={20} stroke={1.5} className="text-green-500 mt-0.5 shrink-0" />
           <p className="text-sm font-body text-text-regular">
             ¿Estás seguro de que deseas verificar la cuenta de{" "}
             <span className="font-medium text-text-dark">{emprendedora.nombre_negocio}</span>?
@@ -75,8 +75,8 @@ function ModalSuspender({ emprendedora, onClose, onConfirm }) {
   return (
     <Modal titulo="Suspender Cuenta" onClose={onClose} size="sm">
       <div className="flex flex-col gap-4">
-        <div className="flex items-start gap-3 p-4 bg-states-red/10 rounded-lg">
-          <IconAlertTriangle size={20} stroke={1.5} className="text-states-red mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 p-4 bg-states-red/30 rounded-lg">
+          <IconAlertTriangle size={20} stroke={1.5} className="text-red-500 mt-0.5 shrink-0" />
           <p className="text-sm font-body text-text-regular">
             ¿Estás seguro de que deseas suspender la cuenta de{" "}
             <span className="font-medium text-text-dark">{emprendedora.nombre_negocio}</span>?
@@ -199,7 +199,7 @@ export function Emprendedoras() {
               onClick={(e) => { e.stopPropagation(); setModalVerificar(fila) }}
               className="flex items-center gap-1 text-xs font-body hover:opacity-70 transition-opacity"
             >
-              <IconRosetteDiscountCheck size={20} stroke={1.5} className="text-states-blue" />
+              <IconRosetteDiscountCheck size={20} stroke={1.5} className="text-blue-500" />
               Verificar
             </button>
           )}
@@ -208,7 +208,7 @@ export function Emprendedoras() {
               onClick={(e) => { e.stopPropagation(); setModalSuspender(fila) }}
               className="flex items-center gap-1 text-xs font-body hover:opacity-70 transition-opacity"
             >
-              <IconCancel size={20} stroke={1.5} className="text-states-red" />
+              <IconCancel size={20} stroke={1.5} className="text-red-500" />
               Suspender
             </button>
           )}
@@ -216,7 +216,7 @@ export function Emprendedoras() {
             onClick={(e) => { e.stopPropagation(); window.location.href = `mailto:${fila.email}` }}
             className="flex items-center gap-1 text-xs font-body hover:text-text-dark transition-colors"
           >
-            <IconMail size={20} stroke={1.5} className="text-states-green"/>
+            <IconMail size={20} stroke={1.5} className="text-green-500"/>
             Enviar Correo
           </button>
         </div>
