@@ -68,8 +68,8 @@ function OrderCard({ pedido }) {
 
   return (
     <article
-      onClick={() => navigate(`/pedidos/${pedido.id_pedido}`)}
-      className="bg-bg border border-bg-dark/10 rounded-xl p-4 cursor-pointer
+      //onClick={() => navigate(`/pedidos/${pedido.id_pedido}`)}
+      className="bg-bg-light border border-bg-dark/10 rounded-xl p-4
                  transition-all duration-fast hover:border-bg-dark/25 hover:shadow-sm
                  active:scale-[0.995]"
     >
@@ -174,7 +174,7 @@ export function HistorialCompras() {
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <Header />
-      <main className="bg-bg-light min-h-screen">
+      <main className="bg-bg min-h-screen">
         <div className="max-w-7xl mx-auto px-4 py-8">
 
           {/* Encabezado */}
@@ -199,7 +199,7 @@ export function HistorialCompras() {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-bg-dark/15
-                           bg-bg text-text-dark placeholder:text-text-light
+                           bg-bg-light text-text-dark placeholder:text-text-light
                            focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
                            transition-colors"
               />
@@ -212,7 +212,7 @@ export function HistorialCompras() {
                 value={estado}
                 onChange={(e) => setEstado(e.target.value)}
                 className="pl-9 pr-4 py-2 text-sm rounded-lg border border-bg-dark/15
-                           bg-bg text-text-dark appearance-none cursor-pointer
+                           bg-bg-light text-text-dark appearance-none cursor-pointer
                            focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
                            transition-colors"
               >
