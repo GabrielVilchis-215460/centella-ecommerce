@@ -19,7 +19,7 @@ import { Checkout }         from "./features/cliente/Checkout"
 import { CheckoutPago } from "./features/cliente/CheckoutPago"
 import { ConfirmacionPago } from "./features/cliente/ConfirmacionPago"
 import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
-// import { HistorialCompras } from "./features/cliente/HistorialCompras"
+import { HistorialCompras } from "./features/cliente/HistorialCompras"
 
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
@@ -29,6 +29,8 @@ import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
 import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimiento"
+import { DetalleProducto }      from "./features/cliente/DetalleProducto" 
+import { DetalleServicio }      from "./features/cliente/DetalleServicio"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"

@@ -48,7 +48,7 @@ export function AtributoModal({ onClose, onGuardar, atributo = null }) {
             </option>
             <option value="talla">Talla</option>
             <option value="color">Color</option>
-            <option value="tamanio">Tamaño</option>
+            <option value="tamaño">Tamaño</option>
             <option value="material">Material</option>
           </select>
         </div>
