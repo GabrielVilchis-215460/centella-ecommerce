@@ -17,6 +17,9 @@ class InsigniaOut(BaseModel):
     nombre_negocio: str
     insignia: bool
     solicitud_activa: bool
+    nombre_solicitante: str
+    email: str
+    fecha_solicitud: datetime
 
 
 class ReporteOut(BaseModel):

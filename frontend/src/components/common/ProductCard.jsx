@@ -3,7 +3,7 @@ import { IconShoppingCart, IconStar } from "@tabler/icons-react"
 import { Button } from "./Button"
 import { useAuth } from "../../context/AuthContext"
 
-export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar }) {
+export function ProductCard({ nombre, precio, calificacion, imagen, onClick }) {
   const [hover, setHover] = useState(false)
   const { esEmprendedora } = useAuth() 
 
@@ -11,6 +11,7 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar })
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={onClick}
       className="relative rounded-md overflow-hidden shadow-md cursor-pointer w-full"
     >
 
@@ -22,11 +23,12 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onAgregar })
       />
 
       {/* agregar a carrito - solo en hover */}
-      {hover && onAgregar && (
-        <div className="absolute top-3 right-3">
+      {hover && (
+        <div
+          className="absolute top-3 right-3"
+        >
           <Button
             size="sm"
-            onClick={onAgregar}
             className="flex items-center gap-3 w-auto! px-1 text-sm"
           >
             Agregar

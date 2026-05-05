@@ -19,6 +19,7 @@ from .service import (
     eliminar_publicacion_service,
     suspender_cuenta_service,
     descartar_reporte_service,
+    revocar_insignia_service,
 )
 
 router = APIRouter(prefix="/admin", tags=["Admin Management"], dependencies=[Depends(require_admin)])
@@ -83,6 +84,12 @@ def rechazar_insignia(id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "No encontrada")
     return {"message": "Insignia rechazada"}
 
+@router.patch("/insignias/{id}/revocar")
+def revocar_insignia(id: int, db: Session = Depends(get_db)):
+    result = revocar_insignia_service(db, id)
+    if not result:
+        raise HTTPException(404, "No encontrada")
+    return {"message": "Insignia revocada"}
 
 @router.get("/reportes", response_model=list[ReporteOut])
 def get_reportes(

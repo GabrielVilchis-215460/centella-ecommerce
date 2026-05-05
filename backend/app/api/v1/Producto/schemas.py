@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Optional
 from app.models.enum import TipoEntregaEnum
 
-
 class ProductoBase(BaseModel):
     nombre: str = Field(..., max_length=200)
     descripcion: Optional[str] = None
@@ -14,11 +13,9 @@ class ProductoBase(BaseModel):
     activo: bool = True
     id_categoria: int
 
-
 class ProductoCreate(ProductoBase):
-    id_emprendedora: int
+    #id_emprendedora: int
     fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
-
 
 class ProductoUpdate(BaseModel):
     nombre: Optional[str] = Field(None, max_length=200)
@@ -29,14 +26,6 @@ class ProductoUpdate(BaseModel):
     activo: Optional[bool] = None
     id_categoria: Optional[int] = None
 
-
-class ProductoRead(ProductoBase):
-    id_producto: int
-    id_emprendedora: int
-    fecha_creacion: datetime
-
-    model_config = {"from_attributes": True}
-
 class ImagenRead(BaseModel):
     id_imagen: int
     url: str
@@ -44,3 +33,12 @@ class ImagenRead(BaseModel):
     orden: int
 
     model_config = {"from_attributes": True}
+
+class ProductoRead(ProductoBase):
+    id_producto: int
+    id_emprendedora: int
+    fecha_creacion: datetime
+    imagenes: list[ImagenRead] = []
+
+    model_config = {"from_attributes": True}
+

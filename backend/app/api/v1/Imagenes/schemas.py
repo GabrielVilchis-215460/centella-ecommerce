@@ -1,10 +1,4 @@
-"""
-app/api/v1/imagenes/schema.py
-Pydantic models for validation
-"""
-
 from pydantic import BaseModel
-
 
 class ImageResponse(BaseModel):
     success: bool
@@ -13,7 +7,9 @@ class ImageResponse(BaseModel):
     filename: str = None
     error: str = None
 
-
 class ImagesListResponse(BaseModel):
     success: bool
     images: list
+
+class ReordenarRequest(BaseModel):
+    ids_imagenes: list[int]

@@ -92,7 +92,11 @@ def get_insignias_service(
         Emprendedora.nombre_negocio,
         Emprendedora.insignia_hecho_juarez,
         Emprendedora.solicitud_insignia_activa,
-    )
+        Usuario.nombre,
+        Usuario.apellido,
+        Usuario.email,
+        Usuario.fecha_registro,
+    ).join(Usuario, Usuario.id_usuario == Emprendedora.id_usuario)
 
     if q:
         query = query.where(
@@ -119,9 +123,12 @@ def get_insignias_service(
     return [
         {
             "id_emprendedora": row.id_emprendedora,
-            "nombre_negocio": row.nombre_negocio,
-            "insignia": row.insignia_hecho_juarez,
+            "nombre_negocio":  row.nombre_negocio,
+            "insignia":        row.insignia_hecho_juarez,
             "solicitud_activa": row.solicitud_insignia_activa,
+            "nombre_solicitante": f"{row.nombre} {row.apellido}",
+            "email":           row.email,
+            "fecha_solicitud": row.fecha_registro,
         }
         for row in result
     ]
@@ -245,6 +252,15 @@ def rechazar_insignia_service(db: Session, id: int):
     if not emp:
         return None
 
+    emp.solicitud_insignia_activa = False
+    db.commit()
+    return True
+
+def revocar_insignia_service(db: Session, id: int):
+    emp = db.get(Emprendedora, id)
+    if not emp:
+        return None
+    emp.insignia_hecho_juarez = False
     emp.solicitud_insignia_activa = False
     db.commit()
     return True

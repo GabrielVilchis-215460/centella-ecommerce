@@ -45,8 +45,13 @@ function ProfileDropdown({ onClose }) {
 
       {/* Nombre */}
       <div className="flex items-center gap-3 px-4 py-4 border-b border-bg-dark">
-        <div className="w-9 h-9 rounded-full bg-bg-dark flex items-center justify-center"> {/* foto */}
-          <IconUser size={18} stroke={1.5} color="var(--color-text-light)" />
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-dark shrink-0">
+          {usuario?.foto_perfil_url
+            ? <img src={usuario.foto_perfil_url} alt="Foto" className="w-full h-full object-cover" />
+            : <div className="w-full h-full flex items-center justify-center">
+                <IconUser size={18} stroke={1.5} color="var(--color-text-light)" />
+              </div>
+          }
         </div>
         <span className="font-body text-base font-regular text-text-dark truncate">
           {usuario?.nombre} {usuario?.apellido}
@@ -268,5 +273,5 @@ export function Header() {
   if (esCliente())      return <HeaderCliente />
   if (esEmprendedora()) return <HeaderNav navItems={NAV_EMPRENDEDORA} />
   if (esAdmin())        return <HeaderNav navItems={NAV_ADMIN} />
-  //return <HeaderCliente />  // ← fallback para no autenticados
+  return <HeaderCliente />  // ← fallback para no autenticados
 }

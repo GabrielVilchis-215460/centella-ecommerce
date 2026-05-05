@@ -86,6 +86,8 @@ def login_user(data: LoginRequest, db: Session):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
     if not user.email_verificado:
         raise HTTPException(status_code=403, detail="Debes verificar tu correo antes de iniciar sesión")
+    if not user.activo:
+        raise HTTPException(status_code=403, detail="Esta cuenta ha sido desactivada")
     return {
         "access_token": create_access_token({"sub": str(user.id_usuario)}),
         "refresh_token": create_refresh_token({"sub": str(user.id_usuario)}),
@@ -101,7 +103,9 @@ def get_me_user(current_user: Usuario):
         "nombre": current_user.nombre,
         "apellido": current_user.apellido,
         "tipo_usuario": current_user.tipo_usuario,
-        "fecha_registro": current_user.fecha_registro
+        "fecha_registro": current_user.fecha_registro,
+        "foto_perfil_url": current_user.foto_perfil_url,
+        "fecha_nacimiento": str(current_user.fecha_nacimiento) if current_user.fecha_nacimiento else None,
     }
 
 

@@ -10,6 +10,8 @@ import { RecuperarContrasena } from "./features/auth/RecuperarContrasena"
 import { VerificarCodigo }     from "./features/auth/VerificarCodigo"
 import { NuevaContrasena }     from "./features/auth/NuevaContrasena"
 import { CrearPerfil } from "./features/auth/CrearPerfil"
+//gen
+import { Ajustes } from "./features/auth/Ajustes"
 
 // rutas del cliente
 import { Catalogo }         from "./features/cliente/Catalogo"
@@ -17,20 +19,28 @@ import { Checkout }         from "./features/cliente/Checkout"
 import { CheckoutPago } from "./features/cliente/CheckoutPago"
 import { ConfirmacionPago } from "./features/cliente/ConfirmacionPago"
 import { CheckoutConfirmacion } from "./features/cliente/CheckoutConfirmacion"
-// import { HistorialCompras } from "./features/cliente/HistorialCompras"
+import { HistorialCompras } from "./features/cliente/HistorialCompras"
+import { DetalleProducto }      from "./features/cliente/DetalleProducto" 
+import { DetalleServicio }      from "./features/cliente/DetalleServicio"
 
 // rutas de emprendedoras
 import { Dashboard }            from "./features/emprendedora/Dashboard"
-// import { GestionProductos }     from "./features/emprendedora/GestionProductos"
-// import { GestionServicios }     from "./features/emprendedora/GestionServicios"
+import { GestionProductos }     from "./features/emprendedora/GestionProductos"
+import { GestionServicios }     from "./features/emprendedora/GestionServicios"
 import { GestionPedidos }       from "./features/emprendedora/GestionPedidos"
 import { DetalleEmprendedora } from "./features/emprendedora/DetalleEmprendedora"
 import { GestionPagina } from "./features/emprendedora/GestionPagina"
+import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimiento"
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
+<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
 import { Emprendedoras } from "./features/admin/Emprendedoras"
 //import { Insignias }     from "./features/admin/Insignias"
+=======
+//import { Emprendedoras } from "./features/admin/Emprendedoras"
+import { GestionInsignias }     from "./features/admin/GestionInsignias"
+>>>>>>> main
 //import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
@@ -71,12 +81,17 @@ export function AppRoutes() {
       <Route path="/nueva-contrasena"     element={<NuevaContrasena />}     />
       <Route path="/crear-perfil" element={<CrearPerfil />} />
 
+      <Route path="/perfil/ajustes" element={
+        <ProtectedRoute roles={["cliente", "emprendedora"]}>
+          <Ajustes />
+        </ProtectedRoute>
+      } />
+
       {/* Cliente */}
       
       <Route path="/catalogo" element={<Catalogo />} />
-      {/*<Route path="/catalogo" element={<Catalogo />}         />
-      {/*<Route path="/catalogo/producto/:id"      element={<DetalleProducto />}  />
-      <Route path="/catalogo/servicio/:id"      element={<DetalleServicio />}  />*/}
+      <Route path="/catalogo/producto/:id" element={<DetalleProducto />} />
+      <Route path="/catalogo/servicio/:id"  element={<DetalleServicio />} />
       <Route path="/catalogo/emprendedora/:id" element={<DetalleEmprendedora />} />
       <Route path="/checkout" element={
         <ProtectedRoute roles={["cliente"]}>
@@ -107,12 +122,12 @@ export function AppRoutes() {
       <ProtectedRoute roles={["cliente"]}>
           <Confirmacion />
       </ProtectedRoute>
-      } />
+      } />*/}
       <Route path="/historial" element={
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
         </ProtectedRoute>
-      } />*/}
+      } />
 
       {/* Emprendedora */}
       <Route path="/dashboard" element={
@@ -120,7 +135,7 @@ export function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
-      {/*<Route path="/dashboard/productos" element={
+      <Route path="/dashboard/productos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionProductos />
         </ProtectedRoute>
@@ -129,7 +144,7 @@ export function AppRoutes() {
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionServicios />
         </ProtectedRoute>
-      } />*/}
+      } />
       <Route path="/dashboard/pedidos" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPedidos />
@@ -145,6 +160,11 @@ export function AppRoutes() {
           <GestionPagina />
         </ProtectedRoute>
       } />
+      <Route path="/dashboard/GestionPerfil" element={
+        <ProtectedRoute roles={["emprendedora"]}>
+          <AjustesEmprendimiento />
+        </ProtectedRoute>
+      } />
 
       {/* Admin */}
       <Route path="/admin" element={
@@ -157,12 +177,17 @@ export function AppRoutes() {
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
         </ProtectedRoute>
+<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
       } />
       {/*<Route path="/admin/insignias" element={
+=======
+      } /> */}
+      <Route path="/admin/insignias" element={
+>>>>>>> main
         <ProtectedRoute roles={["administrador"]}>
-          <Insignias />
+          <GestionInsignias />
         </ProtectedRoute>
-      } />
+      } /> {/*
       <Route path="/admin/moderacion" element={
         <ProtectedRoute roles={["administrador"]}>
           <Moderacion />
