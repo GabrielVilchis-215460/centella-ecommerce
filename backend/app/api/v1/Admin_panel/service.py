@@ -1,6 +1,7 @@
 from typing import Optional, Literal
 from sqlalchemy.orm import Session
 from sqlalchemy import select, or_, and_
+from sqlalchemy.orm import aliased
 
 from app.models import (
     Usuario,
@@ -140,81 +141,143 @@ def get_reportes_service(
     estado: Optional[str] = None,
     ordenar_por: Optional[Literal["recientes", "estado"]] = None,
 ):
+    from app.models.resena import Resena
+
+    UsuarioReportador  = aliased(Usuario)
+    UsuarioPropietario = aliased(Usuario)
+
     query = (
         select(
             Reporte.id_reporte,
             Reporte.tipo_contenido,
-
+            Reporte.id_referencia,
+            Reporte.motivo,
+            Reporte.estado,
+            Reporte.fecha,
+            # Producto
             Producto.id_producto,
             Producto.nombre.label("producto_nombre"),
-
+            # Servicio
             Servicio.id_servicio,
             Servicio.nombre.label("servicio_nombre"),
-
-            Emprendedora.nombre_negocio.label("propietario"),
-            Usuario.nombre.label("reportado_por"),
-            Reporte.estado,
+            # Emprendedora (para producto/servicio)
+            Emprendedora.nombre_negocio.label("nombre_negocio"),
+            UsuarioPropietario.nombre.label("propietario_nombre"),
+            UsuarioPropietario.apellido.label("propietario_apellido"),
+            UsuarioPropietario.email.label("propietario_email"),
+            # Reportador
+            UsuarioReportador.nombre.label("reportado_por_nombre"),
+            UsuarioReportador.email.label("reportado_por_email"),
         )
-        # Producto join (only when tipo = producto)
-        .outerjoin(
-            Producto,
-            and_(
-                Reporte.tipo_contenido == TipoContenidoReporteEnum.producto,
-                Producto.id_producto == Reporte.id_referencia,
-            )
-        )
-        # Servicio join (only when tipo = servicio)
-        .outerjoin(
-            Servicio,
-            and_(
-                Reporte.tipo_contenido == TipoContenidoReporteEnum.servicio,
-                Servicio.id_servicio == Reporte.id_referencia,
-            )
-        )
-        # Emprendedora (from either producto or servicio)
-        .outerjoin(
-            Emprendedora,
-            or_(
-                Emprendedora.id_emprendedora == Producto.id_emprendedora,
-                Emprendedora.id_emprendedora == Servicio.id_emprendedora,
-            )
-        )
-        .join(Usuario, Usuario.id_usuario == Reporte.id_reportador)
+        .outerjoin(Producto, and_(
+            Reporte.tipo_contenido == TipoContenidoReporteEnum.producto,
+            Producto.id_producto == Reporte.id_referencia,
+        ))
+        .outerjoin(Servicio, and_(
+            Reporte.tipo_contenido == TipoContenidoReporteEnum.servicio,
+            Servicio.id_servicio == Reporte.id_referencia,
+        ))
+        .outerjoin(Emprendedora, or_(
+            Emprendedora.id_emprendedora == Producto.id_emprendedora,
+            Emprendedora.id_emprendedora == Servicio.id_emprendedora,
+        ))
+        .outerjoin(UsuarioPropietario, UsuarioPropietario.id_usuario == Emprendedora.id_usuario)
+        .join(UsuarioReportador, UsuarioReportador.id_usuario == Reporte.id_reportador)
     )
 
     if q:
-        query = query.where(
-            or_(
-                Producto.nombre.ilike(f"%{q}%"),
-                Emprendedora.nombre_negocio.ilike(f"%{q}%"),
-                Usuario.nombre.ilike(f"%{q}%"),
-            )
-        )
-
+        query = query.where(or_(
+            Producto.nombre.ilike(f"%{q}%"),
+            Servicio.nombre.ilike(f"%{q}%"),
+            Emprendedora.nombre_negocio.ilike(f"%{q}%"),
+        ))
     if estado:
         query = query.where(Reporte.estado == estado)
-
     if ordenar_por == "estado":
         query = query.order_by(Reporte.estado.asc())
-    elif ordenar_por == "recientes":
-        query = query.order_by(Reporte.id_reporte.desc())
     else:
         query = query.order_by(Reporte.id_reporte.desc())
 
-    result = db.execute(query)
+    rows = db.execute(query).all()
 
-    return [
-        {
-            "id_reporte": row.id_reporte,
-            "producto_id": row.id_producto,
-            "producto": row.producto_nombre,
-            "propietario": row.propietario,
-            "reportado_por": row.reportado_por,
-            "estado": row.estado,
-        }
-        for row in result
+    # Para reseñas necesitamos hacer lookups separados
+    resenas_ids = [
+        r.id_referencia for r in rows
+        if r.tipo_contenido == TipoContenidoReporteEnum.resena
     ]
+    from app.models.resena import Resena
+    from app.models.enum import TipoResenaEnum
+    resenas_map = {}
+    if resenas_ids:
+        resenas = db.query(Resena).filter(Resena.id_resena.in_(resenas_ids)).all()
+        for res in resenas:
+            # Buscar nombre del item referenciado
+            nombre_item = None
+            autor = db.query(Usuario).filter(Usuario.id_usuario == res.id_cliente).first()
+            if res.tipo_resena == TipoResenaEnum.producto:
+                prod = db.query(Producto).filter(Producto.id_producto == res.id_referencia).first()
+                nombre_item = prod.nombre if prod else None
+            elif res.tipo_resena == TipoResenaEnum.servicio:
+                srv = db.query(Servicio).filter(Servicio.id_servicio == res.id_referencia).first()
+                nombre_item = srv.nombre if srv else None
+            resenas_map[res.id_resena] = {
+                "nombre_item": nombre_item,
+                "autor_nombre": f"{autor.nombre} {autor.apellido}" if autor else "Usuario",
+                "autor_email":  autor.email if autor else None,
+            }
 
+    result = []
+    for row in rows:
+        tipo = row.tipo_contenido
+
+        if tipo == TipoContenidoReporteEnum.producto:
+            nombre_contenido = row.producto_nombre or f"Referencia #{row.id_referencia}"
+            propietario      = f"{row.nombre_negocio} - {row.propietario_nombre} {row.propietario_apellido}" if row.nombre_negocio else "—"
+            propietario_email = row.propietario_email
+
+        elif tipo == TipoContenidoReporteEnum.servicio:
+            nombre_contenido = row.servicio_nombre or f"Referencia #{row.id_referencia}"
+            propietario      = f"{row.nombre_negocio} - {row.propietario_nombre} {row.propietario_apellido}" if row.nombre_negocio else "—"
+            propietario_email = row.propietario_email
+
+        elif tipo == TipoContenidoReporteEnum.vendedora:
+            emp = db.query(Emprendedora).filter(
+                Emprendedora.id_emprendedora == row.id_referencia
+            ).first()
+            usr = db.query(Usuario).filter(
+                Usuario.id_usuario == emp.id_usuario
+            ).first() if emp else None
+            nombre_contenido  = emp.nombre_negocio if emp else f"Referencia #{row.id_referencia}"
+            propietario       = f"{usr.nombre} {usr.apellido}".strip() if usr else "—"
+            propietario_email = usr.email if usr else None
+
+        elif tipo == TipoContenidoReporteEnum.resena:
+            resena_info      = resenas_map.get(row.id_referencia, {})
+            nombre_item      = resena_info.get("nombre_item")
+            nombre_contenido = f'Reseña de "{nombre_item}"' if nombre_item else f"Reseña #{row.id_referencia}"
+            propietario      = resena_info.get("autor_nombre", "—")
+            propietario_email = resena_info.get("autor_email")
+
+        else:
+            nombre_contenido = f"Referencia #{row.id_referencia}"
+            propietario      = "—"
+            propietario_email = None
+
+        result.append({
+            "id_reporte":          row.id_reporte,
+            "tipo_contenido":      tipo.value,
+            "id_referencia":       row.id_referencia,
+            "nombre_contenido":    nombre_contenido,
+            "propietario":         propietario,
+            "propietario_email":   propietario_email,
+            "reportado_por":       row.reportado_por_nombre,
+            "reportado_por_email": row.reportado_por_email,
+            "motivo":              row.motivo,
+            "estado":              row.estado.value,
+            "fecha":               row.fecha.isoformat() if row.fecha else None,
+        })
+
+    return result
 
 def verificar_emprendedora_service(db: Session, id: int):
     emp = db.get(Emprendedora, id)
@@ -232,6 +295,11 @@ def suspender_emprendedora_service(db: Session, id: int):
         return None
 
     emp.estado_verificacion = EstadoVerificacionEnum.suspendida
+
+    usuario = db.get(Usuario, emp.id_usuario)
+    if usuario:
+        usuario.activo = False
+
     db.commit()
     return True
 
@@ -271,9 +339,18 @@ def eliminar_publicacion_service(db: Session, id: int):
     if not rep:
         return None
 
-    producto = db.get(Producto, rep.id_contenido)
-    if producto:
-        producto.activo = False
+    if rep.tipo_contenido == TipoContenidoReporteEnum.producto:
+        obj = db.get(Producto, rep.id_referencia)
+        if obj: obj.activo = False
+
+    elif rep.tipo_contenido == TipoContenidoReporteEnum.servicio:
+        obj = db.get(Servicio, rep.id_referencia)
+        if obj: obj.activo = False
+
+    elif rep.tipo_contenido == TipoContenidoReporteEnum.resena:
+        from app.models.resena import Resena
+        obj = db.get(Resena, rep.id_referencia)
+        if obj: db.delete(obj)
 
     rep.estado = EstadoReporteEnum.resuelto
     db.commit()
@@ -285,22 +362,51 @@ def suspender_cuenta_service(db: Session, id: int):
     if not rep:
         return None
 
-    producto = db.get(Producto, rep.id_contenido)
-    if producto:
-        emp = db.get(Emprendedora, producto.id_emprendedora)
+    id_usuario = None
+
+    if rep.tipo_contenido == TipoContenidoReporteEnum.producto:
+        producto = db.get(Producto, rep.id_referencia)
+        if producto:
+            emp = db.get(Emprendedora, producto.id_emprendedora)
+            if emp:
+                emp.estado_verificacion = EstadoVerificacionEnum.suspendida
+                id_usuario = emp.id_usuario
+
+    elif rep.tipo_contenido == TipoContenidoReporteEnum.servicio:
+        from app.models.servicio import Servicio
+        servicio = db.get(Servicio, rep.id_referencia)
+        if servicio:
+            emp = db.get(Emprendedora, servicio.id_emprendedora)
+            if emp:
+                emp.estado_verificacion = EstadoVerificacionEnum.suspendida
+                id_usuario = emp.id_usuario
+
+    elif rep.tipo_contenido == TipoContenidoReporteEnum.vendedora:
+        emp = db.get(Emprendedora, rep.id_referencia)
         if emp:
-            emp.estado_verificacion = EstadoVerificacionEnum.rechazado
+            emp.estado_verificacion = EstadoVerificacionEnum.suspendida
+            id_usuario = emp.id_usuario
+
+    elif rep.tipo_contenido == TipoContenidoReporteEnum.resena:
+        from app.models.resena import Resena
+        resena = db.get(Resena, rep.id_referencia)
+        if resena:
+            id_usuario = resena.id_cliente
+
+    if id_usuario:
+        usuario = db.get(Usuario, id_usuario)
+        if usuario:
+            usuario.activo = False
 
     rep.estado = EstadoReporteEnum.resuelto
     db.commit()
     return True
-
 
 def descartar_reporte_service(db: Session, id: int):
     rep = db.get(Reporte, id)
     if not rep:
         return None
 
-    rep.estado = EstadoReporteEnum.rechazado
+    rep.estado = EstadoReporteEnum.descartado
     db.commit()
     return True

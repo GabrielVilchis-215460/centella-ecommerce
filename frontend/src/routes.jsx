@@ -34,14 +34,9 @@ import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimi
 
 // rutas de admin
 import { AdminPanel }    from "./features/admin/AdminPanel"
-<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
 import { Emprendedoras } from "./features/admin/Emprendedoras"
-//import { Insignias }     from "./features/admin/Insignias"
-=======
-//import { Emprendedoras } from "./features/admin/Emprendedoras"
 import { GestionInsignias }     from "./features/admin/GestionInsignias"
->>>>>>> main
-//import { Moderacion }    from "./features/admin/Moderacion"
+import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
 function ProtectedRoute({ children, roles = [] }) {
@@ -177,23 +172,17 @@ export function AppRoutes() {
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
         </ProtectedRoute>
-<<<<<<< SCRUM-128-Vista-Gestion-de-emprendedoras
       } />
-      {/*<Route path="/admin/insignias" element={
-=======
-      } /> */}
       <Route path="/admin/insignias" element={
->>>>>>> main
         <ProtectedRoute roles={["administrador"]}>
           <GestionInsignias />
         </ProtectedRoute>
-      } /> {/*
+      } /> 
       <Route path="/admin/moderacion" element={
         <ProtectedRoute roles={["administrador"]}>
           <Moderacion />
         </ProtectedRoute>
       } />
-        */}
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
 

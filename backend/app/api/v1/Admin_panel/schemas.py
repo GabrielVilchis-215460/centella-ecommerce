@@ -24,11 +24,16 @@ class InsigniaOut(BaseModel):
 
 class ReporteOut(BaseModel):
     id_reporte: int
-    producto_id: Optional[int] = None
-    producto: Optional[str] = None
+    tipo_contenido: str
+    id_referencia: int
+    nombre_contenido: Optional[str] = None
     propietario: Optional[str] = None
-    reportado_por: str
+    propietario_email: Optional[str] = None
+    reportado_por: Optional[str] = None
+    reportado_por_email: Optional[str] = None
+    motivo: Optional[str] = None
     estado: str
+    fecha: Optional[str] = None
 
     class Config:
         from_attributes = True

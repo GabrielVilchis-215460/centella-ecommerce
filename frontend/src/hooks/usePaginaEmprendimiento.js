@@ -95,6 +95,7 @@ export function usePaginaEmprendimiento() {
     cargando,
     error,
     // Encabezado
+    idEmprendedora: Number(id),
     nombreNegocio:    perfil?.nombre_negocio    ?? "",
     logoUrl:          perfil?.logo_url           ?? null,
     descripcion:      perfil?.descripcion_negocio ?? "",

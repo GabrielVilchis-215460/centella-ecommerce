@@ -2,6 +2,8 @@ import { useRef, useState } from "react"
 import { IconDots, IconFlag, IconStar } from "@tabler/icons-react"
 import { StarRating }        from "./StarRating"
 import { OrderByDropdown }   from "./Dropdown"
+import { ReporteModal }    from "./ReporteModal"
+import { useAuth }         from "../../context/AuthContext"
 
 const ORDEN_RESENAS = [
   { value: "recientes",  label: "Más recientes"      },
@@ -17,7 +19,7 @@ function fmtFecha(iso) {
   })
 }
 
-function ResenaCard({ resena }) {
+function ResenaCard({ resena, onReportar }) {
   const [opcionesAbiertas, setOpcionesAbiertas] = useState(false)
   const ref = useRef(null)
 
@@ -53,7 +55,7 @@ function ResenaCard({ resena }) {
             {opcionesAbiertas && (
               <div className="absolute right-0 top-[calc(100%+4px)] bg-bg-light rounded-md shadow-lg z-50 w-32 overflow-hidden">
                 <button
-                  onClick={() => setOpcionesAbiertas(false)}
+                  onClick={() => { setOpcionesAbiertas(false); onReportar?.() }}
                   className="flex items-center gap-2 w-full px-3 py-2 font-body text-sm text-text-regular hover:bg-bg-dark transition-colors"
                 >
                   <IconFlag size={14} stroke={1.5} />
@@ -74,6 +76,9 @@ function ResenaCard({ resena }) {
 }
 
 export function ResenasSection({ resenas, promedio, orden, onOrdenChange, onAgregarResena, esCliente }) {
+  const { estaAutenticado } = useAuth()
+  const [resenaAReportar, setResenaAReportar] = useState(null)
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -109,9 +114,24 @@ export function ResenasSection({ resenas, promedio, orden, onOrdenChange, onAgre
           {resenas.length === 0 ? (
             <p className="font-body text-sm text-text-light pl-5">No hay reseñas todavía.</p>
           ) : (
-            resenas.map((r) => <ResenaCard key={r.id_resena} resena={r} />)
+            resenas.map((r) => (
+              <ResenaCard
+                key={r.id_resena}
+                resena={r}
+                onReportar={estaAutenticado ? () => setResenaAReportar(r) : null}
+              />
+            ))
           )}
         </div>
+
+        {resenaAReportar && (
+          <ReporteModal
+            tipo="resena"
+            idReferencia={resenaAReportar.id_resena}
+            nombreContenido={`Reseña de ${resenaAReportar.nombre_cliente || "Usuario"}`}
+            onClose={() => setResenaAReportar(null)}
+          />
+        )}
 
       </div>
     </div>
