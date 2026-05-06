@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 
-/* ----- IR DESCOMENTANDO CADA RUTA CONFORME SE VAYA INCORPORANDO O YAMA ------*/
 // public
 import { Login }    from "./features/auth/Login"
 import { Registro } from "./features/auth/Registro"
@@ -113,11 +112,6 @@ export function AppRoutes() {
           <CheckoutConfirmacion />
         </ProtectedRoute>
       } />
-      {/*<Route path="/checkout/confirmacion" element={
-      <ProtectedRoute roles={["cliente"]}>
-          <Confirmacion />
-      </ProtectedRoute>
-      } />*/}
       <Route path="/historial" element={
         <ProtectedRoute roles={["cliente"]}>
           <HistorialCompras />
@@ -145,11 +139,6 @@ export function AppRoutes() {
           <GestionPedidos />
         </ProtectedRoute>
       } />
-      {/*<Route path="/dashboard/pagina" element={
-        <ProtectedRoute roles={["emprendedora"]}>
-          <Pagina />
-        </ProtectedRoute>
-      } />*/}
       <Route path="/dashboard/gestionpagina" element={
         <ProtectedRoute roles={["emprendedora"]}>
           <GestionPagina />
@@ -167,7 +156,6 @@ export function AppRoutes() {
           <AdminPanel />
         </ProtectedRoute>
       } />
-      
       <Route path="/admin/emprendedoras" element={
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
