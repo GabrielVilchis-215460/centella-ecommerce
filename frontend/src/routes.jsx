@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 
-/* ----- IR DESCOMENTANDO CADA RUTA CONFORME SE VAYA INCORPORANDO O YAMA ------*/
 // public
 import { Login }    from "./features/auth/Login"
 import { Registro } from "./features/auth/Registro"
@@ -36,7 +35,7 @@ import { AjustesEmprendimiento } from "./features/emprendedora/AjustesEmprendimi
 import { AdminPanel }    from "./features/admin/AdminPanel"
 import { Emprendedoras } from "./features/admin/Emprendedoras"
 import { GestionInsignias }     from "./features/admin/GestionInsignias"
-//import { Moderacion }    from "./features/admin/Moderacion"
+import { Moderacion }    from "./features/admin/Moderacion"
 
 // rutas protegidas
 function ProtectedRoute({ children, roles = [] }) {
@@ -161,18 +160,17 @@ export function AppRoutes() {
         <ProtectedRoute roles={["administrador"]}>
           <Emprendedoras />
         </ProtectedRoute>
-      } /> 
+      } />
       <Route path="/admin/insignias" element={
         <ProtectedRoute roles={["administrador"]}>
           <GestionInsignias />
         </ProtectedRoute>
-      } /> {/*
+      } /> 
       <Route path="/admin/moderacion" element={
         <ProtectedRoute roles={["administrador"]}>
           <Moderacion />
         </ProtectedRoute>
       } />
-        */}
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
 

@@ -12,6 +12,7 @@ import { ResenaModal }        from "../../components/common/ResenaModal"
 import { ResenasSection }     from "../../components/common/ResenasSection"
 import { ServiceCard }        from "../../components/common/ServiceCard"
 import { useDetalleServicio } from "../../hooks/useDetalleServicio"
+import { ReporteModal } from "../../components/common/ReporteModal"
 
 function Skeleton({ className = "" }) {
   return <div className={`animate-pulse rounded-md bg-bg-dark ${className}`} />
@@ -22,6 +23,7 @@ export function DetalleServicio() {
   const reportarRef = useRef(null)
   const carruselRef = useRef(null)
   const [reportarAbierto, setReportarAbierto] = useState(false)
+  const [reportarModal, setReportarModal] = useState(false)
 
   const {
     servicio, resenas, cargando, error,
@@ -98,7 +100,7 @@ export function DetalleServicio() {
                     {reportarAbierto && (
                       <div className="absolute left-0 top-[calc(100%+4px)] bg-bg-light rounded-md shadow-lg z-50 w-36 overflow-hidden">
                         <button
-                          onClick={() => setReportarAbierto(false)}
+                          onClick={() => { setReportarAbierto(false); setReportarModal(true) }}
                           className="flex items-center gap-2 w-full px-4 py-3 font-body text-sm text-text-regular hover:bg-bg-dark transition-colors"
                         >
                           <IconFlag size={16} stroke={1.5} />
@@ -237,6 +239,14 @@ export function DetalleServicio() {
           nombreEmprendedora={servicio.emprendedora?.nombre_vendedora}
           onClose={() => setModalResena(false)}
           onGuardada={() => window.location.reload()}
+        />
+      )}
+      {reportarModal && (
+        <ReporteModal
+          tipo="servicio"
+          idReferencia={Number(servicio.id_servicio)}
+          nombreContenido={servicio.nombre}
+          onClose={() => setReportarModal(false)}
         />
       )}
     </>

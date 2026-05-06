@@ -8,7 +8,8 @@ import {
   IconDots,
   IconArrowLeft,
   IconCarambola,
-  IconRosetteDiscountCheck
+  IconRosetteDiscountCheck,
+  IconFlag
 } from "@tabler/icons-react"
 import { Icon }                    from "../../components/common/Icon"
 import { Header }                  from "../../components/layout/Header"
@@ -16,6 +17,7 @@ import { Footer }                  from "../../components/layout/Footer"
 import { ProductCard }             from "../../components/common/ProductCard"
 import { usePaginaEmprendimiento } from "../../hooks/usePaginaEmprendimiento"
 import { ServiceCard } from "../../components/common/ServiceCard"
+import { ReporteModal } from "../../components/common/ReporteModal"
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -25,8 +27,20 @@ function Skeleton({ className = "" }) {
 
 // ─── Encabezado ───────────────────────────────────────────────────────────────
 
-function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, insignia, verificada, cargando }) {
+function EncabezadoEmprendedora({ idEmprendedora, logoUrl, nombreNegocio, etiquetas, rating, insignia, verificada, cargando }) {
   const navigate = useNavigate()
+  const reportarRef = useRef(null)
+  const [reportarAbierto, setReportarAbierto] = useState(false)
+  const [reportarModal,   setReportarModal]   = useState(false)
+  
+  useEffect(() => {
+    const handler = (e) => {
+      if (reportarRef.current && !reportarRef.current.contains(e.target))
+        setReportarAbierto(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
 
   if (cargando) {
     return (
@@ -87,6 +101,35 @@ function EncabezadoEmprendedora({ logoUrl, nombreNegocio, etiquetas, rating, ins
           </div>
         )}
       </div>
+      {!cargando && (
+      <div className="relative ml-auto shrink-0" ref={reportarRef}>
+        <button
+          onClick={() => setReportarAbierto(!reportarAbierto)}
+          className="text-text-light hover:text-text-dark transition-colors"
+        >
+          <IconDots size={20} stroke={1.5} />
+        </button>
+        {reportarAbierto && (
+          <div className="absolute right-0 top-[calc(100%+4px)] bg-bg-light rounded-md shadow-lg z-50 w-36 overflow-hidden">
+            <button
+              onClick={() => { setReportarAbierto(false); setReportarModal(true) }}
+              className="flex items-center gap-2 w-full px-4 py-3 font-body text-sm text-text-regular hover:bg-bg-dark transition-colors"
+            >
+              <IconFlag size={16} stroke={1.5} />
+              Reportar
+            </button>
+          </div>
+        )}
+      </div>
+    )}
+    {reportarModal && (
+      <ReporteModal
+        tipo="vendedora"
+        idReferencia={idEmprendedora}
+        nombreContenido={nombreNegocio}
+        onClose={() => setReportarModal(false)}
+      />
+    )}
     </div>
   )
 }
@@ -197,6 +240,7 @@ function CarruselServicios({ servicios, cargando, colorNegocio }) {
 export function DetalleEmprendedora() {
   const {
     cargando, error,
+    idEmprendedora,
     nombreNegocio, logoUrl, insignia, verificada,
     etiquetas, rating, htmlContenido, productos, servicios
   } = usePaginaEmprendimiento()
@@ -219,6 +263,7 @@ export function DetalleEmprendedora() {
       <main className="mx-auto max-w-7xl px-6 py-4 space-y-6">
         {/* Encabezado */}
         <EncabezadoEmprendedora
+          idEmprendedora={idEmprendedora}
           logoUrl={logoUrl}
           nombreNegocio={nombreNegocio}
           etiquetas={etiquetas}

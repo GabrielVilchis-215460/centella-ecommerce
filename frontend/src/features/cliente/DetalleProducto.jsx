@@ -11,6 +11,7 @@ import { NumberInput }         from "../../components/common/NumberInput"
 import { ResenaModal }         from "../../components/common/ResenaModal"
 import { ResenasSection }      from "../../components/common/ResenasSection"
 import { useDetalleProducto }  from "../../hooks/useDetalleProducto"
+import { ReporteModal } from "../../components/common/ReporteModal"
 
 function Skeleton({ className = "" }) {
   return <div className={`animate-pulse rounded-md bg-bg-dark ${className}`} />
@@ -25,6 +26,7 @@ export function DetalleProducto() {
   const navigate    = useNavigate()
   const reportarRef = useRef(null)
   const [reportarAbierto, setReportarAbierto] = useState(false)
+  const [reportarModal, setReportarModal] = useState(false)
 
   const {
     producto, resenas, cargando, error,
@@ -147,7 +149,7 @@ export function DetalleProducto() {
                     {reportarAbierto && (
                       <div className="absolute right-0 top-[calc(100%+4px)] bg-bg-light rounded-md shadow-lg z-50 w-36 overflow-hidden">
                         <button
-                          onClick={() => setReportarAbierto(false)}
+                          onClick={() => { setReportarAbierto(false); setReportarModal(true) }}
                           className="flex items-center gap-2 w-full px-4 py-3 font-body text-sm text-text-regular hover:bg-bg-dark transition-colors"
                         >
                           <IconFlag size={16} stroke={1.5} />
@@ -324,6 +326,14 @@ export function DetalleProducto() {
           nombreEmprendedora={producto.emprendedora?.nombre_vendedora}
           onClose={() => setModalResena(false)}
           onGuardada={() => window.location.reload()}
+        />
+      )}
+      {reportarModal && (
+        <ReporteModal
+          tipo="producto"
+          idReferencia={Number(producto.id_producto)}
+          nombreContenido={producto.nombre}
+          onClose={() => setReportarModal(false)}
         />
       )}
     </>
