@@ -141,7 +141,11 @@ function HeaderCliente() {
 
   const handleBuscar = (e) => {
     e.preventDefault()
-    if (busqueda.trim()) navigate(`/catalogo?q=${busqueda}`)
+    if (!busqueda.trim()) return
+    const tabActual = new URLSearchParams(window.location.search).get("tab")
+    const enCatalogo = window.location.pathname === "/catalogo"
+    const tab = enCatalogo && tabActual ? `&tab=${tabActual}` : ""
+    navigate(`/catalogo?q=${encodeURIComponent(busqueda.trim())}${tab}`)
   }
 
   return (
