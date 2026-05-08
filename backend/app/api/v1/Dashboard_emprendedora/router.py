@@ -13,7 +13,7 @@ from app.services.analytics.emprendedora_metrics import (
 router = APIRouter(prefix="/emprendedora/dashboard", tags=["Dashboard Emprendedora"], dependencies=[Depends(require_emprendedora)])
 
 
-@router.get("/")
+@router.get("/", summary="Obtener métricas del Dashboard de Emprendedora")
 def get_dashboard(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(require_emprendedora), 

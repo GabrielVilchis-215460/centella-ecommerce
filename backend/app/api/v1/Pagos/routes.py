@@ -27,26 +27,3 @@ async def confirmar_paypal(
 @router.get("/confirm/stripe/{id_pedido}", response_model=PaymentResponse)
 async def confirmar_stripe(id_pedido: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente) ):
     return await payment_service.confirmar_stripe(db, id_pedido)
-
-# Solo para pruebas de pagos
-@router.patch("/test/pedido/{id_pedido}/estado")
-async def cambiar_estado_pedido(
-    id_pedido: int,
-    estado: EstadoPedidoEnum,
-    db: Session = Depends(get_db),
-    current_user: Usuario = Depends(require_emprendedora),
-):
-    pedido = db.query(Pedido).filter(Pedido.id_pedido == id_pedido).first()
-    if not pedido:
-        raise HTTPException(status_code=404, detail="Pedido no encontrado.")
-    
-    pedido.estado = estado
-    pedido.proveedor_payment_id = None  # resetear también el ID del proveedor
-    db.commit()
-    db.refresh(pedido)
-    
-    return {
-        "id_pedido": pedido.id_pedido,
-        "estado": pedido.estado,
-        "proveedor_payment_id": pedido.proveedor_payment_id
-    }

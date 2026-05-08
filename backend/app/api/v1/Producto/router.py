@@ -11,13 +11,14 @@ from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
-@router.get("/", response_model=list[ProductoRead])
+@router.get("/", response_model=list[ProductoRead], summary="Listar productos de la emprendedora")
 def listar(
     skip: int = 0,
     limit: int = 20,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(require_emprendedora),
 ):
+    """Obtiene una lista paginada de los productos que pertenecen a la emprendedora autenticada."""
     emp = db.query(Emprendedora).filter(
         Emprendedora.id_usuario == current_user.id_usuario
     ).first()
@@ -25,16 +26,18 @@ def listar(
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
     return service.get_by_emprendedora(db, emp.id_emprendedora, skip, limit)
 
-@router.get("/{id_producto}", response_model=ProductoRead)
+@router.get("/{id_producto}", response_model=ProductoRead, summary="Obtener producto por ID")
 def obtener(id_producto: int, db: Session = Depends(get_db)):
+    """Obtiene los datos básicos de un producto en específico utilizando su identificador."""
     return service.get_by_id(db, id_producto)
 
-@router.post("/", response_model=ProductoRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ProductoRead, status_code=status.HTTP_201_CREATED, summary="Crear un nuevo producto")
 def crear(
     data: ProductoCreate,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(require_emprendedora),
 ):
+    """Crea un nuevo producto en el catálogo asociado al perfil de la emprendedora autenticada."""
     emp = db.query(Emprendedora).filter(
         Emprendedora.id_usuario == current_user.id_usuario
     ).first()
@@ -42,18 +45,21 @@ def crear(
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
     return service.create(db, data, emp.id_emprendedora)
 
-@router.put("/{id_producto}", response_model=ProductoRead, dependencies=[Depends(require_emprendedora_or_admin)])
+@router.put("/{id_producto}", response_model=ProductoRead, dependencies=[Depends(require_emprendedora_or_admin)], summary="Actualizar información del producto")
 def actualizar(id_producto: int, data: ProductoUpdate, db: Session = Depends(get_db)):
+    """Modifica los datos de un producto existente. Requiere permisos de la emprendedora dueña o de un administrador."""
     return service.update(db, id_producto, data)
 
-@router.delete("/{id_producto}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)])
+@router.delete("/{id_producto}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)], summary="Eliminar producto")
 def eliminar(id_producto: int, db: Session = Depends(get_db)):
+    """Elimina un producto del sistema mediante su ID. Requiere permisos de la emprendedora o de un administrador."""
     service.delete(db, id_producto)
 
 @router.post(
     "/{id_producto}/imagenes",
     response_model=dict,
     status_code=status.HTTP_201_CREATED,
+    summary="Subir imágenes del producto",
     openapi_extra={
         "requestBody": {
             "content": {
@@ -83,7 +89,7 @@ def subir_imagenes_producto(
     current_user = Depends(require_emprendedora),
     image_service: ImageUploadService = Depends(get_image_service)
 ):
-    """Sube múltiples imágenes asociadas a un producto"""
+    """Sube múltiples imágenes asociadas a un producto. alida que el producto pertenezca a la emprendedora."""
     
     # 1. Obtener el producto (lanzará 404 automáticamente si no existe gracias a tu service)
     producto = service.get_by_id(db, id_producto)
@@ -125,40 +131,44 @@ def subir_imagenes_producto(
         "errors": errors
     }
 
-@router.get("/{id_producto}/imagenes", response_model=list[ImagenRead])
+@router.get("/{id_producto}/imagenes", response_model=list[ImagenRead], summary="Listar imágenes de un producto")
 def obtener_imagenes_producto(id_producto: int, db: Session = Depends(get_db)):
-    """Obtiene la lista de imágenes de un producto"""
+    """Obtiene la lista de todas las imágenes vinculadas a un producto en específico."""
     return service.get_imagenes_by_producto(db, id_producto)
 
-@router.get("/{id_producto}/detalle")
+@router.get("/{id_producto}/detalle", summary="Obtener detalle completo del producto")
 def detalle_producto(id_producto: int, db: Session = Depends(get_db)):
+    """Obtiene toda la información consolidada de un producto, incluyendo datos básicos, atributos e imágenes."""
     return service.get_detalle_completo(db, id_producto)
 
 from app.models.atributo_producto import AtributoProducto
 from app.models.enum import TipoAtributoEnum
 
-@router.get("/{id_producto}/atributos")
+@router.get("/{id_producto}/atributos", summary="Obtener atributos del producto")
 def obtener_atributos(id_producto: int, db: Session = Depends(get_db)):
+    """Devuelve la lista de atributos activos (ej. talla, color, material) asociados a un producto."""
     return db.query(AtributoProducto).filter(
         AtributoProducto.id_producto == id_producto,
         AtributoProducto.atributo_activo == True
     ).all()
 
-@router.post("/{id_producto}/atributos", status_code=201, dependencies=[Depends(require_emprendedora)])
+@router.post("/{id_producto}/atributos", status_code=201, dependencies=[Depends(require_emprendedora)], summary="Agregar atributo al producto")
 def crear_atributo(
     id_producto: int,
     tipo: TipoAtributoEnum,
     valor: str,
     db: Session = Depends(get_db),
 ):
+    """Agrega un nuevo atributo (ej. color 'Rojo') a un producto existente."""
     atributo = AtributoProducto(id_producto=id_producto, tipo=tipo, valor=valor)
     db.add(atributo)
     db.commit()
     db.refresh(atributo)
     return atributo
 
-@router.delete("/{id_producto}/atributos/{id_atributo}", status_code=204, dependencies=[Depends(require_emprendedora)])
+@router.delete("/{id_producto}/atributos/{id_atributo}", status_code=204, dependencies=[Depends(require_emprendedora)], summary="Eliminar atributo del producto")
 def eliminar_atributo(id_producto: int, id_atributo: int, db: Session = Depends(get_db)):
+    """Marca un atributo de producto como inactivo (eliminación lógica)."""
     atributo = db.query(AtributoProducto).filter(
         AtributoProducto.id_atributo == id_atributo,
         AtributoProducto.id_producto == id_producto
@@ -168,7 +178,7 @@ def eliminar_atributo(id_producto: int, id_atributo: int, db: Session = Depends(
     atributo.atributo_activo = False
     db.commit()
 
-@router.put("/{id_producto}/atributos/{id_atributo}", status_code=200, dependencies=[Depends(require_emprendedora)])
+@router.put("/{id_producto}/atributos/{id_atributo}", status_code=200, dependencies=[Depends(require_emprendedora)], summary="Editar atributo del producto")
 def editar_atributo(
     id_producto: int,
     id_atributo: int,
@@ -176,6 +186,7 @@ def editar_atributo(
     valor: str,
     db: Session = Depends(get_db),
 ):
+    """Actualiza el tipo o el valor de un atributo específico perteneciente a un producto."""
     atributo = db.query(AtributoProducto).filter(
         AtributoProducto.id_atributo == id_atributo,
         AtributoProducto.id_producto == id_producto,

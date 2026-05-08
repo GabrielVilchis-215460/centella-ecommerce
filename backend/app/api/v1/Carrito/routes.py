@@ -8,12 +8,12 @@ from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/carrito", tags=["Carrito"])
 
-@router.get("/", response_model=Carrito)
+@router.get("/", response_model=Carrito, summary="Obtener carrito del usuario")
 def leer_carrito(id_usuario: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Obtiene el carrito del usuario actual."""
     return get_carrito_by_usuario(db, id_usuario=id_usuario)
 
-@router.post("/items", response_model=ItemCarrito)
+@router.post("/items", response_model=ItemCarrito, summary="Agregar producto al carrito")
 def agregar_producto(
     id_usuario: int, 
     item: ItemCarritoCreate, 
@@ -24,7 +24,7 @@ def agregar_producto(
     carrito = get_carrito_by_usuario(db, id_usuario=id_usuario)
     return agregar_item_al_carrito(db, id_carrito=carrito.id_carrito, item=item)
 
-@router.delete("/items/{id_item}")
+@router.delete("/items/{id_item}", summary="Eliminar producto del carrito")
 def quitar_producto(id_item: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Elimina un item específico del carrito."""
     item_eliminado = eliminar_item(db, id_item=id_item)
@@ -32,7 +32,7 @@ def quitar_producto(id_item: int, db: Session = Depends(get_db), current_user: U
         raise HTTPException(status_code=404, detail="Item no encontrado")
     return {"message": "Producto eliminado del carrito"}
 
-@router.patch("/items/{id_item}", response_model=ItemCarrito)
+@router.patch("/items/{id_item}", response_model=ItemCarrito, summary="Modificar cantidad de un producto")
 def actualizar_item(
     id_item: int,
     datos:ItemCarritoUpdate,
@@ -55,14 +55,14 @@ def actualizar_item(
     db.refresh(db_item)
     return db_item
 
-@router.get("/totales", response_model=TotalesCarrito)
+@router.get("/totales", response_model=TotalesCarrito, summary="Calcular totales del carrito")
 def obtener_totales(id_usuario: int, db: Session = Depends(get_db), current_user: Usuario = Depends(require_cliente)):
     """Calcula subtotales por item y el total general del carrito."""
     carrito = get_carrito_by_usuario(db, id_usuario)
     return calcular_totales(db, carrito.id_carrito)
 
 # resumen de pedido
-@router.post("/checkout", response_model=CheckoutResponse, status_code=201)
+@router.post("/checkout", response_model=CheckoutResponse, status_code=201, summary="Procesar pago y generar pedido")
 async def finalizar_compra(
     id_usuario: int,
     checkout: CheckoutRequest,
