@@ -132,28 +132,57 @@ backend/
 │   ├── config.py         # Carga de variables de entorno y settings
 │   └── main.py           # Punto de entrada de FastAPI
 ├── migrations/           # Archivos de migración de base de datos mediante Alembic
-├── tests/                # Pruebas unitarias y de integración mediante PyTest
-├── .env                  # Variables de entorno
-├── .gitignore            # Archivos y carpetas ignorados por Git
 ├── alembic.ini           # Configuración de la herramienta de migraciones
+├── logo.png              # Logo requerido para la generación de QRs
 ├── pytest.ini            # Configuración de comportamiento de Pytest
-Frontend/
-├── README.md             # Documentación del proyecto
 └── requirements.txt      # Dependencias del proyecto
 frontend/
-├── public/              # Archivos estáticos 
+├── public/               # Archivos estáticos
 ├── src/
-│   ├── assets/          # Imágenes, fuentes y estilos globales
-│   ├── components/      # Componentes UI reutilizables
-│   │   ├── common/      # Botones, Inputs, etc.
-│   │   └── layout/      # Header, Footer, Sidebar
-│   ├── features/        # Módulos por funcionalidad (Auth, Cart, Dashboard)
-│   ├── hooks/           # Custom hooks globales
-│   ├── services/        # Lógica de comunicación con la API mediante Axios
-│   ├── utils/           # Funciones de ayuda y constantes
-│   ├── App.jsx          # Componente raíz y rutas principales
-│   └── main.jsx         # Punto de entrada del cliente
-├── .env                 # Variables de entorno (VITE_API_URL)
-├── tailwind.config.js   # Configuración de estilos
-└── package.json         # Dependencias del ecosistema Node
+│   ├── assets/           # Imágenes, fuentes y estilos globales
+│   ├── components/       # Componentes UI reutilizables
+│   ├── context/          # Contextos globales de React (estado compartido)
+│   ├── features/         # Módulos por funcionalidad (Auth, Cart, Dashboard)
+│   ├── hooks/            # Custom hooks globales
+│   ├── services/         # Lógica de comunicación con la API
+│   ├── App.css           # Estilos globales del componente raíz
+│   ├── App.jsx           # Componente raíz y rutas principales
+│   ├── index.css         # Estilos base
+│   ├── main.jsx          # Punto de entrada del cliente
+│   └── routes.jsx        # Definición de rutas de la aplicación
+├── .gitignore            # Archivos y carpetas ignorados por Git
+├── README.md             # Documentación del frontend
+├── eslint.config.js      # Configuración de ESLint
+├── index.html            # HTML principal
+├── package-lock.json     # Lock file de dependencias
+├── package.json          # Dependencias del ecosistema Node
+├── postcss.config.js     # Configuración de PostCSS
+├── tailwind.config.js    # Configuración de estilos
+└── vite.config.js        # Configuración de Vite
+.gitignore                # Gitignore raíz del repositorio
+README.md                 # Documentación general del proyecto
+requirements.txt          # Dependencias globales
 ```
+
+## 🔑 Credenciales de Uso
+ 
+### Credenciales de Admin
+- **Email:** 
+- **Password:** ``
+### Métodos de Pago – Stripe
+ 
+#### Email
+- Puede ser cualquiera.
+#### Tarjetas (valores de prueba)
+- **Visa (pago exitoso):** `4242 4242 4242 4242`
+- **MasterCard (pago exitoso):** `5555 5555 5555 4444`
+- **Error de CVC:** `4000 0000 0000 0101`
+- **Tarjeta declinada:** `4000 0000 0000 0002`
+> Para todas las tarjetas de prueba:
+> - Fecha: cualquier fecha futura
+> - CVC: cualquier número
+ 
+### Métodos de Pago – PayPal
+- **Email:** `sb-08h9u47490918@personal.example.com`
+- **Password:** `HjKy7H$&`
+- **Código de verificación (en caso de ser requerido):** `1111`
