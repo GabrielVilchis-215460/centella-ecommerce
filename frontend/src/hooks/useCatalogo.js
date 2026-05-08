@@ -29,8 +29,10 @@ export function useCatalogo() {
   const [orden,         setOrden]         = useState("newest")
 
   // Búsqueda
-  const [busqueda,      setBusqueda]      = useState("")
-
+  const [busqueda, setBusqueda] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get("q") || ""
+  })
   // Filtros comunes
   const [categorias, setCategorias] = useState([])
   const [categoriaActiva,  setCategoriaActiva]  = useState(null)
@@ -127,7 +129,8 @@ export function useCatalogo() {
     setPagina(1)
     setOrden("newest")
     setCategoriaActiva(null)
-    setBusqueda("")
+    const q = new URLSearchParams(window.location.search).get("q")
+    if (!q) setBusqueda("")
     setPrecioMin(0)
     setPrecioMax(0)
     setPrecioMinConfirmado(0)
@@ -155,6 +158,12 @@ export function useCatalogo() {
     }
     fetchCategorias()
   }, [tab])
+
+  // Sincronizar busqueda si la URL cambia
+  useEffect(() => {
+    const q = searchParams.get("q") || ""
+    if (q) setBusqueda(q)
+  }, [searchParams]) 
 
   const buscarPrecio = () => {
     setPrecioMinConfirmado(precioMin)
