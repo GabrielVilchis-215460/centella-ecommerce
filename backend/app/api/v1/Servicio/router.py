@@ -9,7 +9,7 @@ from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/servicios", tags=["Servicios"])
 
-@router.get("/", response_model=list[ServicioRead])
+@router.get("/", response_model=list[ServicioRead], summary="Listar servicios de la emprendedora")
 def listar(
     skip: int = 0,
     limit: int = 20,
@@ -23,11 +23,11 @@ def listar(
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
     return service.get_by_emprendedora(db, emp.id_emprendedora, skip, limit)
 
-@router.get("/{id_servicio}", response_model=ServicioRead)
+@router.get("/{id_servicio}", response_model=ServicioRead, summary="Obtener servicio por ID")
 def obtener(id_servicio: int, db: Session = Depends(get_db)):
     return service.get_by_id(db, id_servicio)
 
-@router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ServicioRead, status_code=status.HTTP_201_CREATED, summary="Crear servicio")
 def crear(
     data: ServicioCreate,
     db: Session = Depends(get_db),
@@ -40,14 +40,14 @@ def crear(
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
     return service.create(db, data, emp.id_emprendedora)
 
-@router.put("/{id_servicio}", response_model=ServicioRead, dependencies=[Depends(require_emprendedora_or_admin)]) 
+@router.put("/{id_servicio}", response_model=ServicioRead, dependencies=[Depends(require_emprendedora_or_admin)], summary="Actualizar servicio") 
 def actualizar(id_servicio: int, data: ServicioUpdate, db: Session = Depends(get_db)):
     return service.update(db, id_servicio, data)
 
-@router.delete("/{id_servicio}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)])
+@router.delete("/{id_servicio}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_emprendedora_or_admin)], summary="Eliminar servicio")
 def eliminar(id_servicio: int, db: Session = Depends(get_db)):
     service.delete(db, id_servicio)
 
-@router.get("/{id_servicio}/detalle")
+@router.get("/{id_servicio}/detalle", summary="Obtener detalle completo del servicio")
 def detalle_servicio(id_servicio: int, db: Session = Depends(get_db)):
     return service.get_detalle_completo(db, id_servicio)

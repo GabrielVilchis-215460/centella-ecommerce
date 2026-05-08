@@ -23,7 +23,7 @@ from app.api.v1.Imagenes.service import ImageUploadService
 
 router = APIRouter(prefix="/paginas", tags=["Paginas"])
 
-@router.get("/{id_emprendedora}")#, response_model=PaginaPublica)
+@router.get("/{id_emprendedora}", summary="Obtener pagina de negocio de la emprendedora")#, response_model=PaginaPublica)
 def get_public_page(
     id_emprendedora: int,
     skip: int = 0,
@@ -42,7 +42,7 @@ def get_public_page(
 
     return result
 
-@router.post("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)])
+@router.post("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)], summary="Crear pagina de negocio de emprendedora")
 def create(
     data: PaginaCreate,
     db: Session = Depends(get_db),
@@ -59,7 +59,7 @@ def create(
         raise HTTPException(403, str(e))
 
 
-@router.patch("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)])
+@router.patch("/", response_model=PaginaRead, dependencies=[Depends(require_emprendedora)], summary="Actualizar pagina de negocio de emprendedora")
 def update(
     data: PaginaUpdate,
     db: Session = Depends(get_db),
@@ -80,7 +80,7 @@ def update(
 def get_image_service(db: Session = Depends(get_db)) -> ImageUploadService:
     return ImageUploadService(db)
 
-@router.post("/logo", response_model=dict, dependencies=[Depends(require_emprendedora)])
+@router.post("/logo", response_model=dict, dependencies=[Depends(require_emprendedora)], summary="Subir logo de negocio")
 async def upload_logo(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),

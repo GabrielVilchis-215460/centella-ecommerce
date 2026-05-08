@@ -13,7 +13,7 @@
 
 ## 🏛️ Arquitectura de Software
 
-<img width="1412" height="1412" alt="image" src="https://github.com/user-attachments/assets/a46375c6-9552-440d-bc4e-317a409dbf4a" />
+<img width="1391" height="421" alt="Untitled Diagram" src="https://github.com/user-attachments/assets/e48cf388-5890-41c9-bd04-d2004207ba0d" />
 
 ## ⚙️ Tecnologías Utilizadas
 
@@ -27,7 +27,30 @@
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
 </p>
 
-## Ramas Clave
+## 🌿 Ramas Clave
+ 
+El proyecto utiliza una estrategia de ramas basada en **Jira** para la gestión de tareas y sprints.
+ 
+| Rama | Descripción |
+| ---- | ----------- |
+| `main` | Rama de **producción**. Contiene el código estable y listo para despliegue. |
+| `SCRUM-#<número>-<descripción>` | Ramas de **features**, creadas automáticamente desde Jira al iniciar una tarea del backlog. Cada número corresponde al ID de la tarea en el tablero SCRUM. |
+ 
+### Ejemplos de ramas de features
+ 
+| Rama | Vista / Funcionalidad |
+| ---- | --------------------- |
+| `SCRUM-115-Vista-Panel-de-administración` | Panel de administración |
+| `SCRUM-117-Vista-Codigo-de-verificaci...` | Código de verificación |
+| `SCRUM-119-Vista-Ajustes-de-cuenta` | Ajustes de cuenta |
+| `SCRUM-120-Vista-Resumen-de-compra` | Resumen de compra |
+| `SCRUM-123-Vista-Carrito-de-compras` | Carrito de compras |
+| `SCRUM-125-Vista-CRUD-servicios` | CRUD de servicios |
+| `SCRUM-128-Vista-Gestion-de-emprend...` | Gestión de emprendimientos |
+| `SCRUM-129-Vista-Gestion-de-insignias` | Gestión de insignias |
+| `SCRUM-130-Vista-Moderacion-de-plat...` | Moderación de plataforma |
+ 
+> Cada rama de feature se fusiona a `main` una vez que la tarea ha sido revisada y aprobada.
 
 ## 🛠️ Instrucciones de Uso
 ### 🔧 Backend (FastAPI)

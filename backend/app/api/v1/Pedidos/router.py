@@ -10,7 +10,7 @@ from typing import Optional, List
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
-@router.get("/{id_pedido}/confirmacion", response_model=ConfirmacionPedidoResponse)
+@router.get("/{id_pedido}/confirmacion", response_model=ConfirmacionPedidoResponse, summary="Obtener confirmacion de pedido")
 def confirmacion_pedido(
     id_pedido: int,
     db: Session = Depends(get_db),
@@ -18,7 +18,7 @@ def confirmacion_pedido(
 ):
     return get_confirmacion_pedido(db, id_pedido)
 
-@router.post("/", response_model=PedidoRead)
+@router.post("/", response_model=PedidoRead, summary="Crear pedido")
 def create(
     data: PedidoCreate,
     db: Session = Depends(get_db),
@@ -30,7 +30,7 @@ def create(
         raise HTTPException(403, str(e))
 
 
-@router.get("/", response_model=List[PedidoRead])
+@router.get("/", response_model=List[PedidoRead], summary="Listar todos los pedidos")
 def list_pedidos(
     skip: int = 0,
     limit: int = 20,
@@ -48,7 +48,7 @@ def list_pedidos(
         ordenar_por,
     )
 
-@router.get("/{pedido_id}")
+@router.get("/{pedido_id}", summary="Obtener un pedido por ID")
 def get_one(
     pedido_id: int,
     db: Session = Depends(get_db),
@@ -60,7 +60,7 @@ def get_one(
     return pedido
 
 
-@router.delete("/{pedido_id}")
+@router.delete("/{pedido_id}", summary="Eliminar pedido")
 def delete(
     pedido_id: int,
     db: Session = Depends(get_db),
@@ -72,7 +72,7 @@ def delete(
     return {"message": "Pedido eliminado"}
 
 
-@router.patch("/{pedido_id}")#, response_model=PedidoRead)
+@router.patch("/{pedido_id}", summary="Actualizar pedido")#, response_model=PedidoRead)
 def update(
     pedido_id: int,
     data: PedidoUpdate,

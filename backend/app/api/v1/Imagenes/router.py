@@ -23,17 +23,17 @@ def get_service(db: Session = Depends(get_db)) -> ImageUploadService:
 @router.post("/upload", response_model=ImageResponse#,  dependencies=[
         #Depends(require_cliente),
         #Depends(require_emprendedora)]
-        )
+        , summary="Subir una imagen")
 async def upload_image(
     file: UploadFile = File(...),
     entity_id: int = Form(...),
     entity_type: str = Form(..., description="Type: 'producto', 'perfil', 'emprendedora', etc"),
     service: ImageUploadService = Depends(get_service)
 ):
-    """Upload image for any entity"""
+    """Sube una nueva imagen y la asocia a una entidad específica en el sistema (producto, perfil, etc.)."""
     return service.upload_image(file, entity_id, entity_type)
  
-@router.get("/presigned-download/{id_imagen}")
+@router.get("/presigned-download/{id_imagen}", summary="Obtener URL de descarga temporal")
 async def get_presigned_download_url(
     id_imagen: int,
     expires_in: int = Query(ONE_WEEK, description="URL expiration in seconds (default: 1 year)"),
@@ -42,7 +42,7 @@ async def get_presigned_download_url(
     """Get temporary presigned URL for downloading an image"""
     return service.get_presigned_download_url(id_imagen, expires_in)
  
-@router.get("/{entity_type}/{entity_id}", response_model=ImagesListResponse)
+@router.get("/{entity_type}/{entity_id}", response_model=ImagesListResponse, summary="Listar imágenes de una entidad")
 async def get_images(
     entity_id: int,
     entity_type: str,
@@ -51,7 +51,7 @@ async def get_images(
     """Get all images for any entity"""
     return service.get_entity_images(entity_id, entity_type)
  
-@router.delete("/image/{id_imagen}")
+@router.delete("/image/{id_imagen}", summary="Eliminar una imagen")
 async def delete_image(
     id_imagen: int,
     service: ImageUploadService = Depends(get_service)
@@ -59,7 +59,7 @@ async def delete_image(
     """Delete one image"""
     return service.delete_image(id_imagen)
 
-@router.put("/reordenar", status_code=status.HTTP_200_OK)
+@router.put("/reordenar", status_code=status.HTTP_200_OK, summary="Actualizar orden de imágenes")
 def actualizar_orden_imagenes(
     data: ReordenarRequest, 
     db: Session = Depends(get_db)

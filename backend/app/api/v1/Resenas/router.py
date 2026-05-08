@@ -15,7 +15,7 @@ from app.core.deps import require_cliente
 router = APIRouter(prefix="/resenas", tags=["Reseñas"])
 
 
-@router.post("/create", dependencies=[Depends(require_cliente)])
+@router.post("/create", dependencies=[Depends(require_cliente)], summary="Crear reseña")
 def create_resena(
     data: ResenaCreate,
     db: Session = Depends(get_db)
@@ -38,7 +38,7 @@ def create_resena(
     return result
 
 
-@router.get("/resena/{id_resena}")
+@router.get("/resena/{id_resena}", summary="Obtener reseña")
 def get_resena(
     id_resena: int,
     db: Session = Depends(get_db)
@@ -52,7 +52,7 @@ def get_resena(
     return result
 
 
-@router.get("/referencia/{id_referencia}/{tipo_resena}")
+@router.get("/referencia/{id_referencia}/{tipo_resena}", summary="Obtener reseñas por ID de referencia")
 def get_resenas_by_referencia(
     id_referencia: int,
     tipo_resena: TipoResenaEnum,
@@ -62,7 +62,7 @@ def get_resenas_by_referencia(
     return service.get_resenas_by_referencia(db, id_referencia, tipo_resena)
 
 
-@router.get("/vendedora/{id_emprendedora}")
+@router.get("/vendedora/{id_emprendedora}", summary="Obtener reseñas por emprendedora")
 def get_resenas_by_vendedora(
     id_emprendedora: int,
     db: Session = Depends(get_db)
@@ -71,7 +71,7 @@ def get_resenas_by_vendedora(
     return service.get_resenas_by_vendedora(db, id_emprendedora)
 
 
-@router.put("/resena/{id_resena}")
+@router.put("/resena/{id_resena}", summary="Actualizar reseña")
 def update_resena(
     id_resena: int,
     data: ResenaUpdate,
@@ -94,7 +94,7 @@ def update_resena(
     return result
 
 
-@router.delete("/resena/{id_resena}")
+@router.delete("/resena/{id_resena}", summary="Eliminar reseña")
 def delete_resena(
     id_resena: int,
     id_cliente: int,
@@ -109,7 +109,7 @@ def delete_resena(
     return result
 
 
-@router.get("/promedio/{id_referencia}/{tipo_resena}")
+@router.get("/promedio/{id_referencia}/{tipo_resena}", summary="Obtener calificaciones promedio")
 def get_average_ratings(
     id_referencia: int,
     tipo_resena: TipoResenaEnum,
