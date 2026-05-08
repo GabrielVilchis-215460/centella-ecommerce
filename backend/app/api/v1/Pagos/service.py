@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import select
 from fastapi import HTTPException
 from app.models.pedido import Pedido
 from app.models.enum import MetodoPagoEnum, EstadoPedidoEnum, TipoEntregaItemEnum
@@ -7,6 +8,8 @@ from app.services.stripe_service import stripe_service
 from app.services.paypal_service import paypal_service
 from app.config import settings
 from app.api.v1.Envios.service import service_asignar_envio
+from app.models.carrito import Carrito
+from app.models.item_carrito import ItemCarrito
 
 class PaymentService:
 
@@ -22,6 +25,18 @@ class PaymentService:
                     status_code=400,
                     detail=f"El pedido {pedido.id_pedido} ya fue procesado."
                 )
+            
+            # Validacion para pagos en efectivo en modalidad de shipping
+            if pedido.metodo_pago == MetodoPagoEnum.efectivo:
+                tiene_envio = any(
+                    item.tipo_entrega == TipoEntregaItemEnum.envio
+                    for item in pedido.items
+                )
+                if tiene_envio:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"El pedido incluye envio a domicilio. El pago en efectivo solo aplica para entregas fisicas."
+                    )
 
             match pedido.metodo_pago:
                 case MetodoPagoEnum.stripe:
@@ -105,8 +120,7 @@ class PaymentService:
         """PayPal regresa con ?token=ORDER_ID en la URL"""
         capture = await paypal_service.capture_order(token)
 
-        #capture = await paypal_service.capture_order(token)
-        print(f"📦 PayPal capture status: {capture.get('status')}")
+        print(f"PayPal capture status: {capture.get('status')}")
         if capture.get("status") == "COMPLETED":
             pedido = self.get_pedido(db, id_pedido)
             pedido.estado = EstadoPedidoEnum.confirmado
@@ -142,29 +156,34 @@ class PaymentService:
             item.tipo_entrega == TipoEntregaItemEnum.envio
             for item in pedido.items
         )
+
         tiene_fisica = any(
         item.tipo_entrega == TipoEntregaItemEnum.fisica
         for item in pedido.items
         )
+        
+        try:
+            carrito = db.query(Carrito).filter(Carrito.id_cliente == pedido.id_cliente).first()
+            
+            if carrito:
+                db.query(ItemCarrito).filter(ItemCarrito.id_carrito == carrito.id_carrito).delete()
+                db.commit()
+                print(f"Carrito vaciado para el cliente {pedido.id_cliente}")
+        except Exception as e:
+            print(f"Error al intentar vaciar el carrito {e}")
+
         if tiene_envio:
             try:
                 await service_asignar_envio(pedido.id_pedido, db)
             except Exception as e:
-                print(f"⚠️ Error al asignar envío para pedido {pedido.id_pedido}: {e}")
+                print(f"Error al asignar envío para pedido {pedido.id_pedido}: {e}")
 
-        
         if tiene_fisica:
             try:
                 from app.api.v1.Envios.service import _generar_qr_base64
                 from app.services.email_service import enviar_correo_pedido
-                ###
                 from app.services.archivos_service import CloudflareR2Client
                 import base64
-                ##
-
-                #qr_base64 = _generar_qr_base64(pedido.id_pedido)
-                #pedido.codigo_qr_url = qr_base64
-                #db.commit()
                 # Generar QR
                 qr_base64 = _generar_qr_base64(pedido.id_pedido)
                 img_bytes = base64.b64decode(qr_base64)
@@ -186,11 +205,18 @@ class PaymentService:
                     qr_base64=qr_base64,
                 )
             except Exception as e:
-                print(f"⚠️ Error al generar QR o mandar correo: {e}")
+                print(f"Error al generar QR o mandar correo: {e}")
     
     # Funciones auxiliares
     def get_pedidos(self, db: Session, ids: list[int]):
-        pedidos = db.query(Pedido).filter(Pedido.id_pedido.in_(ids)).all()
+        #pedidos = db.query(Pedido).filter(Pedido.id_pedido.in_(ids)).all()
+
+        pedidos = db.execute(
+            select(Pedido)
+            .options(selectinload(Pedido.items))
+            .where(Pedido.id_pedido.in_(ids))
+        ).scalars().all()
+
         if len(pedidos) != len(ids):
             raise HTTPException(status_code=404, detail="Uno o mas pedidos no encontrados")
         return pedidos

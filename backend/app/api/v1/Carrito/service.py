@@ -320,8 +320,7 @@ async def convertir_a_pedido(
 
         pedidos_creados.append(nuevo_pedido)
 
-    # --- Vaciar carrito y confirmar toda la transacción ---
-    vaciar_carrito(db, carrito.id_carrito)
+    #vaciar_carrito(db, carrito.id_carrito)
     db.commit()
 
     for pedido in pedidos_creados:

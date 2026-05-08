@@ -37,7 +37,7 @@ def get_confirmacion_pedido(db: Session, id_pedido: int) -> dict:
     # Track URL desde envia.com — construida desde el numero de rastreo
     track_url = None
     if pedido.numero_rastreo:
-        track_url = f"https://test.envia.com/rastreo?label={pedido.numero_rastreo}&cntry_code=mx"
+        track_url = f"https://dev.envia.com/es-MX/rastreo?label={pedido.numero_rastreo}&cntry_code=mx"
 
     return {
         "id_pedido": pedido.id_pedido,
@@ -46,7 +46,20 @@ def get_confirmacion_pedido(db: Session, id_pedido: int) -> dict:
         "subtotal": pedido.subtotal,
         "costo_envio": pedido.costo_envio,
         "total": pedido.total,
-        "items": pedido.items,
+        #"items": pedido.items,
+        "items": [
+            {
+                "id_item": item.id_item_pedido,
+                "id_producto": item.id_producto,
+                "nombre_producto": item.nombre_producto,
+                "cantidad": item.cantidad,
+                "precio_unitario": float(item.precio_unitario),
+                "subtotal": float(item.precio_unitario * item.cantidad),
+                "tipo_entrega": item.tipo_entrega,
+                "imagen_url": item.imagen_url,
+            }
+            for item in pedido.items
+        ],
 
         # Envío
         "tiene_envio": tiene_envio,

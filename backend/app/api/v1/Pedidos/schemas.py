@@ -10,6 +10,7 @@ class ItemPedidoConfirmacion(BaseModel):
     cantidad: int
     precio_unitario: Decimal
     tipo_entrega: TipoEntregaItemEnum
+    imagen_url: Optional[str] = None
 
     class Config:
         from_attributes = True
