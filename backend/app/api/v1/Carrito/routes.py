@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db 
-from app.api.v1.Carrito.service import convertir_a_pedido, get_carrito_by_usuario, agregar_item_al_carrito, eliminar_item, calcular_totales
+from app.api.v1.Carrito.service import convertir_a_pedido, get_carrito_by_usuario, agregar_item_al_carrito, eliminar_item, calcular_totales, get_producto, validar_stock
 from app.api.v1.Carrito.schemas import Carrito, ItemCarrito, ItemCarritoCreate, ItemCarritoUpdate, TotalesCarrito, CheckoutRequest, CheckoutResponse, PedidoResumen
 from app.core.deps import get_current_user, require_cliente
 from app.models.usuario import Usuario
@@ -46,6 +46,11 @@ def actualizar_item(
     ).first()
     if not db_item:
         raise HTTPException(status_code=404, detail="Item no encontrado.")
+
+    # Validar si el stock si se esta intentando actualizar la cantidad
+    if datos.cantidad is not None:
+        producto = get_producto(db, db_item.id_producto)
+        validar_stock(producto, datos.cantidad)
 
     update_data = datos.model_dump(exclude_unset=True)
     for campo, valor in update_data.items():

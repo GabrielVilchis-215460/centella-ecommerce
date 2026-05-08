@@ -90,6 +90,13 @@ def agregar_item_al_carrito(db: Session, id_carrito: int, item: schemas.ItemCarr
         ItemCarrito.id_producto == item.id_producto
     ).first()
 
+    # Para verificar el stock del producto al momento de añadir al carrito
+    nueva_cantidad = item.cantidad
+    if db_item:
+        nueva_cantidad += db_item.cantidad
+
+    validar_stock(producto, nueva_cantidad)
+
     if db_item:
         db_item.cantidad += item.cantidad
         if item.tipo_entrega_seleccionado is not None:
