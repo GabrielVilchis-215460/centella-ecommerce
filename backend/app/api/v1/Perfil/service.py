@@ -372,8 +372,9 @@ def subir_logo_emprendedora(file: UploadFile, current_user: Usuario, db: Session
 
 def get_etiquetas_negocio(id_emprendedora: int, db: Session):
     emp = db.query(Emprendedora).filter(
-        Emprendedora.id_usuario == id_emprendedora
+        Emprendedora.id_emprendedora == id_emprendedora
     ).first()
+    
     if not emp:
         raise HTTPException(status_code=404, detail="Perfil de emprendedora no encontrado")
     

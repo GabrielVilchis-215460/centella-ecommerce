@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func, union_all, literal
+from sqlalchemy import select, func, union_all, literal, desc
 from app.models.producto import Producto
 from app.models.servicio import Servicio
 from app.models.emprendedora import Emprendedora
@@ -10,7 +10,8 @@ from app.models.enum import TipoResenaEnum, TipoEntregaEnum, EstadoVerificacionE
 from app.models.imagen import Imagen
 from .schemas import ProductoCatalogoRead, ServicioCatalogoRead, EmprendedoraCatalogoRead
 from typing import Optional
-
+from app.models.producto import Producto
+from app.models.servicio import Servicio
 
 def get_productos(
     db: Session,
@@ -275,8 +276,6 @@ def get_emprendedoras(
 
 def _get_etiquetas(db: Session, id_emprendedora: int) -> list[str]:
     """Calcula las etiquetas de tipo_negocio + categorías top para una emprendedora."""
-    from app.models.producto import Producto
-    from app.models.servicio import Servicio
 
     p_cats = select(
         Producto.id_categoria,
@@ -294,6 +293,7 @@ def _get_etiquetas(db: Session, id_emprendedora: int) -> list[str]:
         select(Categoria.nombre, union_query.c.origen)
         .join(Categoria, Categoria.id_categoria == union_query.c.id_categoria)
         .group_by(Categoria.id_categoria, Categoria.nombre, union_query.c.origen)
+        .order_by(desc(func.count(union_query.c.id_categoria)))
         .limit(3)
     ).all()
 
