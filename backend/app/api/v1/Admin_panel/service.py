@@ -300,9 +300,28 @@ def suspender_emprendedora_service(db: Session, id: int):
     if usuario:
         usuario.activo = False
 
+    db.query(Producto).filter(Producto.id_emprendedora == id).update({"activo": False})
+    db.query(Servicio).filter(Servicio.id_emprendedora == id).update({"activo": False})
+
     db.commit()
     return True
 
+def reactivar_emprendedora_service(db: Session, id: int):
+    emp = db.get(Emprendedora, id)
+    if not emp:
+        return None
+
+    emp.estado_verificacion = EstadoVerificacionEnum.verificada
+
+    usuario = db.get(Usuario, emp.id_usuario)
+    if usuario:
+        usuario.activo = True
+
+    db.query(Producto).filter(Producto.id_emprendedora == id).update({"activo": True})
+    db.query(Servicio).filter(Servicio.id_emprendedora == id).update({"activo": True})
+
+    db.commit()
+    return True
 
 def aprobar_insignia_service(db: Session, id: int):
     emp = db.get(Emprendedora, id)

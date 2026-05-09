@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
-
+from app.models.emprendedora import Emprendedora
 from app.core.database import get_db
 from app.core.deps import require_cliente, require_emprendedora, get_current_user
 from app.models.usuario import Usuario
-
+from app.models.enum import EstadoVerificacionEnum
 from .schemas import (
     PaginaCreate,
     PaginaUpdate,
@@ -30,6 +30,14 @@ def get_public_page(
     limit: int = 20,
     db: Session = Depends(get_db),
 ):
+    emp = db.get(Emprendedora, id_emprendedora)
+
+    if not emp or emp.estado_verificacion == EstadoVerificacionEnum.suspendida:
+        raise HTTPException(
+            status_code=404, 
+            detail="Esta página no está disponible en este momento."
+        )
+    
     result = get_pagina_publica(
         db,
         id_emprendedora,

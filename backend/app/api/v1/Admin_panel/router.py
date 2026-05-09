@@ -17,6 +17,7 @@ from .service import (
     suspender_cuenta_service,
     descartar_reporte_service,
     revocar_insignia_service,
+    reactivar_emprendedora_service
 )
 
 router = APIRouter(prefix="/admin", tags=["Admin Management"], dependencies=[Depends(require_admin)])
@@ -49,6 +50,14 @@ def suspender_emprendedora(id: int, db: Session = Depends(get_db)):
     if not result:
         raise HTTPException(404, "No encontrada")
     return {"message": "Emprendedora suspendida"}
+
+@router.patch("/emprendedoras/{id}/reactivar", summary="Reactivar cuenta de emprendedora suspendida")
+def reactivar_emprendedora(id: int, db: Session = Depends(get_db)):
+    """Restaura el acceso y los privilegios de una cuenta de emprendedora que había sido suspendida."""
+    result = reactivar_emprendedora_service(db, id)
+    if not result:
+        raise HTTPException(404, "No encontrada")
+    return {"message": "Emprendedora reactivada"}
 
 @router.get("/insignias", response_model=list[InsigniaOut], summary="Listar solicitudes de insignias")
 def get_insignias(

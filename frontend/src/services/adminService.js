@@ -25,4 +25,6 @@ export const adminService = {
   suspenderCuenta: (id) =>
     api.patch(`/api/v1/admin/reportes/${id}/suspender-cuenta`),
   descartarReporte: (id) => api.patch(`/api/v1/admin/reportes/${id}/descartar`),
+  reactivarEmprendedora: (id) =>
+    api.patch(`/api/v1/admin/emprendedoras/${id}/reactivar`),
 };
