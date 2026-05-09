@@ -152,6 +152,19 @@ def get_pedidos(
             "estado": pedido.estado,
             "fecha_pedido": pedido.fecha_pedido,
             "total": float(pedido.total),
+            "items": [
+                {
+                    "id_item": item.id_item_pedido,
+                    "producto_id": item.id_producto,
+                    "nombre": item.nombre_producto,
+                    "cantidad": item.cantidad,
+                    "precio_unitario": float(item.precio_unitario),
+                    "subtotal": float(item.precio_unitario * item.cantidad),
+                    "tipo_entrega": item.tipo_entrega.value if item.tipo_entrega else None, #item.tipo_entrega,
+                    "imagen_url": item.imagen_url,
+                }
+                for item in pedido.items
+            ]
         })
 
     return result

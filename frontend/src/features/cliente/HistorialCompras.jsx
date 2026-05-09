@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import {
   IconSearch, IconFilter, IconPackage,
   IconTruck, IconMapPin,
-  IconX,
+  IconX, IconChevronDown, IconChevronUp
 } from "@tabler/icons-react"
 import { Icon } from "../../components/common/Icon"
 import { StatusBadge } from "../../components/common/StatusBadge"
@@ -28,13 +28,11 @@ const STATUS_MAP = {
   cancelado:  { texto: "Cancelado",  color: "red"    },
 }
 
-// Ícono y label según tipo de entrega del backend
 const ENTREGA_MAP = {
   envio:   { icon: IconTruck,       label: "Envío a domicilio" },
   fisica:  { icon: IconMapPin,      label: "Recogida en punto" }
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 const formatOrderId = (idPedido, fechaPedido) => {
   const date = fechaPedido ? new Date(fechaPedido) : new Date()
   const y  = date.getFullYear()
@@ -60,6 +58,7 @@ function OrderCard({ pedido }) {
   const orderId      = formatOrderId(pedido.id_pedido, pedido.fecha_pedido)
   const badge        = STATUS_MAP[pedido.estado] ?? { texto: pedido.estado, color: "gray" }
   const entrega      = ENTREGA_MAP[pedido.tipo_entrega]
+  const [expandido, setExpandido] = useState(false)
 
   // URL de rastreo de Envia.com
   const trackUrl = pedido.numero_rastreo
@@ -69,11 +68,11 @@ function OrderCard({ pedido }) {
   return (
     <article
       //onClick={() => navigate(`/pedidos/${pedido.id_pedido}`)}
+      onClick={() => setExpandido(!expandido)}
       className="bg-bg-light border border-bg-dark/10 rounded-xl p-4
                  transition-all duration-fast hover:border-bg-dark/25 hover:shadow-sm
-                 active:scale-[0.995]"
+                 active:scale-[0.995] cursor-pointer"
     >
-      {/* Cabecera: ID + estado + chevron */}
       <div className="flex items-start justify-between gap-3 mb-1">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-semibold text-text-dark font-body">
@@ -88,7 +87,7 @@ function OrderCard({ pedido }) {
               {formatCurrency(pedido.total)}
             </p>
           </div>
-          {/*<Icon icon={IconChevronRight} size={18} className="text-text-light" />*/}
+          <Icon icon={expandido ? IconChevronUp : IconChevronDown} size={18} className="text-text-light" />
         </div>
       </div>
 
@@ -106,6 +105,34 @@ function OrderCard({ pedido }) {
           </span>
         )}
       </div>
+      {/* Tarjeta de productos */}
+      {expandido && pedido.items && pedido.items.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-bg-dark/10 flex flex-col gap-3">
+          {pedido.items.map((item) => (
+            <div key={item.id_item} className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-md bg-bg-dark/10 overflow-hidden shrink-0">
+                {item.imagen_url ? (
+                  <img src={item.imagen_url} alt={item.nombre} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-text-light">Sin img</div>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="font-body text-sm font-medium text-text-dark">{item.nombre}</p>
+                <p className="font-body text-xs text-text-light">Cantidad: {item.cantidad}</p>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-bg-dark/5 text-text-light border border-bg-dark/10 uppercase font-bold">
+                  {item.tipo_entrega === 'envio' ? 'Envío' : 'Física'}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="font-body text-sm font-medium text-text-dark">
+                  {formatCurrency(item.subtotal)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Rastreo como link — solo si tiene número y es envío */}
       {trackUrl && (
         <div className="mt-3 pt-3 border-t border-bg-dark/10">

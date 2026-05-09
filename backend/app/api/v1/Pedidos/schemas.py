@@ -72,6 +72,7 @@ class ItemPedidoRead(BaseModel):
     precio_unitario: float
     subtotal: float
     imagen_url: Optional[str] = None
+    tipo_entrega: Optional[str] = None
     
 class ClienteRead(BaseModel):
     id: int
