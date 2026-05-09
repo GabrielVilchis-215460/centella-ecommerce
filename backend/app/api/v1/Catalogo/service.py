@@ -214,6 +214,10 @@ def get_emprendedoras(
         .outerjoin(calificacion_sq, calificacion_sq.c.id_emprendedora == Emprendedora.id_emprendedora)
     )
 
+    query = query.where(
+    Emprendedora.estado_verificacion != EstadoVerificacionEnum.suspendida
+    )
+    
     if nombre:
         query = query.where(
             Usuario.nombre.ilike(f"%{nombre}%") |

@@ -136,7 +136,7 @@ function EncabezadoEmprendedora({ idEmprendedora, logoUrl, nombreNegocio, etique
 
 // ─── Carrusel productos ───────────────────────────────────────────────────────
 
-function CarruselProductos({ productos, cargando }) {
+function CarruselProductos({ productos, cargando, navigate }) {
   const ref = useRef(null)
   const scroll = (dir) => {
     if (ref.current) ref.current.scrollBy({ left: dir * 220, behavior: "smooth" })
@@ -169,7 +169,7 @@ function CarruselProductos({ productos, cargando }) {
               precio={Number(p.precio)}
               calificacion={Number(p.calificacion_promedio ?? 0)}
               imagen={p.imagen_url || (p.imagenes && p.imagenes.length > 0 ? p.imagenes[0].url : null)}
-              onAgregar={() => {}}
+              onClick={() => navigate(`/catalogo/producto/${p.id_producto}`)}
             />
           </div>
         ))}
@@ -185,7 +185,7 @@ function CarruselProductos({ productos, cargando }) {
   )
 }
 
-function CarruselServicios({ servicios, cargando, colorNegocio }) {
+function CarruselServicios({ servicios, cargando, colorNegocio, navigate }) {
   const ref = useRef(null)
   const scroll = (dir) => {
     if (ref.current) ref.current.scrollBy({ left: dir * 220, behavior: "smooth" })
@@ -220,7 +220,7 @@ function CarruselServicios({ servicios, cargando, colorNegocio }) {
               calificacion={Number(s.calificacion_promedio ?? 0)}
               categoria={s.nombre_categoria}
               color={colorNegocio}
-              onClick={() => {}}
+              onClick={() => navigate(`/catalogo/servicio/${s.id_servicio}`)}
             />
           </div>
         ))}
@@ -244,7 +244,8 @@ export function DetalleEmprendedora() {
     nombreNegocio, logoUrl, insignia, verificada,
     etiquetas, rating, htmlContenido, productos, servicios
   } = usePaginaEmprendimiento()
-
+  const navigate = useNavigate()
+  
   if (error) {
     return (
       <>
@@ -291,7 +292,7 @@ export function DetalleEmprendedora() {
           <div className="space-y-3">
             <h2 className="font-heading text-md font-semibold text-text-dark px-6">Productos</h2>
             <hr className="border-bg-dark mx-6" />
-            <CarruselProductos productos={productos} cargando={cargando} />
+            <CarruselProductos productos={productos} cargando={cargando} navigate={navigate} />
           </div>
         )}
 
@@ -300,7 +301,7 @@ export function DetalleEmprendedora() {
           <div className="space-y-3">
             <h2 className="font-heading text-md font-semibold text-text-dark px-6">Servicios</h2>
             <hr className="border-bg-dark mx-6" />
-            <CarruselServicios servicios={servicios} cargando={cargando} />
+            <CarruselServicios servicios={servicios} cargando={cargando} navigate={navigate}/>
           </div>
         )}
       </main>
