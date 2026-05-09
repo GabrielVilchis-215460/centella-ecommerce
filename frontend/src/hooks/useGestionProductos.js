@@ -81,17 +81,18 @@ export function useGestionProductos() {
     return await emprendedoraService.getAtributosProducto(idProducto)
     }
 
-   async function crearAtributo(idProducto, tipo, valor) {
-    return await emprendedoraService.crearAtributo(idProducto, tipo, valor)
-    }
+   async function crearAtributo(idProducto, tipo, valor, atributo_activo) {
+    return await emprendedoraService.crearAtributo(idProducto, tipo, valor, atributo_activo)
+   }
 
     async function eliminarAtributo(idProducto, idAtributo) {
-    return await emprendedoraService.eliminarAtributo(idProducto, idAtributo)
+      return await emprendedoraService.eliminarAtributo(idProducto, idAtributo)
     }
 
-    async function editarAtributo(idProducto, idAtributo, tipo, valor) {
-      return await emprendedoraService.editarAtributo(idProducto, idAtributo, tipo, valor)
-    }
+    async function editarAtributo(idProducto, idAtributo, tipo, valor, atributo_activo) {
+      return await emprendedoraService.editarAtributo(idProducto, idAtributo, tipo, valor, atributo_activo)
+   }
+   
    async function eliminarImagen(idImagen) {
       try {
         console.log("Intentando borrar imagen con ID: ",idImagen);

@@ -40,8 +40,6 @@ const FILTER_GRUPOS = [
   },
 ]
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function fmtFecha(iso) {
   if (!iso) return "—"
   const d = new Date(iso)
@@ -55,13 +53,9 @@ function fmtPrecio(valor) {
   return `$${Number(valor).toFixed(2)}`
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
-
 function Skeleton({ className = "" }) {
   return <div className={`animate-pulse rounded-md bg-bg-dark ${className}`} />
 }
-
-// ─── Columnas DataTable ───────────────────────────────────────────────────────
 
 const COLUMNAS = [
   {
@@ -135,8 +129,6 @@ const COLUMNAS = [
   },
 ]
 
-// ─── Componente principal ─────────────────────────────────────────────────────
-
 export function GestionProductos() {
   const { usuario, cargando: cargandoAuth } = useAuth()
   const {
@@ -190,7 +182,7 @@ export function GestionProductos() {
         paquete:    fila.tipo_entrega === "envio" || fila.tipo_entrega === "ambas",
         puntoMedio: fila.tipo_entrega === "fisica" || fila.tipo_entrega === "ambas",
         imagenes:   imgs.map((img) => ({ url: img.url, id_imagen: img.id_imagen, filename: img.filename })),
-        atributos:  atrs.map((a) => ({ id_atributo: a.id_atributo, tipo: a.tipo, valor: a.valor })),
+        atributos:  atrs.map((a) => ({ id_atributo: a.id_atributo, tipo: a.tipo, valor: a.valor, atributo_activo: a.atributo_activo ?? true })),
       })
       setModalAbierto(true)
     } finally {
@@ -263,13 +255,15 @@ export function GestionProductos() {
         (a) => a.id_atributo && !datos.atributosEliminados?.includes(a.id_atributo)
       )
         for (const atr of atributosEditados) {
-          await editarAtributo(idProducto, atr.id_atributo, atr.tipo, atr.valor)
+          await editarAtributo(idProducto, atr.id_atributo, atr.tipo, atr.valor, atr.atributo_activo)
       }
+
       console.log(">>> atributos detalle:", datos.atributos)
+
       // Atributos nuevos (no tienen id_atributo)
       const atributosNuevos = (datos.atributos ?? []).filter((a) => !a.id_atributo)
         for (const atr of atributosNuevos) {
-          await crearAtributo(idProducto, atr.tipo, atr.valor)
+          await crearAtributo(idProducto, atr.tipo, atr.valor, atr.atributo_activo)
       }
 
       const ordenImagenes = datos.imagenes

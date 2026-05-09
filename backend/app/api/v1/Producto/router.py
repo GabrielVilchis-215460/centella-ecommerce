@@ -149,7 +149,7 @@ def obtener_atributos(id_producto: int, db: Session = Depends(get_db)):
     """Devuelve la lista de atributos activos (ej. talla, color, material) asociados a un producto."""
     return db.query(AtributoProducto).filter(
         AtributoProducto.id_producto == id_producto,
-        AtributoProducto.atributo_activo == True
+       # AtributoProducto.atributo_activo == True
     ).all()
 
 @router.post("/{id_producto}/atributos", status_code=201, dependencies=[Depends(require_emprendedora)], summary="Agregar atributo al producto")
@@ -157,6 +157,7 @@ def crear_atributo(
     id_producto: int,
     tipo: TipoAtributoEnum,
     valor: str,
+    atributo_activo: bool = True,
     db: Session = Depends(get_db),
 ):
     """Agrega un nuevo atributo (ej. color 'Rojo') a un producto existente."""
@@ -184,18 +185,22 @@ def editar_atributo(
     id_atributo: int,
     tipo: TipoAtributoEnum,
     valor: str,
+    atributo_activo: bool,
     db: Session = Depends(get_db),
 ):
     """Actualiza el tipo o el valor de un atributo específico perteneciente a un producto."""
     atributo = db.query(AtributoProducto).filter(
         AtributoProducto.id_atributo == id_atributo,
         AtributoProducto.id_producto == id_producto,
-        AtributoProducto.atributo_activo == True
+        #AtributoProducto.atributo_activo == True
     ).first()
     if not atributo:
         raise HTTPException(status_code=404, detail="Atributo no encontrado")
+    
     atributo.tipo = tipo
     atributo.valor = valor
+    atributo.atributo_activo = atributo_activo
+
     db.commit()
     db.refresh(atributo)
     return atributo

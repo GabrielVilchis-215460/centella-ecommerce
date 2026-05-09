@@ -53,19 +53,15 @@ export function ProductoModal({ onClose, onGuardar, producto = null, categorias 
   }
 
   // atributos
-  const handleGuardarAtributo = (data) => {
-    const atributoFormateado = {
-      id_atributo: data.id_atributo,
-      tipo: data.tipo,
-      valor: data.valor
-    }
-
+  const handleGuardarAtributo = (datosArray) => {
     if (atributoModal === "nuevo") {
-      setAtributos((prev) => [...prev, atributoFormateado])
+      setAtributos((prev) => [...prev, ...datosArray])
     } else {
-      setAtributos((prev) =>
-        prev.map((a, i) => i === atributoModal.index ? atributoFormateado : a)
-      )
+      setAtributos((prev) => {
+        const nuevosAtributos = [...prev]
+        nuevosAtributos.splice(atributoModal.index, 1, ...datosArray)
+        return nuevosAtributos
+      })
     }
     setAtributoModal(null)
   }
@@ -249,13 +245,30 @@ export function ProductoModal({ onClose, onGuardar, producto = null, categorias 
               {/* Lista de atributos */}
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {atributos.map((atr, i) => (
-                  <div key={i} className="flex items-start justify-between border border-text-light rounded-md px-3 py-2">
-                    <div className="flex flex-col">
-                      {/* Cambiamos 'atr.nombre' por 'atr.tipo' y quitamos el .join() usando 'atr.valor' */}
+                  <div 
+                    key={i} 
+                    className={`flex items-center justify-between border rounded-md px-3 py-2 transition-colors ${
+                      atr.atributo_activo === false ? "bg-bg-dark/50 border-text-light/30" : "border-text-light"
+                    }`}
+                  >
+                    <div className={`flex flex-col ${atr.atributo_activo === false ? "opacity-50" : ""}`}>
                       <span className="font-body text-sm text-text-dark font-medium">{atr.tipo}</span>
                       <span className="font-body text-xs text-text-light">{atr.valor}</span>  
                     </div>
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-1.5 mr-2">
+                        <span className="text-[10px] text-text-light font-body uppercase">
+                          {atr.atributo_activo !== false ? 'Disp.' : 'Agot.'}
+                        </span>
+                        <Switch
+                          checked={atr.atributo_activo !== false}
+                          onChange={(val) => {
+                            const nuevos = [...atributos];
+                            nuevos[i].atributo_activo = val;
+                            setAtributos(nuevos);
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={() => setAtributoModal({ index: i, data: atr })}
                         className="text-text-light hover:text-text-dark transition-colors"
