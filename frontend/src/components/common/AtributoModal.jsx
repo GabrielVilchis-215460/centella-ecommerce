@@ -4,9 +4,7 @@ import { Modal } from "./Modal"
 
 export function AtributoModal({ onClose, onGuardar, atributo = null }) {
   const [tipo, setTipo] = useState(atributo?.tipo || "")
-  const valoresIniciales = atributo?.valor
-    ? atributo.valor.split(",").map(v => v.trim())
-    : [""]
+  const valoresIniciales = atributo?.valor ? [atributo.valor] : [""]
   const [valores, setValores] = useState(valoresIniciales)
 
   const agregarValor = () => setValores((prev) => [...prev, ""])
@@ -19,11 +17,17 @@ export function AtributoModal({ onClose, onGuardar, atributo = null }) {
 
   const handleGuardar = () => {
     if (!tipo.trim()) return
-    onGuardar({ 
-      id_atributo: atributo?.id_atributo,
-      tipo: tipo, 
-      valor: valores.filter((v) => v.trim()).join(", ") 
-    })
+    
+    const atributosSeparados = valores
+      .filter((v) => v.trim())
+      .map((v) => ({
+        id_atributo: atributo?.id_atributo, 
+        tipo: tipo, 
+        valor: v.trim(),
+        atributo_activo: atributo?.atributo_activo ?? true
+      }))
+
+    onGuardar(atributosSeparados)
     onClose()
   }
   const todosLlenos = tipo.trim() && valores.every((v) => v.trim())

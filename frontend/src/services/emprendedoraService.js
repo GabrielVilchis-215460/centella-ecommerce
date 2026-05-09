@@ -117,20 +117,20 @@ export const emprendedoraService = {
     const { data } = await api.get(`/api/v1/productos/${idProducto}/atributos`)
     return data
   },
-  crearAtributo: async (idProducto, tipo, valor) => {
+  crearAtributo: async (idProducto, tipo, valor, atributo_activo = true) => {
     const { data } = await api.post(`/api/v1/productos/${idProducto}/atributos`, null, {
-      params: { tipo, valor }
+      params: { tipo, valor, atributo_activo: atributo_activo ?? true }
     })
     return data
   },
   eliminarAtributo: async (idProducto, idAtributo) => {
     await api.delete(`/api/v1/productos/${idProducto}/atributos/${idAtributo}`)
   },
-  editarAtributo: async (idProducto, idAtributo, tipo, valor) => {
+  editarAtributo: async (idProducto, idAtributo, tipo, valor, atributo_activo) => {
     const { data } = await api.put(
       `/api/v1/productos/${idProducto}/atributos/${idAtributo}`,
       null,
-      { params: { tipo, valor } }
+      { params: { tipo, valor, atributo_activo: atributo_activo ?? true } }
     )
     return data
   },
