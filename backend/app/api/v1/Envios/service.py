@@ -110,19 +110,32 @@ async def service_asignar_envio(pedido_id: int, db: Session):
     }
 
     # Elige automáticamente el carrier más barato
-    mejor_tarifa = await cotizar_mas_barato(
-        destino=destino,
-        paquete=paquete,
-        carrier="fedex",   
-    )
+    try:
+        mejor_tarifa = await cotizar_mas_barato(
+            destino=destino,
+            paquete=paquete,
+            carrier="fedex",
+        )
+    except Exception:
+        # CP no válido o envia.com no disponible
+        raise HTTPException(
+            status_code=422,
+            detail="No se pudo cotizar el envío. El código postal puede no ser válido."
+        )
 
     # Genera la etiqueta con el service del más barato
-    resultado = await envia_service.generar_etiqueta(
-        destino=destino,
-        paquete=paquete,
-        carrier=mejor_tarifa["carrier"],
-        service=mejor_tarifa["service"],
-    )
+    try:
+        resultado = await envia_service.generar_etiqueta(
+            destino=destino,
+            paquete=paquete,
+            carrier=mejor_tarifa["carrier"],
+            service=mejor_tarifa["service"],
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=422,
+            detail="No se pudo generar la etiqueta de envío."
+        )
 
     # Guardar solo numero_rastreo y costo_envio en BD
     pedido.numero_rastreo = resultado["tracking_number"]

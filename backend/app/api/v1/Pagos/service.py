@@ -176,7 +176,9 @@ class PaymentService:
             try:
                 await service_asignar_envio(pedido.id_pedido, db)
             except Exception as e:
+                db.rollback()
                 print(f"Error al asignar envío para pedido {pedido.id_pedido}: {e}")
+                pedido = db.get(Pedido, pedido.id_pedido)
 
         if tiene_fisica:
             try:

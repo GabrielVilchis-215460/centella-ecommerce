@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Modal } from "./Modal"
 import { Button } from "./Button"
 import { Checkbox } from "./Checkbox"
+import { enviosService } from "../../services/enviosService"
 
 export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) {
   const [calle,     setCalle]     = useState(direccionInicial?.calle      || "")
@@ -14,9 +15,14 @@ export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) 
   const [principal, setPrincipal] = useState(direccionInicial?.es_principal     || false)
   const [guardando,  setGuardando]  = useState(false)
   const [error,      setError]      = useState("")
+  const [cpValido, setCpValido] = useState(direccionInicial?.codigo_postal ? true : null)
+  const [verificandoCp, setVerificandoCp] = useState(false)
 
-  const valido = calle.trim() && colonia.trim() && numExt.trim() && ciudad.trim() && cp.trim()
-
+const valido =
+  calle.trim() && colonia.trim() && numExt.trim() && ciudad.trim() &&
+  cp.length === 5 && cpValido === true &&
+  telefono.length === 10
+  
   const handleGuardar = async () => {
     if (!valido) return
     try {
@@ -37,6 +43,27 @@ export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) 
       setError(err.response?.data?.detail || "Error al agregar la dirección.")
     } finally {
       setGuardando(false)
+    }
+  }
+
+  const verificarCp = async (codigo) => {
+    if (codigo.length !== 5) { setCpValido(null); return }
+    try {
+      setVerificandoCp(true)
+      await enviosService.cotizar(
+        {
+          name: "Test", phone: "0000000000",
+          street: "Test", number: "1",
+          city: "Ciudad Juárez", state: "CHH",
+          country: "MX", postalCode: codigo,
+        },
+        { content: "Test", weight: 1.5, length: 30, width: 20, height: 10, declared_value: 100 }
+      )
+      setCpValido(true)
+    } catch {
+      setCpValido(false)
+    } finally {
+      setVerificandoCp(false)
     }
   }
 
@@ -75,7 +102,7 @@ export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) 
             <input
               type="text"
               value={numExt}
-              onChange={(e) => setNumExt(e.target.value)}
+              onChange={(e) => setNumExt(e.target.value.replace(/\D/g, ""))}
               placeholder="Ej. 1234"
               className="w-full px-3 py-2 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular placeholder:text-text-light/50"
             />
@@ -85,7 +112,7 @@ export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) 
             <input
               type="text"
               value={numInt}
-              onChange={(e) => setNumInt(e.target.value)}
+              onChange={(e) => setNumInt(e.target.value.replace(/\D/g, ""))}
               placeholder="Ej. A-210"
               className="w-full px-3 py-2 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular placeholder:text-text-light/50"
             />
@@ -122,20 +149,43 @@ export function DireccionModal({ onClose, onGuardar, direccionInicial = null }) 
             <input
               type="text"
               value={cp}
-              onChange={(e) => setCp(e.target.value)}
-              placeholder="Ej. 12345"
-              className="w-full px-3 py-2 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular placeholder:text-text-light/50"
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 5)
+                setCp(val)
+                setCpValido(null)
+                if (val.length === 5) verificarCp(val)
+              }}
+              placeholder="Ej. 32000"
+              className={`w-full px-3 py-2 font-body text-sm bg-transparent border rounded-md focus:outline-none transition-colors ${
+                cpValido === false
+                  ? "border-error text-error"
+                  : cpValido === true
+                    ? "border-green-500 text-text-light"
+                    : "border-text-light text-text-light focus:border-text-regular"
+              } placeholder:text-text-light/50`}
             />
+            {verificandoCp && (
+              <span className="font-body text-xs text-text-light">Verificando código postal...</span>
+            )}
+            {cpValido === false && !verificandoCp && (
+              <span className="font-body text-xs text-error">Código postal no válido o no reconocido.</span>
+            )}
+            {cpValido === true && !verificandoCp && (
+              <span className="font-body text-xs text-green-600">Código postal válido.</span>
+            )}
           </div>
           <div className="flex flex-col gap-1">
             <label className="font-body text-sm text-text-regular">Número telefónico</label>
             <input
               type="text"
               value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              onChange={(e) => setTelefono(e.target.value.replace(/\D/g, "").slice(0, 10))}
               placeholder="Ej. 123 456 7890"
               className="w-full px-3 py-2 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md focus:outline-none focus:border-text-regular placeholder:text-text-light/50"
             />
+            {telefono.length > 0 && telefono.length < 10 && (
+              <span className="font-body text-xs text-error">El número telefónico debe tener 10 dígitos.</span>
+            )}
           </div>
         </div>
 
