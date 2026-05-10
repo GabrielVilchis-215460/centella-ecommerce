@@ -14,10 +14,32 @@ const ICONOS = {
   instagram: { icon: IconBrandInstagram,label: "Instagram"  },
 }
 
+const PATRONES_URL = {
+  whatsapp:  /^https?:\/\/(wa\.me|api\.whatsapp\.com|chat\.whatsapp\.com)/i,
+  facebook:  /^https?:\/\/(www\.)?(facebook\.com|fb\.com|fb\.me)/i,
+  instagram: /^https?:\/\/(www\.)?instagram\.com/i,
+  web:       /^https?:\/\/.+\..+/i,
+}
+
+function validarUrl(red, url) {
+  if (!url) return true
+  return PATRONES_URL[red] ? PATRONES_URL[red].test(url) : /^https?:\/\/.+/.test(url)
+}
+
 // overlay
-function EnlaceOverlay({ red, enlace, onGuardar, onQuitar, onClose }) {
-  const [url, setUrl] = useState(enlace || "")
+function EnlaceOverlay({ red, enlace, urlNegocio, onGuardar, onQuitar, onClose }) {
+  const [url, setUrl] = useState(enlace || urlNegocio || "")
+  const [error, setError] = useState("")
   const { label } = ICONOS[red]
+
+  const handleGuardar = () => {
+    if (!validarUrl(red, url)) {
+      setError(`Ingresa una URL válida${PATRONES_URL[red] ? ` de ${label}` : ""}.`)
+      return
+    }
+    onGuardar(url)
+    onClose()
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -33,30 +55,43 @@ function EnlaceOverlay({ red, enlace, onGuardar, onQuitar, onClose }) {
 
         {/* Input */}
         <div className="flex flex-col gap-1">
-            <label className="font-body text-sm text-text-regular">Enlace</label>
-            <div className="relative">
-                <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full px-4 py-3 pr-10 font-body text-sm text-text-regular bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular"
-                />
-                {url && (
-                <button
-                    onClick={() => setUrl("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-text-dark transition-colors"
-                >
-                    <IconX size={16} stroke={1.5} />
-                </button>
-                )}
-            </div>
+          <label className="font-body text-sm text-text-regular">Enlace</label>
+          <div className="relative">
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => { setUrl(e.target.value); setError("") }}
+              placeholder="https://..."
+              className={`w-full px-4 py-3 pr-10 font-body text-sm text-text-regular bg-transparent border rounded-md placeholder:text-text-light focus:outline-none transition-colors ${
+                error ? "border-error" : "border-text-light focus:border-text-regular"
+              }`}
+            />
+            {url && (
+              <button
+                onClick={() => { setUrl(""); setError("") }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-text-dark transition-colors"
+              >
+                <IconX size={16} stroke={1.5} />
+              </button>
+            )}
+          </div>
+          {error && <p className="font-body text-xs text-error">{error}</p>}
+          {!enlace && urlNegocio && !url && (
+            <p className="font-body text-xs text-text-light">
+              Tu negocio ya tiene un enlace guardado para esta red — 
+              Si deseas borrarlo o editarlo permanentemente puedes realizarlo en {""}
+              <a href="/dashboard/GestionPerfil"
+                className="text-primary hover:text-aux underline transition-colors">
+                Editar perfil de emprendimiento
+              </a>.
+            </p>
+          )}
         </div>
 
         {/* Acciones */}
         <div className="flex flex-col gap-2">
           <button
-            onClick={() => { onGuardar(url); onClose() }}
+            onClick={handleGuardar}
             disabled={!url.trim()}
             className="w-full py-2 bg-primary text-white font-body text-sm rounded-full hover:bg-aux transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
@@ -71,14 +106,13 @@ function EnlaceOverlay({ red, enlace, onGuardar, onQuitar, onClose }) {
             </button>
           )}
         </div>
-
       </div>
     </div>
   )
 }
 
 // boton
-export function SocialButton({ red, enlace, onEnlaceChange, disabled = false, variant = "default" }) {
+export function SocialButton({ red, enlace, urlNegocio, onEnlaceChange, disabled = false, variant = "default" }) {
   const [overlayAbierto, setOverlayAbierto] = useState(false)
   const { icon: IconComponent, label } = ICONOS[red]
   const tieneEnlace = !!enlace
@@ -115,6 +149,7 @@ export function SocialButton({ red, enlace, onEnlaceChange, disabled = false, va
         <EnlaceOverlay
           red={red}
           enlace={enlace}
+          urlNegocio={urlNegocio}
           onGuardar={(url) => onEnlaceChange(red, url)}
           onQuitar={() => onEnlaceChange(red, null)}
           onClose={() => setOverlayAbierto(false)}

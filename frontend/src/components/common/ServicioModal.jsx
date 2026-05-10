@@ -5,8 +5,21 @@ import { Switch } from "./Switch"
 import { NumberInput } from "./NumberInput"
 import { SocialButton } from "./SocialButton"
 
+const PATRONES_URL = {
+  whatsapp:  /^https?:\/\/(wa\.me|api\.whatsapp\.com|chat\.whatsapp\.com)/i,
+  facebook:  /^https?:\/\/(www\.)?(facebook\.com|fb\.com|fb\.me)/i,
+  instagram: /^https?:\/\/(www\.)?instagram\.com/i,
+  web:       /^https?:\/\/.+\..+/i,
+}
+
+function validarUrl(red, url) {
+  if (!url) return true
+  const patron = PATRONES_URL[red]
+  return patron ? patron.test(url) : /^https?:\/\/.+/.test(url)
+}
+
 // categorias como prop
-export function ServicioModal({ onClose, onGuardar, servicio = null, categorias = [] }) {
+export function ServicioModal({ onClose, onGuardar, servicio = null, categorias = [],  redesNegocio = {} }) {
   const modo = servicio ? "editar" : "agregar"
 
   const [nombre,      setNombre]      = useState(servicio?.nombre      || "")
@@ -25,14 +38,22 @@ export function ServicioModal({ onClose, onGuardar, servicio = null, categorias 
   const entrada = Object.entries(servicio.enlaces).find(([_, url]) => url)
   return entrada ? { red: entrada[0], url: entrada[1] } : null
 })
+
+  const [urlError, setUrlError] = useState("")
   const [otroEnlace, setOtroEnlace] = useState(servicio?.otroEnlace || "")
 
   const handleEnlaceChange = (red, url) => {
     if (!url) {
       setRedActiva(null)
-    } else {
-      setRedActiva({ red, url })
+      setUrlError("")
+      return
     }
+    if (!validarUrl(red, url)) {
+      setUrlError(`El enlace no parece ser una URL válida de ${PATRONES_URL[red] ? red : "esa red"}.`)
+      return
+    }
+    setUrlError("")
+    setRedActiva({ red, url })
   }
 
   const tieneEnlace = !!redActiva || !!otroEnlace
@@ -118,11 +139,16 @@ export function ServicioModal({ onClose, onGuardar, servicio = null, categorias 
                   key={red}
                   red={red}
                   enlace={redActiva?.red === red ? redActiva.url : null}
+                  urlNegocio={redesNegocio[red] || null}
                   onEnlaceChange={handleEnlaceChange}
                   disabled={!!otroEnlace || (redActiva && redActiva.red !== red)}
                 />
               ))}
             </div>
+
+            {urlError && (
+              <p className="font-body text-xs text-error">{urlError}</p>
+            )}
 
             {/* Otro enlace */}
             <div className="flex flex-col gap-1">
@@ -131,7 +157,15 @@ export function ServicioModal({ onClose, onGuardar, servicio = null, categorias 
                 <input
                   type="url"
                   value={otroEnlace}
-                  onChange={(e) => setOtroEnlace(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    setOtroEnlace(val)
+                    if (val && !/^https?:\/\/.+\..+/.test(val)) {
+                      setUrlError("Ingresa una URL válida (debe empezar con https://)")
+                    } else {
+                      setUrlError("")
+                    }
+                  }}
                   placeholder="https://..."
                   disabled={!!redActiva}
                   className="w-full px-3 py-2 pr-10 font-body text-sm text-text-light bg-transparent border border-text-light rounded-md placeholder:text-text-light focus:outline-none focus:border-text-regular disabled:opacity-40"

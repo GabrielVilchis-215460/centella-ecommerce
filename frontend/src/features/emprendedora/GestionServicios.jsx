@@ -99,6 +99,7 @@ export function GestionServicios() {
     servicios, total, pagina, setPagina, totalPaginas,
     categorias, cargando, error,
     crearServicio, actualizarServicio, eliminarServicio,
+    redesNegocio,
   } = useGestionServicios()
 
   const [busqueda, setBusqueda] = useState("")
@@ -273,6 +274,7 @@ export function GestionServicios() {
         <ServicioModal
           servicio={servicioModal}
           categorias={categorias}
+          redesNegocio={redesNegocio}
           onClose={() => { setModalAbierto(false); setServicioEditar(null) }}
           onGuardar={handleGuardar}
         />

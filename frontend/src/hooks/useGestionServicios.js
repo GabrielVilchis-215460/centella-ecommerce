@@ -10,6 +10,9 @@ export function useGestionServicios() {
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
+  const [redesNegocio, setRedesNegocio] = useState({
+    whatsapp: null, web: null, facebook: null, instagram: null
+  })
 
   const cargar = useCallback(async () => {
     try {
@@ -37,6 +40,12 @@ export function useGestionServicios() {
     emprendedoraService.getCategorias("servicio")
       .then((data) => setCategorias(data))
       .catch(() => setCategorias([]))
+  }, [])
+
+  useEffect(() => {
+    emprendedoraService.getPerfilNegocio()
+      .then((data) => setRedesNegocio(data.enlace_redes_sociales ?? {}))
+      .catch(() => {})
   }, [])
 
   async function crearServicio(datos) {
@@ -80,6 +89,7 @@ export function useGestionServicios() {
     setPagina,
     totalPaginas: Math.ceil(total / LIMIT) || 1,
     categorias,
+    redesNegocio,
     cargando,
     error,
     crearServicio,
