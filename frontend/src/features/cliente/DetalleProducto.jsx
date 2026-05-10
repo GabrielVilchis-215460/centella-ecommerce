@@ -239,10 +239,10 @@ export function DetalleProducto() {
                   <Button
                     size="sm"
                     onClick={handleAgregarCarrito}
-                    disabled={!esCliente()}
+                    disabled={!esCliente() || producto.cantidad_stock === 0}
                     className="flex-1"
                   >
-                    Agregar a carrito
+                    {producto.cantidad_stock === 0 ? "Sin stock" : "Agregar a carrito"}
                   </Button>
                 </div>
 

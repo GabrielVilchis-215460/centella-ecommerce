@@ -35,7 +35,7 @@ export function CartProvider({ children }) {
     } finally {
       setCargando(false)
     }
-  }, [usuario?.id, estaAutenticado, esCliente])
+  }, [usuario?.id])
 
   useEffect(() => {
     cargarCarrito()

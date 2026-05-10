@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import api from "../../services/axios"
+import { useCart } from "../../context/CartContext"
 
 export function ConfirmacionPago() {
   const { id_pedido }         = useParams()
@@ -8,6 +9,7 @@ export function ConfirmacionPago() {
   const navigate              = useNavigate()
   const [error, setError]     = useState(null)
   const confirmado            = useRef(false)
+  const { cargarCarrito } = useCart()
 
   useEffect(() => {
     if (confirmado.current) return
@@ -28,7 +30,7 @@ export function ConfirmacionPago() {
             await api.get(`/api/v1/pagos/confirm/stripe/${p.id_pedido}`)
           }
         }
-
+        await cargarCarrito()
         navigate("/checkout/confirmacion", { replace: true })
       } catch (err) {
         console.error("Error al confirmar pago:", err)
