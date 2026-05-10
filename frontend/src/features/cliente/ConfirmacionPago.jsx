@@ -15,13 +15,18 @@ export function ConfirmacionPago() {
 
     const confirmar = async () => {
       try {
+        const raw = sessionStorage.getItem("checkout_pedidos")
+        if (!raw) throw new Error("No se encontraron pedidos en la sesion")
+        const pedidos = JSON.parse(raw) 
         const esPaypal = window.location.pathname.includes("paypal")
 
-        if (esPaypal) {
-          const token = searchParams.get("token")
-          await api.get(`/api/v1/pagos/confirm/paypal/${id_pedido}?token=${token}`)
-        } else {
-          await api.get(`/api/v1/pagos/confirm/stripe/${id_pedido}`)
+        for (const p of pedidos) {
+          if (esPaypal) {
+            const token = searchParams.get("token")
+            await api.get(`/api/v1/pagos/confirm/paypal/${p.id_pedido}?token=${token}`)
+          } else {
+            await api.get(`/api/v1/pagos/confirm/stripe/${p.id_pedido}`)
+          }
         }
 
         navigate("/checkout/confirmacion", { replace: true })

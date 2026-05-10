@@ -193,8 +193,22 @@ export function CheckoutConfirmacion() {
                   </div>
                 ))}
               </div>
+              {/* Desglose individual de este pedido */}
+              <div className="pt-3 border-t border-text-light/20 flex flex-col gap-2">
+                 <div className="flex justify-between text-sm text-text-regular">
+                   <span>Subtotal</span>
+                   <span>${parseFloat(pedido.subtotal).toLocaleString("es-MX", { minimumFractionDigits: 2 })}</span>
+                 </div>
+                 <div className="flex justify-between text-sm text-text-regular">
+                   <span>Costo de envío</span>
+                   <span>${parseFloat(pedido.costo_envio).toLocaleString("es-MX", { minimumFractionDigits: 2 })}</span>
+                 </div>
+                 <div className="flex justify-between text-base font-medium text-text-dark pt-1">
+                   <span>Total del pedido</span>
+                   <span>${parseFloat(pedido.total).toLocaleString("es-MX", { minimumFractionDigits: 2 })}</span>
+                 </div>
+              </div>
             </div>
-
           </div>
         ))}
 
