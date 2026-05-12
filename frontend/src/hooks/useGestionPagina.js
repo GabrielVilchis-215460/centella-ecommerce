@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useToast } from "../context/ToastContext"
 
 export function useGestionPagina() {
   const [perfil, setPerfil]       = useState(null)
@@ -11,6 +12,7 @@ export function useGestionPagina() {
   const [guardando, setGuardando] = useState(false)
   const [error, setError]         = useState(null)
   const [servicios, setServicios] = useState([])
+  const { showToast } = useToast()  
 
   useEffect(() => {
     let cancelado = false
@@ -70,8 +72,9 @@ export function useGestionPagina() {
     try {
       setGuardando(true)
       await emprendedoraService.actualizarContenidoPagina({ html })
+      showToast("Cambios guardados exitosamente", "success")
     } catch (err) {
-      setError(err?.response?.data?.detail || "Error al guardar")
+      showToast(err?.response?.data?.detail || "Error al guardar", "error")
     } finally {
       setGuardando(false)
     }

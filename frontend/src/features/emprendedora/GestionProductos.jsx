@@ -13,7 +13,7 @@ import { OrderByDropdown, FilterDropdown } from "../../components/common/Dropdow
 import { useAuth } from "../../context/AuthContext"
 import { useGestionProductos } from "../../hooks/useGestionProductos"
 import { emprendedoraService } from "../../services/emprendedoraService"
-
+import { ConfirmDeleteModal } from "../../components/common/ConfirmDeleteModal"
 // Constantes
 const ORDENAR_OPCIONES = [
   { value: "recientes", label: "Más recientes" },
@@ -144,6 +144,7 @@ export function GestionProductos() {
   const [modalAbierto, setModalAbierto]   = useState(false)
   const [productoEditar, setProductoEditar] = useState(null)
   const [cargandoImagenes, setCargandoImagenes] = useState(false)
+  const [confirmarEliminar, setConfirmarEliminar] = useState(null)
 
   if (!cargandoAuth && usuario?.tipo_usuario !== "emprendedora") {
     return <Navigate to="/" replace />
@@ -190,9 +191,8 @@ export function GestionProductos() {
     }
   }
 
-  const handleEliminar = async (fila) => {
-    if (!window.confirm(`¿Eliminar "${fila.nombre}"?`)) return
-    await eliminarProducto(fila.id_producto)
+  const handleEliminar = (fila) => {
+    setConfirmarEliminar({ id: fila.id_producto, nombre: fila.nombre })
   }
 
   const handleGuardar = async (datos) => {
@@ -381,6 +381,18 @@ export function GestionProductos() {
           categorias={categorias}
           onClose={() => { setModalAbierto(false); setProductoEditar(null) }}
           onGuardar={handleGuardar}
+        />
+      )}
+
+      {confirmarEliminar && (
+        <ConfirmDeleteModal
+          nombre={confirmarEliminar.nombre}
+          tipo="producto"
+          onConfirmar={async () => {
+            await eliminarProducto(confirmarEliminar.id)
+            setConfirmarEliminar(null)
+          }}
+          onCancelar={() => setConfirmarEliminar(null)}
         />
       )}
 

@@ -12,7 +12,7 @@ import { Button } from "../../components/common/Button"
 import { OrderByDropdown, FilterDropdown } from "../../components/common/Dropdown"
 import { useAuth } from "../../context/AuthContext"
 import { useGestionServicios } from "../../hooks/useGestionServicios"
-
+import { ConfirmDeleteModal } from "../../components/common/ConfirmDeleteModal"
 const ORDENAR_OPCIONES = [
   { value: "recientes", label: "Más recientes" },
   { value: "nombre",    label: "Nombre A-Z"    },
@@ -107,6 +107,7 @@ export function GestionServicios() {
   const [filtros, setFiltros] = useState({ activo: true, inactivo: true })
   const [modalAbierto, setModalAbierto] = useState(false)
   const [servicioEditar, setServicioEditar] = useState(null)
+  const [confirmarEliminar, setConfirmarEliminar] = useState(null)
 
   if (!cargandoAuth && usuario?.tipo_usuario !== "emprendedora") {
     return <Navigate to="/" replace />
@@ -155,10 +156,9 @@ export function GestionServicios() {
     setModalAbierto(true)
   }
 
-  const handleEliminar = async (fila) => {
-    if (!window.confirm(`¿Eliminar "${fila.nombre}"?`)) return
-    await eliminarServicio(fila.id_servicio)
-  }
+  const handleEliminar = (fila) => {
+  setConfirmarEliminar({ id: fila.id_servicio, nombre: fila.nombre })
+}
 
   // Normalizar servicio para el modal
   const servicioModal = servicioEditar ? {
@@ -277,6 +277,18 @@ export function GestionServicios() {
           redesNegocio={redesNegocio}
           onClose={() => { setModalAbierto(false); setServicioEditar(null) }}
           onGuardar={handleGuardar}
+        />
+      )}
+
+      {confirmarEliminar && (
+        <ConfirmDeleteModal
+          nombre={confirmarEliminar.nombre}
+          tipo="servicio"
+          onConfirmar={async () => {
+            await eliminarServicio(confirmarEliminar.id)
+            setConfirmarEliminar(null)
+          }}
+          onCancelar={() => setConfirmarEliminar(null)}
         />
       )}
     </div>

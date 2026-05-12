@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useToast } from "../context/ToastContext"
 
 const LIMIT = 10
 
@@ -10,7 +11,8 @@ export function useGestionProductos() {
   const [categorias, setCategorias] = useState([])
   const [cargando, setCargando]     = useState(true)
   const [error, setError]           = useState(null)
-
+  const { showToast } = useToast()
+  
   const cargar = useCallback(async () => {
     try {
       setCargando(true)
@@ -43,21 +45,23 @@ export function useGestionProductos() {
         try {
             const { imagenes, atributos, ...resto } = datos
             const nuevo = await emprendedoraService.crearProducto(resto)
+            showToast("Producto creado exitosamente", "success")
             return nuevo
         } catch (err) {
             const detail = err?.response?.data?.detail
-            setError(typeof detail === "string" ? detail : "Error al crear producto")
-        }
+            showToast(typeof detail === "string" ? detail : "Error al crear producto", "error")
+          }
     }
 
     async function actualizarProducto(idProducto, datos) {
         try {
             const { imagenes, atributos, ...resto } = datos
             const actualizado = await emprendedoraService.actualizarProducto(idProducto, resto)
+            showToast("Producto actualizado exitosamente", "success")
             return actualizado
         } catch (err) {
             const detail = err?.response?.data?.detail
-            setError(typeof detail === "string" ? detail : "Error al actualizar producto")
+            showToast(typeof detail === "string" ? detail : "Error al actualizar producto", "error")
             throw err 
         }
     }
@@ -67,9 +71,10 @@ export function useGestionProductos() {
       await emprendedoraService.eliminarProducto(idProducto)
       setProductos((prev) => prev.filter((p) => p.id_producto !== idProducto))
       setTotal((prev) => prev - 1)
+      showToast("Producto eliminado", "success")
     } catch (err) {
       const detail = err?.response?.data?.detail
-      setError(typeof detail === "string" ? detail : "Error al eliminar producto")
+      showToast(typeof detail === "string" ? detail : "Error al eliminar producto", "error")
     }
   }
 

@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useToast } from "../context/ToastContext"
 
 const LIMIT = 10
 
 export function useGestionServicios() {
+  const { showToast } = useToast() 
   const [servicios, setServicios]   = useState([])
   const [total, setTotal]  = useState(0)
   const [pagina, setPagina]  = useState(1)
@@ -53,9 +55,10 @@ export function useGestionServicios() {
       const nuevo = await emprendedoraService.crearServicio(datos)
       setServicios((prev) => [nuevo, ...prev])
       setTotal((prev) => prev + 1)
+      showToast("Servicio creado exitosamente", "success")
     } catch (err) {
       const detail = err?.response?.data?.detail
-      setError(typeof detail === "string" ? detail : "Error al crear servicio")
+      showToast(typeof detail === "string" ? detail : "Error al crear servicio", "error")
     }
   }
 
@@ -65,9 +68,10 @@ export function useGestionServicios() {
       setServicios((prev) =>
         prev.map((s) => s.id_servicio === idServicio ? actualizado : s)
       )
+      showToast("Servicio actualizado exitosamente", "success")
     } catch (err) {
       const detail = err?.response?.data?.detail
-      setError(typeof detail === "string" ? detail : "Error al actualizar servicio")
+      showToast(typeof detail === "string" ? detail : "Error al actualizar servicio", "error")
     }
   }
 
@@ -76,9 +80,10 @@ export function useGestionServicios() {
       await emprendedoraService.eliminarServicio(idServicio)
       setServicios((prev) => prev.filter((s) => s.id_servicio !== idServicio))
       setTotal((prev) => prev - 1)
+      showToast("Servicio eliminado", "success")
     } catch (err) {
       const detail = err?.response?.data?.detail
-      setError(typeof detail === "string" ? detail : "Error al eliminar servicio")
+      showToast(typeof detail === "string" ? detail : "Error al eliminar servicio", "error")
     }
   }
 

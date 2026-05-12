@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useToast } from "../context/ToastContext"
 
 const LIMIT = 10
 
@@ -28,6 +29,8 @@ export function useGestionPedidos() {
     },
   })
 
+  const { showToast } = useToast()
+  
   const cargar = useCallback(async () => {
     try {
       setCargando(true)
@@ -74,8 +77,9 @@ export function useGestionPedidos() {
       setPedidos((prev) =>
         prev.map((p) => p.id_pedido === idPedido ? { ...p, estado: nuevoEstado } : p)
       )
+      showToast("Estado del pedido actualizado", "success")
     } catch (err) {
-      setError(err?.response?.data?.detail || "Error al actualizar estado")
+      showToast(err?.response?.data?.detail || "Error al actualizar estado", "error")
     }
   }
 
