@@ -4,11 +4,13 @@ import { catalogoService } from "../services/catalogoService"
 import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
 import { emprendedoraService } from "../services/emprendedoraService"
+import { useToast } from "../context/ToastContext"
 
 export function useDetalleProducto() {
   const { id }  = useParams()
   const { agregarItem } = useCart()
   const { usuario, esCliente } = useAuth()
+  const { showToast } = useToast()
 
   const [producto,   setProducto]   = useState(null)
   const [resenas,    setResenas]    = useState([])
@@ -92,6 +94,7 @@ export function useDetalleProducto() {
   const handleAgregarCarrito = () => {
     if (!esCliente()) return
     agregarItem(Number(id), cantidad, tipoEntrega)
+    showToast("Producto agregado al carrito", "success")
   }
 
   const handleCantidad = (val) => {
