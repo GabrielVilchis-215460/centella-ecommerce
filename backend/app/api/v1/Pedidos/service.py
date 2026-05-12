@@ -55,7 +55,7 @@ def get_confirmacion_pedido(db: Session, id_pedido: int) -> dict:
                 "cantidad": item.cantidad,
                 "precio_unitario": float(item.precio_unitario),
                 "subtotal": float(item.precio_unitario * item.cantidad),
-                "tipo_entrega": item.tipo_entrega,
+                "tipo_entrega": item.tipo_entrega.value if item.tipo_entrega else None,
                 "imagen_url": item.imagen_url,
             }
             for item in pedido.items
