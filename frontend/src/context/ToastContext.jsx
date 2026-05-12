@@ -6,6 +6,9 @@ const ToastContext = createContext()
 const DURATION = 3500
 const EXIT_DURATION = 300
 
+// referencia externa para usar fuera de React
+export const toastRef = { showToast: null }
+
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
 
@@ -22,6 +25,8 @@ export function ToastProvider({ children }) {
     setToasts(prev => [...prev, { id, message, type, removing: false }])
     setTimeout(() => removeToast(id), DURATION)
   }, [removeToast])
+
+  toastRef.showToast = showToast
 
   return (
     <ToastContext.Provider value={{ showToast }}>
