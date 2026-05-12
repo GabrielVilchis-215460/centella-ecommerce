@@ -185,6 +185,9 @@ export function CheckoutConfirmacion() {
                       <span className="font-body text-xs text-text-regular">
                         Cantidad: {item.cantidad}
                       </span>
+                      <span className="w-fit mt-1.5 text-[10px] px-2 py-0.5 rounded-full bg-bg-light text-text-regular border border-text-light/20 uppercase font-bold tracking-wider">
+                        {item.tipo_entrega === 'envio' ? 'Envío' : 'Física'}
+                      </span>
                     </div>
                     <span className="font-body text-sm text-text-dark">
                       ${(parseFloat(item.precio_unitario) * item.cantidad)
