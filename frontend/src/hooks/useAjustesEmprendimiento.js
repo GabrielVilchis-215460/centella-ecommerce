@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react"
 import { emprendedoraService } from "../services/emprendedoraService"
 import { perfilService } from "../services/perfilService"
 import { COLORES_PERFIL } from "./useCrearPerfil"
+import { useToast } from "../context/ToastContext"
 
 export function useAjustesEmprendimiento() {
+  const { showToast } = useToast()
   const logoRef = useRef(null)
 
   const [nombreNegocio,   setNombreNegocio]   = useState("")
@@ -26,7 +28,6 @@ export function useAjustesEmprendimiento() {
   const [cargando,  setCargando]  = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [error,     setError]     = useState("")
-  const [exito,     setExito]     = useState(false)
 
   useEffect(() => {
     emprendedoraService.getPerfilNegocio()
@@ -83,10 +84,9 @@ export function useAjustesEmprendimiento() {
       })
       if (logoFile) await perfilService.subirLogo(logoFile)
       setLogoFile(null)
-      setExito(true)
-      setTimeout(() => setExito(false), 3000)
+      showToast("Cambios guardados exitosamente", "success")
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al guardar los cambios.")
+      showToast(err.response?.data?.detail || "Error al guardar los cambios", "error")
     } finally {
       setGuardando(false)
     }
@@ -96,8 +96,9 @@ export function useAjustesEmprendimiento() {
     try {
       await emprendedoraService.solicitarVerificacion()
       setEstadoVerificacion("pendiente")
+      showToast("Solicitud de verificación enviada", "success")
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al solicitar verificación.")
+      showToast(err.response?.data?.detail || "Error al solicitar verificación", "error")
     }
   }
 
@@ -105,13 +106,14 @@ export function useAjustesEmprendimiento() {
     try {
       await emprendedoraService.solicitarInsignia()
       setSolicitudInsignia(true)
+      showToast('Solicitud de insignia "Hecho en Juárez" enviada', "success")
     } catch (err) {
-      setError(err.response?.data?.detail || "Error al solicitar insignia.")
+      showToast(err.response?.data?.detail || "Error al solicitar insignia", "error")
     }
   }
 
   return {
-    cargando, guardando, error, exito,
+    cargando, guardando, error,
     logoRef, logoPreview, handleLogo,
     nombreNegocio, setNombreNegocio,
     descripcion, setDescripcion,

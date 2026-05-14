@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { useRef, useState, useEffect } from "react"
+import { useToast } from "../../context/ToastContext"
 // import de iconos
 import {
   IconBrandAsana,
@@ -117,6 +118,7 @@ function MenuEmprendimiento() {
   const [cargando, setCargando] = useState(null) // "insignia" | "verificacion" | null
   const ref = useRef(null)
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   useEffect(() => {
     const handler = (e) => {
@@ -140,6 +142,9 @@ function MenuEmprendimiento() {
     setCargando("insignia")
     try {
       await emprendedoraService.solicitarInsignia()
+      showToast('Solicitud de insignia "Hecho en Juárez" enviada', "success")
+    }  catch(err) {
+      showToast(err?.response?.data?.detail || "Error al solicitar insignia", "error")
     } finally {
       setCargando(null)
       setAbierto(false)
@@ -150,9 +155,9 @@ function MenuEmprendimiento() {
     setCargando("verificacion")
     try {
       await emprendedoraService.solicitarVerificacion()
-      alert("Solicitud de verificación enviada exitosamente")
+      showToast("Solicitud de verificación enviada", "success")
     } catch (err) {
-      alert(err?.response?.data?.detail || "Error al solicitar verificación")
+      showToast(err?.response?.data?.detail || "Error al solicitar verificación", "error")
     } finally {
       setCargando(null)
       setAbierto(false)
