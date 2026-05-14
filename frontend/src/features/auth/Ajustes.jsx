@@ -40,13 +40,11 @@ export function Ajustes() {
     handleFoto, handleEliminarFoto,
     handleGuardarPerfil,
     perfilCambiado,
-    errorPerfil, exitoPerfil,
     contrasenaActual, setContrasenaActual,
     contrasenaNueva, setContrasenaNueva,
     confirmarContrasena, setConfirmarContrasena,
     requisitosPass, passValida,
     handleCambiarContrasena,
-    errorPass, exitoPass,
     direcciones,
     modalDireccion, setModalDireccion,
     handleEliminarDireccion,
@@ -131,9 +129,6 @@ export function Ajustes() {
             onChange={setFecha}
             labelClassName="text-sm"
           />
-
-          {errorPerfil && <p className="font-body text-sm text-error">{errorPerfil}</p>}
-          {exitoPerfil  && <p className="font-body text-sm text-success">Cambios guardados exitosamente.</p>}
 
           <div className="flex justify-end">
             <Button
@@ -233,9 +228,6 @@ export function Ajustes() {
               <span className="font-body text-xs text-error">Las contraseñas no coinciden.</span>
             )}
           </div>
-
-          {errorPass && <p className="font-body text-sm text-error">{errorPass}</p>}
-          {exitoPass  && <p className="font-body text-sm text-success">Contraseña actualizada exitosamente.</p>}
 
           <div className="flex justify-end">
             <Button

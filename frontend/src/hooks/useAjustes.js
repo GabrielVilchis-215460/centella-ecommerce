@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useAuth } from "../context/AuthContext"
 import { perfilService } from "../services/perfilService"
 import { useNavigate } from "react-router-dom"
+import { useToast } from "../context/ToastContext"
 
 const REQUISITOS_PASS = [
   { id: "longitud",  label: "Mínimo 8 caracteres", regex: /.{8,}/  },
@@ -34,13 +35,10 @@ export function useAjustes() {
   // Estados
   const [cargando,     setCargando]     = useState(true)
   const [guardando,    setGuardando]    = useState(false)
-  const [errorPerfil,  setErrorPerfil]  = useState("")
-  const [errorPass,    setErrorPass]    = useState("")
-  const [exitoPerfil,  setExitoPerfil]  = useState(false)
-  const [exitoPass,    setExitoPass]    = useState(false)
-
+  
   const [modalEliminar, setModalEliminar] = useState(false)
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   // Prellenar con datos actuales
   useEffect(() => {
@@ -109,8 +107,9 @@ export function useAjustes() {
       setFotoPreview(null)
       setFotoFile(null)
       await refreshUsuario()
+      showToast("Foto de perfil eliminada", "success")
     } catch {
-      setErrorPerfil("Error al eliminar la foto.")
+      showToast("Error al eliminar la foto", "error")
     }
   }
 
@@ -119,7 +118,6 @@ export function useAjustes() {
     if (!perfilCambiado()) return
     try {
       setGuardando(true)
-      setErrorPerfil("")
       await perfilService.actualizarPerfil({
         nombre,
         apellido,
@@ -130,10 +128,9 @@ export function useAjustes() {
       if (fotoFile) await perfilService.subirFotoPerfil(fotoFile)
       await refreshUsuario()
       setFotoFile(null)
-      setExitoPerfil(true)
-      setTimeout(() => setExitoPerfil(false), 3000)
+      showToast("Cambios guardados exitosamente", "success")
     } catch {
-      setErrorPerfil("Error al guardar los cambios.")
+      showToast("Error al guardar los cambios", "error")
     } finally {
       setGuardando(false)
     }
@@ -144,7 +141,6 @@ export function useAjustes() {
     if (!passValida) return
     try {
       setGuardando(true)
-      setErrorPass("")
       await perfilService.cambiarContrasena({
         contrasena_actual: contrasenaActual,
         contrasena_nueva:  contrasenaNueva,
@@ -152,11 +148,10 @@ export function useAjustes() {
       setContrasenaActual("")
       setContrasenaNueva("")
       setConfirmarContrasena("")
-      setExitoPass(true)
-      setTimeout(() => setExitoPass(false), 3000)
+      showToast("Contraseña actualizada exitosamente", "success")
     } catch (err) {
       const detail = err.response?.data?.detail
-      setErrorPass(detail || "Error al cambiar la contraseña.")
+      showToast(detail || "Error al cambiar la contraseña", "error")
     } finally {
       setGuardando(false)
     }
@@ -180,8 +175,9 @@ export function useAjustes() {
       } else {
         setDirecciones(restantes)
       }
+      showToast("Dirección eliminada", "success")
     } catch {
-      setErrorPerfil("Error al eliminar la dirección.")
+      showToast("Error al eliminar la dirección", "error")
     }
   }
 
@@ -191,6 +187,7 @@ export function useAjustes() {
       const nuevas = await perfilService.getDirecciones()
       setDirecciones(nuevas)
       setModalEditarDireccion(null)
+      showToast("Dirección actualizada", "success")
     } catch (err) {
       throw err
     }
@@ -203,6 +200,7 @@ export function useAjustes() {
       const nuevas = await perfilService.getDirecciones()
       setDirecciones(nuevas)
       setModalDireccion(false)
+      showToast("Dirección agregada exitosamente", "success")
     } catch (err) {
       throw err
     }
@@ -214,7 +212,7 @@ export function useAjustes() {
         logout()
         navigate("/login")
     } catch {
-        setErrorPerfil("Error al desactivar la cuenta.")
+        showToast("Error al desactivar la cuenta", "error")
     }
   }
 
@@ -228,14 +226,12 @@ export function useAjustes() {
     handleFoto, handleEliminarFoto,
     handleGuardarPerfil,
     perfilCambiado,
-    errorPerfil, exitoPerfil,
     // Contraseña
     contrasenaActual, setContrasenaActual,
     contrasenaNueva, setContrasenaNueva,
     confirmarContrasena, setConfirmarContrasena,
     requisitosPass, passValida,
     handleCambiarContrasena,
-    errorPass, exitoPass,
     // Direcciones
     direcciones,
     modalDireccion, setModalDireccion,
