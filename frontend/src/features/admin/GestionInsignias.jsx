@@ -1,10 +1,9 @@
-// src/features/admin/GestionInsignias.jsx
-
 import { useState, useEffect } from "react"
 import { IconSearch, IconChevronDown, IconCircleCheck, IconX, IconMail } from "@tabler/icons-react"
 import { Header }       from "../../components/layout/Header"
 import { Footer }       from "../../components/layout/Footer"
 import { adminService } from "../../services/adminService"
+import { useToast } from "../../context/ToastContext"
 
 const ORDEN_OPTS = [
   { value: "recientes", label: "Más recientes" },
@@ -46,6 +45,7 @@ export function GestionInsignias() {
   const [filtro,        setFiltro]        = useState("")
   const [ordenAbierto,  setOrdenAbierto]  = useState(false)
   const [filtroAbierto, setFiltroAbierto] = useState(false)
+  const { showToast } = useToast()
 
   const cargar = async () => {
     try {
@@ -64,27 +64,30 @@ export function GestionInsignias() {
   const handleAprobar = async (id) => {
     try {
       await adminService.aprobarInsignia(id)
+      showToast('Insignia "Hecho en Juárez" aprobada', "success")
       cargar()
     } catch {
-      setError("Error al aprobar la insignia.")
+      showToast("Error al aprobar la insignia", "error")
     }
   }
 
   const handleRechazar = async (id) => {
     try {
       await adminService.rechazarInsignia(id)
+      showToast("Solicitud de insignia rechazada", "warning")
       cargar()
     } catch {
-      setError("Error al rechazar la insignia.")
+      showToast("Error al rechazar la insignia", "error")
     }
   }
 
   const handleRevocar = async (id) => {
     try {
       await adminService.revocarInsignia(id)
+      showToast('Insignia "Hecho en Juárez" revocada', "warning")
       cargar()
     } catch {
-      setError("Error al revocar la insignia.")
+      showToast("Error al revocar la insignia", "error")
     }
   }
 

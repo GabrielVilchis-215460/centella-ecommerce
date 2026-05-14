@@ -18,6 +18,7 @@ import { StatusBadge } from "../../components/common/StatusBadge.jsx"
 import { ModalVerificar } from "../../components/common/VerificarModal.jsx"
 import { ModalSuspender } from "../../components/common/SuspenderModal.jsx"
 import { ModalReactivar } from "../../components/common/ReactivarModal.jsx"
+import { useToast } from "../../context/ToastContext.jsx"
 
 const formatFecha = (f) =>
   new Date(f).toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit", year: "numeric" })
@@ -41,7 +42,7 @@ export function Emprendedoras() {
     sin_insignia: true,
   })
   const { datos, loading, error, refetch } = useGestionEmprendedora(filtros)
-
+  const { showToast } = useToast()
   // Búsqueda con debounce
   useEffect(() => {
     const t = setTimeout(() => setFiltros((f) => ({ ...f, q: busqueda })), 200)
@@ -49,18 +50,36 @@ export function Emprendedoras() {
   }, [busqueda])
 
   const handleVerificar = async () => {
-    await adminService.verificarEmprendedora(modalVerificar.id_emprendedora)
-    refetch()
+    try {
+      await adminService.verificarEmprendedora(modalVerificar.id_emprendedora)
+      showToast(`${modalVerificar.nombre_negocio} verificada exitosamente`, "success")
+      setModalVerificar(null)
+      refetch()
+    } catch (err) {
+      showToast(err?.response?.data?.detail || "Error al verificar", "error")
+    }
   }
 
   const handleSuspender = async () => {
-    await adminService.suspenderEmprendedora(modalSuspender.id_emprendedora)
-    refetch()
+    try {
+      await adminService.suspenderEmprendedora(modalSuspender.id_emprendedora)
+      showToast(`${modalSuspender.nombre_negocio} suspendida`, "warning")
+      setModalSuspender(null)
+      refetch()
+    } catch (err) {
+      showToast(err?.response?.data?.detail || "Error al suspender", "error")
+    }
   }
 
   const handleReactivar = async () => {
-    await adminService.reactivarEmprendedora(modalReactivar.id_emprendedora)
-    refetch()
+    try {
+      await adminService.reactivarEmprendedora(modalReactivar.id_emprendedora)
+      showToast(`${modalReactivar.nombre_negocio} reactivada exitosamente`, "success")
+      setModalReactivar(null)
+      refetch()
+    } catch (err) {
+      showToast(err?.response?.data?.detail || "Error al reactivar", "error")
+    }
   }
 
   // Columnas del DataTable

@@ -8,6 +8,7 @@ import { Footer }       from "../../components/layout/Footer"
 import { Modal }        from "../../components/common/Modal"
 import { Button }       from "../../components/common/Button"
 import { adminService } from "../../services/adminService"
+import { useToast } from "../../context/ToastContext"
 
 const ORDEN_OPTS = [
   { value: "recientes", label: "Más recientes" },
@@ -76,6 +77,7 @@ export function Moderacion() {
   const [filtroAbierto, setFiltroAbierto] = useState(false)
   const [confirmacion,  setConfirmacion]  = useState(null)
   // confirmacion = { tipo: "eliminar" | "suspender", id: number } | null
+  const { showToast } = useToast()
 
   const cargar = async () => {
     try {
@@ -99,12 +101,14 @@ export function Moderacion() {
     try {
       if (confirmacion.tipo === "eliminar") {
         await adminService.eliminarPublicacion(confirmacion.id)
+        showToast("Publicación eliminada", "success") 
       } else {
         await adminService.suspenderCuenta(confirmacion.id)
+        showToast("Cuenta suspendida", "warning")
       }
       cargar()
     } catch {
-      setError("Error al ejecutar la acción.")
+      showToast("Error al ejecutar la acción", "error")
     } finally {
       setConfirmacion(null)
     }
@@ -113,9 +117,10 @@ export function Moderacion() {
   const handleDescartar = async (id) => {
     try {
       await adminService.descartarReporte(id)
+      showToast("Reporte descartado", "info")
       cargar()
     } catch {
-      setError("Error al descartar el reporte.")
+      showToast("Error al descartar el reporte", "error")
     }
   }
 
