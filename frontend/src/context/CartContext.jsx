@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { carritoService } from "../services/carritoService"
 import { useAuth } from "./AuthContext"
+import { toastRef } from "./ToastContext"
 
 const CartContext = createContext(null)
 
@@ -49,8 +50,10 @@ export function CartProvider({ children }) {
     try {
       await carritoService.eliminarItem(id_item)
       await cargarCarrito() // re-sincronizar totales
+      toastRef.showToast?.("Producto eliminado del carrito", "success")
     } catch (err) {
       console.error("Error al eliminar item:", err)
+      toastRef.showToast?.("Error al eliminar el producto", "error")
       cargarCarrito() // revertir
     }
   }

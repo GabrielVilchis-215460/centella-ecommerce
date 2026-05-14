@@ -3,12 +3,14 @@ import { Modal }  from "./Modal"
 import { Button } from "./Button"
 import { reporteService } from "../../services/reporteService"
 import { useAuth } from "../../context/AuthContext"
+import { useToast } from "../../context/ToastContext"
 
 export function ReporteModal({ tipo, idReferencia, nombreContenido, onClose }) {
   const { usuario } = useAuth()
   const [motivo,    setMotivo]    = useState("")
   const [enviando,  setEnviando]  = useState(false)
   const [error,     setError]     = useState("")
+  const { showToast } = useToast()
 
   const handleReportar = async () => {
     try {
@@ -19,9 +21,10 @@ export function ReporteModal({ tipo, idReferencia, nombreContenido, onClose }) {
         id_referencia:  idReferencia,
         motivo:         motivo || null,
       })
+      showToast("Reporte enviado", "info")
       onClose()
     } catch {
-      setError("Error al enviar el reporte.")
+      showToast("Error al enviar el reporte", "error")
     } finally {
       setEnviando(false)
     }

@@ -4,6 +4,7 @@ import { Button }     from "./Button"
 import { StarRating } from "./StarRating"
 import { catalogoService } from "../../services/catalogoService"
 import { useAuth } from "../../context/AuthContext"
+import { useToast } from "../../context/ToastContext"
 
 export function ResenaModal({ tipo, idReferencia, idEmprendedora, nombreItem, nombreEmprendedora, onClose, onGuardada }) {
   const { usuario } = useAuth()
@@ -12,6 +13,7 @@ export function ResenaModal({ tipo, idReferencia, idEmprendedora, nombreItem, no
   const [comentario,   setComentario]   = useState("")
   const [guardando,    setGuardando]    = useState(false)
   const [error,        setError]        = useState("")
+  const { showToast } = useToast()
 
   const valido = calItem > 0 && calVendedora > 0
 
@@ -29,6 +31,7 @@ export function ResenaModal({ tipo, idReferencia, idEmprendedora, nombreItem, no
         calificacion_vendedora:  calVendedora,
         comentario:              comentario || null,
       })
+      showToast("Reseña publicada exitosamente", "success")
       onGuardada?.()
       onClose()
     } catch (err) {
