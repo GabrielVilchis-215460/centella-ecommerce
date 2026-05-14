@@ -11,11 +11,7 @@ export function CartProvider({ children }) {
   const [cargando, setCargando]     = useState(false)
 
   const cargarCarrito = useCallback(async () => {
-    // debug
-    /*console.log("usuario:", usuario)
-    console.log("esCliente:", esCliente())
-    console.log("estaAutenticado:", estaAutenticado())*/
-    if (!estaAutenticado() || !esCliente() || !usuario?.id) return
+    if (!usuario || usuario.tipo_usuario !== "cliente") return
     try {
       setCargando(true)
       const res = await carritoService.obtenerTotales(usuario.id)
@@ -35,11 +31,18 @@ export function CartProvider({ children }) {
     } finally {
       setCargando(false)
     }
-  }, [usuario?.id])
+  }, [usuario?.id, usuario?.tipo_usuario])
 
+  // Limpiar carrito cuando no hay usuario o no es cliente
   useEffect(() => {
-    cargarCarrito()
-  }, [cargarCarrito])
+  // Solo cargar si realmente tenemos un cliente autenticado
+    if (estaAutenticado && usuario?.tipo_usuario === "cliente") {
+      cargarCarrito();
+    } else if (!estaAutenticado) {
+      setItems([]);
+      setTotalPagar(0);
+    }
+  }, [usuario, estaAutenticado, cargarCarrito]);
 
   const eliminarItem = async (id_item) => {
     setItems((prev) => prev.filter((i) => i.id !== id_item)) // optimistic
@@ -67,9 +70,9 @@ export function CartProvider({ children }) {
   }
 
   const agregarItem = async (id_producto, cantidad = 1, tipo_entrega_seleccionado) => {
-    if (!estaAutenticado() || !usuario) {
-      console.warn("Intento de agregar al carrito sin sesión activa.");
-      return; 
+    if (!usuario) {
+      console.warn("Intento de agregar al carrito sin sesión activa.")
+      return
     }
     try {
       await carritoService.agregarItem(
@@ -77,16 +80,13 @@ export function CartProvider({ children }) {
         id_producto,
         cantidad,
         tipo_entrega_seleccionado
-      );
-      
-      await cargarCarrito();
-
+      )
+      await cargarCarrito()
     } catch (err) {
-      // PASO 4: Manejo de errores
-      // Si falla la conexión o la base de datos, lo registramos para poder depurar
-      console.error("Error al agregar item al carrito:", err);
+      console.error("Error al agregar item al carrito:", err)
+      throw err
     }
-  };
+  }
 
   const totalItems = items.reduce((acc, i) => acc + i.cantidad, 0)
 

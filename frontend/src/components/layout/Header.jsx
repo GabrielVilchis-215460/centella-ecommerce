@@ -119,7 +119,11 @@ function HeaderCliente() {
   const [carritoAbierto, setCarritoAbierto] = useState(false)
 
   // ← Consumir contexto en lugar de estado local
-  const { items, eliminarItem, actualizarCantidad } = useCart()
+  const { items, eliminarItem, actualizarCantidad, cargarCarrito } = useCart()
+
+  useEffect(() => {
+    cargarCarrito();
+  }, [cargarCarrito]);
 
   useEffect(() => {
     const handler = (e) => {
