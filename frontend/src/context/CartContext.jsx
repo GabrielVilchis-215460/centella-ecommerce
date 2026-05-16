@@ -3,7 +3,7 @@ import { carritoService } from "../services/carritoService"
 import { useAuth } from "./AuthContext"
 import { toastRef } from "./ToastContext"
 
-const CartContext = createContext(null)
+export const CartContext = createContext(null)
 
 export function CartProvider({ children }) {
   const { usuario, esCliente, estaAutenticado } = useAuth()
