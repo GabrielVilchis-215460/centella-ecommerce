@@ -57,31 +57,31 @@ El proyecto utiliza una estrategia de ramas basada en **Jira** para la gestión 
 
 Para instalar las dependencias requeridas ubicadas en "requirements.txt", es necesario realizar los siguientes pasos:
 
-1. Para crear el ambiente virtual:
+### 1. Para crear el ambiente virtual:
 
 ```bash
 python -m venv venv
 ```
 
-2. Para activar el ambiente virtual: ./venv/Scripts/activate
+### 2. Para activar el ambiente virtual: ./venv/Scripts/activate
 
 ```bash
 ./venv/Scripts/activate
 ```
 
-4. Para desactivar el ambiente virtual:
+### 3. Para desactivar el ambiente virtual:
 
 ```bash
 deactivate
 ```
 
-6. Para instalar las dependencias: pip install -r requirements.txt
+### 4. Para instalar las dependencias: pip install -r requirements.txt
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Levantar el server de FastAPI
+### 5. Levantar el server de FastAPI
 
 Para leventar el server de fastapi mediante la uvicorn, es necesario realizar lo siguiente:
 
@@ -89,6 +89,12 @@ Para leventar el server de fastapi mediante la uvicorn, es necesario realizar lo
 cd Backend
 uvicorn app.main:app --reload
 # Para cerrar el server una vez que se este ejecutando: ctrl + c
+```
+
+### 6. Correr las pruebas unitarias e integración con Pytest:
+```bash
+cd Backend
+pytest
 ```
 
 ### 🔧 Frontend (React)
@@ -111,10 +117,20 @@ npm install
 
 ### 2. Levantar el servidor de desarrollo
 
-Para iniciar el servidor de desarrollo con Vite (maybe):
+Para iniciar el servidor de desarrollo:
 
 ```bash
 npm run dev
+```
+
+### 3. Correr las pruebas unitarias de componentes con Vitest:
+```bash
+npm run test
+```
+
+### 4. Levantar servidor de documentación interactiva con Storybook:
+```bash
+npm run storybook
 ```
 
 ---
@@ -125,43 +141,56 @@ npm run dev
 backend/
 ├── app/                  # Directorio principal de la aplicación
 │   ├── api/              # Endpoints organizados por módulos (Lógica de negocio)
-│   │   └── v1/           # Versión 1 de la API
-│   ├── core/             # Configuración global, seguridad y constantes
-│   ├── models/           # Modelos de base de datos SQLAlchemy
-│   ├── services/         # Servicios externos
-│   ├── config.py         # Carga de variables de entorno y settings
-│   └── main.py           # Punto de entrada de FastAPI
+│   │   └── v1/           # Versión 1 de la API (Auth, Producto, Carrito, etc.)
+│   ├── core/             # Configuración global, base de datos, seguridad y constantes
+│   ├── models/           # Modelos de base de datos definidos con SQLAlchemy
+│   ├── services/         # Integraciones y servicios externos (Stripe, PayPal, Email)
+│   ├── config.py         # Carga de variables de entorno y settings globales
+│   └── main.py           # Punto de entrada y montaje de rutas de FastAPI
 ├── migrations/           # Archivos de migración de base de datos mediante Alembic
+├── tests/                # Directorio de pruebas automatizadas (Mocks y Cobertura)
+│   ├── conftest.py       # Fixtures compartidas y cliente HTTP asíncrono
+│   ├── test_auth.py      # Pruebas de endpoints de Autenticación
+│   ├── test_carrito.py   # Pruebas del ecosistema del Carrito de compras
+│   ├── test_main.py      # Pruebas base de conectividad de la aplicación
+│   ├── test_productos.py # Pruebas del catálogo y lógica de productos
+│   └── test_servicios.py # Pruebas asociadas al CRUD de servicios
 ├── alembic.ini           # Configuración de la herramienta de migraciones
-├── logo.png              # Logo requerido para la generación de QRs
-├── pytest.ini            # Configuración de comportamiento de Pytest
-└── requirements.txt      # Dependencias del proyecto
+├── logo.png              # Logo requerido para la generación de códigos QR de envíos
+├── pytest.ini            # Configuración de comportamiento y rutas globales de Pytest
+└── requirements.txt      # Dependencias del backend (incluye pytest-asyncio)
+
 frontend/
-├── public/               # Archivos estáticos
+├── .storybook/           # Configuración del entorno y estilos globales de Storybook
+├── public/               # Archivos y recursos estáticos del cliente
 ├── src/
-│   ├── assets/           # Imágenes, fuentes y estilos globales
-│   ├── components/       # Componentes UI reutilizables
-│   ├── context/          # Contextos globales de React (estado compartido)
-│   ├── features/         # Módulos por funcionalidad (Auth, Cart, Dashboard)
-│   ├── hooks/            # Custom hooks globales
-│   ├── services/         # Lógica de comunicación con la API
-│   ├── App.css           # Estilos globales del componente raíz
-│   ├── App.jsx           # Componente raíz y rutas principales
-│   ├── index.css         # Estilos base
-│   ├── main.jsx          # Punto de entrada del cliente
-│   └── routes.jsx        # Definición de rutas de la aplicación
-├── .gitignore            # Archivos y carpetas ignorados por Git
-├── README.md             # Documentación del frontend
-├── eslint.config.js      # Configuración de ESLint
-├── index.html            # HTML principal
-├── package-lock.json     # Lock file de dependencias
-├── package.json          # Dependencias del ecosistema Node
-├── postcss.config.js     # Configuración de PostCSS
-├── tailwind.config.js    # Configuración de estilos
-└── vite.config.js        # Configuración de Vite
-.gitignore                # Gitignore raíz del repositorio
-README.md                 # Documentación general del proyecto
-requirements.txt          # Dependencias globales
+│   ├── assets/           # Imágenes, logos, fuentes y estilos CSS globales
+│   ├── components/       # Componentes UI reutilizables de la aplicación
+│   │   └── common/       # Botones, inputs, tarjetas y sus respectivos archivos *.test.jsx
+│   │   └── layout/       # Header, footer y sidebar
+│   ├── context/          # Contextos globales de React (AuthContext, CartContext, etc.)
+│   ├── features/         # Módulos robustos por funcionalidad (Admin, Auth, Cliente, Emprendedora)
+│   ├── hooks/            # Custom hooks globales para el manejo de estado
+│   ├── services/         # Lógica y configuración de peticiones con Axios hacia la API
+│   ├── stories/          # Historias centralizadas y estructuradas de Storybook (*.stories.jsx)
+│   ├── App.css           # Estilos generales del componente raíz
+│   ├── App.jsx           # Componente raíz y enrutamiento estructural
+│   ├── index.css         # Estilos base e inyección de directivas de Tailwind CSS
+│   ├── main.jsx          # Punto de entrada de renderizado del cliente en el DOM
+│   ├── routes.jsx        # Definición explícita de rutas públicas y protegidas
+│   └── setupTests.js     # Configuración previa de extensión de aserciones (@testing-library/jest-dom)
+├── .gitignore            # Archivos y carpetas omitidos en el control de versiones
+├── eslint.config.js      # Configuración de reglas de linter para JavaScript/React
+├── index.html            # HTML principal de montaje de la aplicación
+├── package-lock.json     # Árbol exacto de dependencias de Node
+├── package.json          # Dependencias y scripts configurados (dev, build, test, storybook)
+├── postcss.config.js     # Configuración de plugins de PostCSS
+├── tailwind.config.js    # Configuración de temas, fuentes y extensiones de Tailwind CSS
+└── vite.config.js        # Configuración de empaquetado de Vite y entorno jsdom para Vitest
+
+.gitignore                # Gitignore raíz del repositorio de e-commerce
+README.md                 # Documentación general y guía del ecosistema del proyecto
+requirements.txt          # Dependencias globales del proyecto
 ```
 
 ## 🔑 Credenciales de Uso
