@@ -276,7 +276,7 @@ def run_seed(db):
 
 if __name__ == "__main__":
     print("Creando tablas en la base de datos...")
-    Base.metadata.create_all(bind=engine)
+    #Base.metadata.create_all(bind=engine)
     print("Tablas creadas/verificadas.")
 
     db = SessionLocal()
