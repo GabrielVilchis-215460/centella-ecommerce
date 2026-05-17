@@ -51,11 +51,11 @@ class Settings(BaseSettings):
     # Fastapi mail config
     RESEND_API_KEY: str
     #RESEND_API_URL: str
-    MAIL_USERNAME: str
-    MAIL_PASSWORD: str
+    #MAIL_USERNAME: str
+    #MAIL_PASSWORD: str
     MAIL_FROM: str
-    MAIL_PORT: int
-    MAIL_SERVER: str
+    #MAIL_PORT: int
+    #MAIL_SERVER: str
     MAIL_FROM_NAME: str
     # CORS
     BACKEND_CORS_ORIGINS: str
