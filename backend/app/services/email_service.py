@@ -2,7 +2,7 @@ from app.config import settings
 import base64
 import httpx
 
-RESEND_API_URL = settings.RESEND_API_URL
+RESEND_API_URL = "https://api.resend.com/emails"
 
 # Estilos comunes para reutilizar
 FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'

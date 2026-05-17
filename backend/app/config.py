@@ -50,7 +50,7 @@ class Settings(BaseSettings):
 
     # Fastapi mail config
     RESEND_API_KEY: str
-    RESEND_API_URL: str
+    #RESEND_API_URL: str
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_FROM: str
