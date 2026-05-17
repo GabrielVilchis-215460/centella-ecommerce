@@ -22,6 +22,8 @@ origins = []
 if settings.BACKEND_CORS_ORIGINS:
     origins = [o.strip() for o in settings.BACKEND_CORS_ORIGINS.split(",")]
 
+print(f"pendejo cors origins: {settings.BACKEND_CORS_ORIGINS}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
