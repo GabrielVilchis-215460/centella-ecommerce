@@ -35,6 +35,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 @router.post("/register", status_code=201, summary="Registrar usuario")
 async def register(data: RegistroRequest, db: Session = Depends(get_db)):
     """Registra un nuevo usuario y envía código de verificación por correo."""
+    print(f"body recibido: {data.model_dump()}")
     return await register_user(data, db)
 
 
