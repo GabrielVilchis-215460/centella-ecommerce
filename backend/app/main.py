@@ -18,9 +18,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+origins = []
+if settings.BACKEND_CORS_ORIGINS:
+    origins = [o.strip() for o in settings.BACKEND_CORS_ORIGINS.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origins=origins,
     #allow_origins=["*"] # en caso de que no acepte los origenes del puerto 5173
     allow_credentials=True,
     allow_methods=["*"],
