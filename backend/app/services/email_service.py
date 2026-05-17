@@ -1,31 +1,39 @@
 from app.config import settings
 import base64
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
-import tempfile
-import os
+import httpx
 
-conf = ConnectionConfig(
-    MAIL_USERNAME = settings.MAIL_USERNAME,
-    MAIL_PASSWORD = settings.MAIL_PASSWORD,
-    MAIL_FROM = settings.MAIL_FROM,
-    MAIL_PORT = settings.MAIL_PORT,
-    MAIL_SERVER = settings.MAIL_SERVER,
-    MAIL_FROM_NAME = settings.MAIL_FROM_NAME,
-    MAIL_STARTTLS = False,
-    MAIL_SSL_TLS = True,
-    USE_CREDENTIALS = True,
-    VALIDATE_CERTS = True
-)
+RESEND_API_URL = settings.RESEND_API_URL
 
 # Estilos comunes para reutilizar
 FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'
 BASE_STYLE = "font-family: 'Poppins', Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px; color: #333;"
 TITLE_STYLE = "font-family: 'Libre Baskerville', serif; color: #872B3D; margin-top: 0;"
 
+async def _send_email(to: str, subject: str, html: str, attachments: list = None):
+    """Función base para enviar correos via Resend HTTP API."""
+    payload = {
+        "from": f"{settings.MAIL_FROM_NAME} <onboarding@resend.dev>",
+        "to": [to],
+        "subject": subject,
+        "html": html,
+    }
+
+    if attachments:
+        payload["attachments"] = attachments
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            RESEND_API_URL,
+            headers={
+                "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=payload
+        )
+        response.raise_for_status()
+
 async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_number: str, label_url: str):
-    """
-    Función para enviar el link del PDF y el rastreo al cliente con la nueva identidad visual.
-    """
+    """Envía el link del PDF y el rastreo al cliente."""
     html = f"""
     <html>
     <head>{FONT_IMPORT}</head>
@@ -54,16 +62,7 @@ async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_n
     </body>
     </html>
     """
-
-    message = MessageSchema(
-        subject="Información de tu Envío - Centella",
-        recipients=[email_destino],
-        body=html,
-        subtype=MessageType.html
-    )
-
-    fm = FastMail(conf)
-    await fm.send_message(message)
+    await _send_email(email_destino, "Información de tu Envío - Centella", html)
 
 async def enviar_correo_qr(
     email_destino: str,
@@ -71,6 +70,7 @@ async def enviar_correo_qr(
     pedido_id: int,
     qr_base64: str,
 ):
+    """Envía el código QR para recoger el pedido como adjunto."""
     html = f"""
     <html>
     <head>{FONT_IMPORT}</head>
@@ -91,23 +91,20 @@ async def enviar_correo_qr(
     </html>
     """
 
-    img_bytes = base64.b64decode(qr_base64)
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    tmp.write(img_bytes)
-    tmp.close()
+    attachments = [
+        {
+            "filename": f"qr_pedido_{pedido_id}.png",
+            "content": qr_base64,  
+        }
+    ]
 
-    try:
-        message = MessageSchema(
-            subject=f"Código QR para recoger tu pedido #{pedido_id}",
-            recipients=[email_destino],
-            body=html,
-            subtype=MessageType.html,
-            attachments=[tmp.name],
-        )
-        fm = FastMail(conf)
-        await fm.send_message(message)
-    finally:
-        os.unlink(tmp.name)
+    await _send_email(
+        email_destino,
+        f"Código QR para recoger tu pedido #{pedido_id}",
+        html,
+        attachments=attachments
+    )
+
 
 async def enviar_correo_pedido(
     email_destino: str,
@@ -120,9 +117,7 @@ async def enviar_correo_pedido(
     track_url: str | None = None,
     qr_base64: str | None = None,
 ):
-    """
-    Decide qué correo(s) mandar según el tipo de entrega del pedido.
-    """
+    """Decide qué correo(s) mandar según el tipo de entrega del pedido."""
     if tiene_envio and tracking_number:
         await enviar_correo_guia(
             email_destino=email_destino,
@@ -138,8 +133,10 @@ async def enviar_correo_pedido(
             pedido_id=pedido_id,
             qr_base64=qr_base64,
         )
-        
+
+
 async def enviar_correo_verificacion(email_destino: str, nombre: str, codigo: str):
+    """Envía el código de verificación al registrarse."""
     html = f"""
     <html>
     <head>{FONT_IMPORT}</head>
@@ -164,16 +161,11 @@ async def enviar_correo_verificacion(email_destino: str, nombre: str, codigo: st
     </body>
     </html>
     """
-    message = MessageSchema(
-        subject="Verifica tu cuenta - Centella",
-        recipients=[email_destino],
-        body=html,
-        subtype=MessageType.html
-    )
-    fm = FastMail(conf)
-    await fm.send_message(message)
-    
+    await _send_email(email_destino, "Verifica tu cuenta - Centella", html)
+
+
 async def enviar_correo_reset(email_destino: str, nombre: str, codigo: str):
+    """Envía el código para restablecer la contraseña."""
     html = f"""
     <html>
     <head>{FONT_IMPORT}</head>
@@ -199,11 +191,4 @@ async def enviar_correo_reset(email_destino: str, nombre: str, codigo: str):
     </body>
     </html>
     """
-    message = MessageSchema(
-        subject="Código de recuperación - Centella",
-        recipients=[email_destino],
-        body=html,
-        subtype=MessageType.html
-    )
-    fm = FastMail(conf)
-    await fm.send_message(message)
+    await _send_email(email_destino, "Código de recuperación - Centella", html)
