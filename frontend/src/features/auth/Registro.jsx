@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { IconEye, IconEyeOff } from "@tabler/icons-react"
 import { useRegistro } from "../../hooks/useRegistro"
 import { Footer } from "../../components/layout/Footer"
-import logoFullColor  from "../../assets/logo_full_color.png"
+import logoFullColor  from "../../assets/Logo_full_color.png"
 import signupImg      from "../../assets/signup.jpg"
 import aboutUs from "../../assets/about_us.png"
 

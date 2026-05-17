@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { Footer } from "../layout/Footer"
-import logoSm from "../../assets/logo_sm_black.png"
+import logoSm from "../../assets/Logo_sm_black.png"
 import { useNavigate } from "react-router-dom"
 
 export function AuthLayout({ children, backTo }) {

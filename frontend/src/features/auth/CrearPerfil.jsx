@@ -5,7 +5,7 @@ import { useCrearPerfil, COLORES_PERFIL } from "../../hooks/useCrearPerfil"
 import { DateSelect }    from "../../components/common/DateSelect"
 import { SocialButton } from "../../components/common/SocialButton"
 import { Select }       from "../../components/common/Select"
-import logoWhite        from "../../assets/logo_sm_white.png"
+import logoWhite        from "../../assets/Logo_sm_white.png"
 import bgGeneral        from "../../assets/create_general.png"
 import bgAdvanced       from "../../assets/create_advanced.jpg"
 
