@@ -82,7 +82,7 @@ class PaymentService:
         order = await paypal_service.create_order(
             amount=float(pedido.total),
             currency="MXN",
-            return_url=f"{settings.BACKEND_URL}/pagos/confirm/paypal/{pedido.id_pedido}"
+            return_url=f"{settings.BACKEND_URL}/api/v1/pagos/confirm/paypal/{pedido.id_pedido}"
         )
 
         approval_url = next(
@@ -134,7 +134,7 @@ class PaymentService:
                # estado=pedido.estado,
                 #total=pedido.total,
             #)
-            return RedirectResponse(url=f"{settings.APP_URL}/pagos/confirm/{id_pedido}")
+            return RedirectResponse(url=f"{settings.APP_URL}/checkout/confirmacion")
 
         raise HTTPException(status_code=400, detail="El pago de PayPal no fue completado.")
 
