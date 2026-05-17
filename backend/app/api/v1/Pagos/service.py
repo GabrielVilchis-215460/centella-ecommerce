@@ -10,6 +10,7 @@ from app.config import settings
 from app.api.v1.Envios.service import service_asignar_envio
 from app.models.carrito import Carrito
 from app.models.item_carrito import ItemCarrito
+from fastapi.responses import RedirectResponse
 
 class PaymentService:
 
@@ -81,7 +82,7 @@ class PaymentService:
         order = await paypal_service.create_order(
             amount=float(pedido.total),
             currency="MXN",
-            return_url=f"{settings.APP_URL}/pagos/confirm/paypal/{pedido.id_pedido}"
+            return_url=f"{settings.BACKEND_URL}/pagos/confirm/paypal/{pedido.id_pedido}"
         )
 
         approval_url = next(
@@ -127,12 +128,13 @@ class PaymentService:
             db.commit()
             db.refresh(pedido)
             await self.post_pago(db, pedido)
-            return PaymentResponse(
-                id_pedido=pedido.id_pedido,
-                metodo_pago=pedido.metodo_pago,
-                estado=pedido.estado,
-                total=pedido.total,
-            )
+            #return PaymentResponse(
+             #   id_pedido=pedido.id_pedido,
+              #  metodo_pago=pedido.metodo_pago,
+               # estado=pedido.estado,
+                #total=pedido.total,
+            #)
+            return RedirectResponse(url=f"{settings.APP_URL}/pagos/confirm/{id_pedido}")
 
         raise HTTPException(status_code=400, detail="El pago de PayPal no fue completado.")
 
