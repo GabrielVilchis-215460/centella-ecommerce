@@ -47,6 +47,7 @@ export const catalogoService = {
         verificadas:    params.verificadas     ?? undefined,
         solo_productos: params.solo_productos  ?? undefined,
         solo_servicios: params.solo_servicios  ?? undefined,
+        hecho_juarez:   params.hecho_juarez   ?? undefined,
       }
     })
     return data

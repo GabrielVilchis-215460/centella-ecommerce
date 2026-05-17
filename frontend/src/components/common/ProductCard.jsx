@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { IconShoppingCart, IconStar } from "@tabler/icons-react"
+import { IconShoppingCart, IconStar, IconAward } from "@tabler/icons-react"
 import { Button } from "./Button"
 import { useAuth } from "../../context/AuthContext"
 
-export function ProductCard({ nombre, precio, calificacion, imagen, onClick }) {
+export function ProductCard({ nombre, precio, calificacion, imagen, insignia = false, onClick }) {
   const [hover, setHover] = useState(false)
   const { esEmprendedora } = useAuth() 
 
@@ -21,6 +21,12 @@ export function ProductCard({ nombre, precio, calificacion, imagen, onClick }) {
         alt={nombre}
         className="w-full h-56 object-cover"
       />
+
+      {insignia && (
+        <div className="absolute top-3 left-3 bg-white/90 rounded-full p-1.5 shadow-sm">
+          <IconAward size={25} stroke={2} color="var(--color-primary)" />
+        </div>
+      )}
 
       {/* agregar a carrito - solo en hover */}
       {hover && (

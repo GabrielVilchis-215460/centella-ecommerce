@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { IconCornerDownRight, IconRosetteDiscountCheck, IconStar } from "@tabler/icons-react"
+import { IconCornerDownRight, IconRosetteDiscountCheck, IconStar, IconAward } from "@tabler/icons-react"
 
-export function SellerCard({ nombre, emprendimiento, calificacion, descripcion, logo, etiquetas = [], verificada = false, color, onClick }) {
+export function SellerCard({ nombre, emprendimiento, calificacion, descripcion, logo, etiquetas = [], verificada = false, insignia = false, color, onClick }) {
     const [hover, setHover] = useState(false)
     const bg = color || "var(--color-secondary)"
 
@@ -51,11 +51,18 @@ export function SellerCard({ nombre, emprendimiento, calificacion, descripcion, 
           </div>
 
           {/* Logo */}
-          <div className="w-28 h-28 rounded-sm bg-white shrink-0 overflow-hidden">
-            {logo
-              ? <img src={logo} alt={nombre} className="w-full h-full object-cover" />
-              : null
-            }
+          <div className="relative w-28 h-28 shrink-0">
+            <div className="w-full h-full rounded-sm bg-white overflow-hidden">
+              {logo
+                ? <img src={logo} alt={nombre} className="w-full h-full object-cover" />
+                : null
+              }
+            </div>
+            {insignia && (
+              <div className="absolute -top-2 left-22 bg-white rounded-full p-1 shadow-sm">
+                <IconAward size={25} stroke={2} color="var(--color-primary)" />
+              </div>
+            )}
           </div>
 
         </div>

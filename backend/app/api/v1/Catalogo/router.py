@@ -55,9 +55,10 @@ def listar_emprendedoras(
     verificadas: Optional[bool] = Query(None),
     solo_productos: Optional[bool] = Query(None),
     solo_servicios: Optional[bool] = Query(None),
+    hecho_juarez: Optional[bool] = Query(None),
     db: Session = Depends(get_db),
 ):
-    return service.get_emprendedoras(db, skip, limit, nombre, ordenar_por, verificadas, solo_productos, solo_servicios)
+    return service.get_emprendedoras(db, skip, limit, nombre, ordenar_por, verificadas, solo_productos, solo_servicios, hecho_juarez)
 
 @router.get("/categorias", response_model=list[CategoriaCatalogoRead])
 def listar_categorias(

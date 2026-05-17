@@ -61,6 +61,7 @@ def get_productos(
             Producto.fecha_creacion,
             calificacion_sq.c.calificacion_promedio,
             imagen_sq.c.imagen_url,
+            Emprendedora.insignia_hecho_juarez,
         )
         .join(Categoria, Categoria.id_categoria == Producto.id_categoria)
         .join(Emprendedora, Emprendedora.id_emprendedora == Producto.id_emprendedora)
@@ -184,6 +185,7 @@ def get_emprendedoras(
     verificadas: Optional[bool] = None,
     solo_productos: Optional[bool] = None,
     solo_servicios: Optional[bool] = None,
+    hecho_juarez: Optional[bool] = None,
 ) -> list[EmprendedoraCatalogoRead]:
 
     calificacion_sq = (
@@ -228,6 +230,9 @@ def get_emprendedoras(
     if verificadas is not None:
         query = query.where(Emprendedora.estado_verificacion == EstadoVerificacionEnum.verificada)
 
+    if hecho_juarez is not None:
+        query = query.where(Emprendedora.insignia_hecho_juarez == hecho_juarez)
+        
     if solo_productos and not solo_servicios:
         query = query.where(
             Emprendedora.id_emprendedora.in_(
