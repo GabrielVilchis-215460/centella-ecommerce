@@ -129,13 +129,15 @@ def get_top_productos(db: Session, emprendedora_id: int, limit: int = 5):
 # nueva funcion
 def get_emprendimiento_info(db: Session, emprendedora_id: int):
     result = db.execute(
-        select(Emprendedora.nombre_negocio, Emprendedora.logo_url)
+        select(Emprendedora.nombre_negocio, Emprendedora.logo_url, Emprendedora.estado_verificacion, Emprendedora.insignia_hecho_juarez)
         .where(Emprendedora.id_emprendedora == emprendedora_id)
     ).first()
 
     return {
         "nombre": result.nombre_negocio if result else "",
         "logo_url": result.logo_url if result else None,
+        "verificada": result.estado_verificacion.value == "verificada" if result else False,
+        "insignia_hecho_juarez": result.insignia_hecho_juarez if result else False,
     }
 
 def get_full_dashboard(db: Session, emprendedora_id: int):

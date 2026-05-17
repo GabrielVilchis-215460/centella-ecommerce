@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react"
 import { useNavigate, Link }           from "react-router-dom"
 import {
   IconArrowLeft, IconDots, IconFlag,
-  IconStar, IconRosetteDiscountCheck,
+  IconStar, IconRosetteDiscountCheck, IconAward,
 } from "@tabler/icons-react"
 import { Header }              from "../../components/layout/Header"
 import { Footer }              from "../../components/layout/Footer"
@@ -159,6 +159,14 @@ export function DetalleProducto() {
                     )}
                   </div>
                 </div>
+                
+                {/* Insignia */}
+                {producto.emprendedora?.insignia_hecho_juarez && (
+                  <div className="flex items-center gap-1.5">
+                    <IconAward size={20} stroke={1.5} color="var(--color-primary)" />
+                    <span className="font-body text-md text-text-light">Producto hecho en Juárez</span>
+                  </div>
+                )}
 
                 {/* Precio + stock */}
                 <div className="flex flex-col gap-1">
