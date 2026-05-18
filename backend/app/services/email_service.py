@@ -30,6 +30,8 @@ async def _send_email(to: str, subject: str, html: str, attachments: list = None
             },
             json=payload
         )
+        print(f"Resend status: {response.status_code}")
+        print(f"Resend response: {response.text}")
         response.raise_for_status()
 
 async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_number: str, label_url: str):
