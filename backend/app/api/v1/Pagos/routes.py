@@ -19,8 +19,8 @@ async def pagar(payload: PayRequest, db: Session = Depends(get_db), current_user
 async def confirmar_paypal(
     id_pedido: int,
     token: str,              # PayPal lo manda como query param automáticamente
-    db: Session = Depends(get_db),
-    current_user: Usuario = Depends(require_cliente)
+    db: Session = Depends(get_db)#,
+    #current_user: Usuario = Depends(require_cliente)
 ):
     return await payment_service.confirmar_paypal(db, id_pedido, token)
 
