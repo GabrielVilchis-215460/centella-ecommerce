@@ -363,6 +363,25 @@ export function Dashboard() {
                 </h1>
                 <MenuEmprendimiento />
               </div>
+              {(emprendimiento.verificada || emprendimiento.insignia_hecho_juarez) && (
+              <div className="flex items-center gap-2 mt-1">
+                {emprendimiento.verificada && (
+                  <>
+                    <IconRosetteDiscountCheck size={16} stroke={1.5} color="var(--color-primary)" />
+                    <span className="font-body text-sm text-text-light">Verificada</span>
+                  </>
+                )}
+                {emprendimiento.verificada && emprendimiento.insignia_hecho_juarez && (
+                  <span className="text-text-light/50 text-sm">•</span>
+                )}
+                {emprendimiento.insignia_hecho_juarez && (
+                  <>
+                    <IconAward size={16} stroke={1.5} color="var(--color-primary)" />
+                    <span className="font-body text-sm text-text-light">Hecho en Juárez</span>
+                  </>
+                )}
+              </div>
+            )}
             </>
           )}
         </section>

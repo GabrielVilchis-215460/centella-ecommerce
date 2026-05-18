@@ -100,6 +100,7 @@ export function useCatalogo() {
           verificadas: verificadas      ? true : undefined,
           solo_productos: soloProductos ? true : undefined,
           solo_servicios: soloServicios ? true : undefined,
+          hecho_juarez:   hechosJuarez  || undefined,
         })
         setItems(data.items)
         setTotal(data.total)

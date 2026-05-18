@@ -164,6 +164,7 @@ export function Catalogo() {
                       precio={Number(p.precio)}
                       calificacion={p.calificacion_promedio ?? 0}
                       imagen={p.imagen_url}
+                      insignia={p.insignia_hecho_juarez ?? false}
                       onClick={() => navigate(`/catalogo/producto/${p.id_producto}`)}
                     />
                   ))}
@@ -203,6 +204,7 @@ export function Catalogo() {
                       logo={v.logo_url}
                       etiquetas={v.etiquetas}
                       verificada={v.estado_verificacion === "verificada"}
+                      insignia={v.insignia_hecho_juarez ?? false}
                       color={v.color_emprendedora_hex || undefined}
                       onClick={() => navigate(`/catalogo/emprendedora/${v.id_emprendedora}`)}
                     />

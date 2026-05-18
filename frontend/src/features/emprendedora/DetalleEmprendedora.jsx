@@ -9,7 +9,8 @@ import {
   IconArrowLeft,
   IconCarambola,
   IconRosetteDiscountCheck,
-  IconFlag
+  IconFlag,
+  IconAward
 } from "@tabler/icons-react"
 import { Icon }                    from "../../components/common/Icon"
 import { Header }                  from "../../components/layout/Header"
@@ -98,6 +99,12 @@ function EncabezadoEmprendedora({ idEmprendedora, logoUrl, nombreNegocio, etique
                 </span>
               </div>
             )}
+          </div>
+        )}
+        {insignia && (
+          <div className="flex items-center gap-3 mt-1.5">
+            <IconAward size={20} stroke={1.5} color="var(--color-primary)" />
+            <span className="font-body text-sm text-text-light">Producto hecho en Juárez</span>
           </div>
         )}
       </div>
@@ -245,7 +252,7 @@ export function DetalleEmprendedora() {
     etiquetas, rating, htmlContenido, productos, servicios
   } = usePaginaEmprendimiento()
   const navigate = useNavigate()
-  
+
   if (error) {
     return (
       <>

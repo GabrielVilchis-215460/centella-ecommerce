@@ -18,6 +18,7 @@ class ProductoCatalogoRead(BaseModel):
     fecha_creacion: datetime
     calificacion_promedio: Optional[float]
     imagen_url: Optional[str] = None
+    insignia_hecho_juarez: bool = False
 
     model_config = {"from_attributes": True}
 

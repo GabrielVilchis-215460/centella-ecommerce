@@ -112,5 +112,6 @@ def get_detalle_completo(db: Session, id_producto: int) -> dict:
             "nombre_vendedora":   f"{usuario.nombre} {usuario.apellido}" if usuario else "",
             "verificada":         emprendedora.estado_verificacion.value == "verificada",
             "color_hex":          emprendedora.color_emprendedora_hex,
+            "insignia_hecho_juarez": emprendedora.insignia_hecho_juarez,
         } if emprendedora else None,
     }
