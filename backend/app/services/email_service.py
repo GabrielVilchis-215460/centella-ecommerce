@@ -2,36 +2,32 @@ from app.config import settings
 import base64
 import httpx
 
-RESEND_API_URL = "https://api.resend.com/emails"
-
 # Estilos comunes para reutilizar
 FONT_IMPORT = '<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">'
 BASE_STYLE = "font-family: 'Poppins', Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px; max-width: 600px; color: #333;"
 TITLE_STYLE = "font-family: 'Libre Baskerville', serif; color: #872B3D; margin-top: 0;"
 
-async def _send_email(to: str, subject: str, html: str, attachments: list = None):
-    """Función base para enviar correos via Resend HTTP API."""
-    payload = {
-        "from": f"{settings.MAIL_FROM_NAME} <onboarding@resend.dev>",
-        "to": [to],
-        "subject": subject,
-        "html": html,
-    }
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
-    if attachments:
-        payload["attachments"] = attachments
+async def _send_email(to: str, subject: str, html: str, attachments: list = None):
+    payload = {
+        "sender": {"name": settings.MAIL_FROM_NAME, "email": settings.MAIL_FROM},
+        "to": [{"email": to}],
+        "subject": subject,
+        "htmlContent": html,
+    }
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            RESEND_API_URL,
+            BREVO_API_URL,
             headers={
-                "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                "api-key": settings.BREVO_API_KEY,
                 "Content-Type": "application/json",
             },
             json=payload
         )
-        print(f"Resend status: {response.status_code}")
-        print(f"Resend response: {response.text}")
+        print(f"Brevo status: {response.status_code}")
+        print(f"Brevo response: {response.text}")
         response.raise_for_status()
 
 async def enviar_correo_guia(email_destino: str, nombre_cliente: str, tracking_number: str, label_url: str):
