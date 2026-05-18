@@ -34,6 +34,7 @@ El proyecto utiliza una estrategia de ramas basada en **Jira** para la gestión 
 | Rama | Descripción |
 | ---- | ----------- |
 | `main` | Rama de **producción**. Contiene el código estable y listo para despliegue. |
+| `develop` | Rama de **desarrollo**. Contiene el código estable y listo para testeos antes de hacer el despliegue. |
 | `SCRUM-#<número>-<descripción>` | Ramas de **features**, creadas automáticamente desde Jira al iniciar una tarea del backlog. Cada número corresponde al ID de la tarea en el tablero SCRUM. |
  
 ### Ejemplos de ramas de features
